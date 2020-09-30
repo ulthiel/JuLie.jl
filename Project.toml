@@ -1,0 +1,9 @@
+name = "Combinatorics"
+uuid = "0fac7475-a920-4e58-b2d0-2357b2a71519"
+authors = ["Ulrich Thiel <mail@ulthiel.com>"]
+version = "0.1.0"
+
+[deps]
+Oscar = "f1435218-dba5-11e9-1e4d-f1a5fab5fc13"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
