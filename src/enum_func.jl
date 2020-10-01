@@ -3,12 +3,9 @@
 # Mostly wrappers to FlINT/GMP.
 ################################################################################
 
-import Oscar: ZZ, QQ, fmpz, fmpq, div
+import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint
 
-export fac, rfac, bin, fib, lucas, catalan, bell, stirling1, stirling2, euler, num_partitions
-
-#harmonic, bernoulli (already in Nemo)
-
+export fac, rfac, bin, fib, lucas, catalan, bell, stirling1, stirling2, euler, num_partitions, harmonic, bernoulli
 
 """
 The factorial n!.
@@ -21,7 +18,7 @@ function fac(n::Integer; alg="gmp")
     return ZZ(z)
   elseif alg=="flint"
     z = ZZ()
-    ccall((:fmpz_fac_ui, :libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+    ccall((:fmpz_fac_ui, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
     return z
   end
 end
@@ -33,7 +30,7 @@ The rising factorial n*(n+1)*...*(n+k-1).
 # gmp is quicker than flint.
 function rfac(n::Integer, k::Integer)
   z = ZZ()
-  ccall((:fmpz_rfac_uiui, :Nemo.libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
+  ccall((:fmpz_rfac_uiui, libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
   return z
 end
 
@@ -51,7 +48,7 @@ function bin(n::Integer, k::Integer; alg="gmp")
     return ZZ(z)
   elseif alg=="flint"
     z = ZZ()
-    ccall((:fmpz_bin_uiui, :libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
+    ccall((:fmpz_bin_uiui, libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
     return z
   end
 end
@@ -68,7 +65,7 @@ function fib(n::Integer; alg="flint")
     return ZZ(z)
   elseif alg=="flint"
     z = ZZ()
-    ccall((:fmpz_fib_ui, :libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+    ccall((:fmpz_fib_ui, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
     return z
   end
 end
@@ -114,7 +111,7 @@ The n-th Bell number B_n.
 """
 function bell(n::Integer)
   z = ZZ()
-  ccall((:arith_bell_number, :libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+  ccall((:arith_bell_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
   return z
 end
 
@@ -124,7 +121,7 @@ The Stirling number S_1(n,k) of the first kind.
 """
 function stirling1(n::Integer, k::Integer)
   z = ZZ()
-  ccall((:arith_stirling_number_1, :libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
+  ccall((:arith_stirling_number_1, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
   return z
 end
 
@@ -134,7 +131,7 @@ The Stirling number S_2(n,k) of the second kind.
 """
 function stirling2(n::Integer, k::Integer)
   z = ZZ()
-  ccall((:arith_stirling_number_2, :libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
+  ccall((:arith_stirling_number_2, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
   return z
 end
 
@@ -144,7 +141,7 @@ The n-th Euler number.
 """
 function euler(n::Integer)
   z = ZZ()
-  ccall((:arith_euler_number, :libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+  ccall((:arith_euler_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
   return z
 end
 
@@ -164,7 +161,7 @@ The n-th Bernoulli number.
 """
 function bernoulli(n::Integer)
   z = QQ()
-  ccall((:arith_bernoulli_number, :libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
+  ccall((:arith_bernoulli_number, libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
   return z
 end
 
@@ -176,6 +173,6 @@ The number of integer partitions of the number n.
 """
 function num_partitions(n::Integer)
   z = ZZ()
-  ccall((:arith_number_of_partitions, :libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+  ccall((:arith_number_of_partitions, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
   return z
 end

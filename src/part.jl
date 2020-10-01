@@ -2,7 +2,7 @@
 # Partitions (of an integer).
 ################################################################################
 
-import Oscar: ZZ, fmpz
+import Nemo: ZZ, fmpz
 
 export partitions
 

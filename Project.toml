@@ -4,6 +4,7 @@ authors = ["Ulrich Thiel <mail@ulthiel.com>"]
 version = "0.1.0"
 
 [deps]
+Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
 Oscar = "f1435218-dba5-11e9-1e4d-f1a5fab5fc13"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
