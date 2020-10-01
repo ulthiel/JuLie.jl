@@ -35,6 +35,8 @@ julia> @time partitions(90); #this time with big integers (fmpz)
 
 And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
 
+Note: There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned to go much farther (some day)—and I want to do it myself.
+
 ## Using
 
 To install the package, do the following In Julia:
@@ -85,7 +87,7 @@ Exit the REPL mode by hitting the backspace key. Then you can start using the pa
 using Combinatorics
 ```
 
-Any changes you make to the code now is not yet available in Julia, you have to restart it—this is simply the way Julia works. This can be annoying when developing. A solution is to load the [Revise](https://timholy.github.io/Revise.jl/v0.6/) package before loading the package.
+Any changes you make to the code now will not be available in the current Julia session—you have to restart it. This is simply the way Julia works but this is annoying when developing. A solution is to load the [Revise](https://timholy.github.io/Revise.jl/v0.6/) package before loading the package.
 
 ```
 using Pkg
@@ -94,4 +96,7 @@ using Revise
 using Combinatorics
 ```
 
-Now, changes you make in the code are immediately active in the Julia session (except for changes to structures, here you need to restart).
+Now, changes you make in the code are immediately available in the Julia session (except for changes to structures, here you need to restart).
+
+### Programming guidelines
+
