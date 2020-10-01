@@ -13,20 +13,28 @@ sage: time X=Partitions(90).list()
 Wall time: 3min 5s #Uses 26.665GiB mem, quitting Sage takes quite a bit of time
 ```
 
+In **GAP** (v4.11.0):
+
+```
+gap> L:=Partitions(90);; time/1000.0;
+51.962 #Uses 11.8477 GiB mem
+```
+
 In **Magma** (v2.25-5):
 
 ```
 > time X:=Partitions(90);
-Time: 32.990 //Uses 15.688GiB mem, Magma UNUSABLE from now on!!
+Time: 32.990 //Uses 15.688 GiB mem, Magma UNUSABLE from now on!!
 ```
-In **Julia** (v1.5.2, my implementation):
+
+And now, in **Julia** (v1.5.2, my implementation):
 
 ```
 julia> @time partitions(90);
 5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time) #No problem afterwards
 ```
 
-In the last one I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using big integers, the Julia implementation is much more efficient:
+In the last one I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using big integers, the Julia implementation is more efficient:
 
 ```
 julia> @time partitions(90); #this time with big integers (fmpz)
@@ -35,7 +43,7 @@ julia> @time partitions(90); #this time with big integers (fmpz)
 
 And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
 
-Note: There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned to go much farther (some day)—and I want to do it myself.
+**Note.** There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned to go much farther (some day)—and I want to do it myself.
 
 ## Using
 
