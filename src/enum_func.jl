@@ -10,7 +10,6 @@ export fac, rfac, bin, fib, lucas, catalan, bell, stirling1, stirling2, euler, n
 """
 The factorial n!.
 """
-# gmp is quicker than flint.
 function fac(n::Integer; alg="gmp")
   if alg=="gmp"
     z = BigInt()
@@ -27,7 +26,6 @@ end
 """
 The rising factorial n*(n+1)*...*(n+k-1).
 """
-# gmp is quicker than flint.
 function rfac(n::Integer, k::Integer)
   z = ZZ()
   ccall((:fmpz_rfac_uiui, libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
@@ -151,7 +149,7 @@ The n-th Harmonic number.
 """
 function harmonic(n::Integer)
   z = QQ()
-  ccall((:arith_harmonic_number, :libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
+  ccall((:arith_harmonic_number, libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
   return z
 end
 
