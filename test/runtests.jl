@@ -1,6 +1,6 @@
 using Test
 using Combinatorics
-import Oscar: ZZ, QQ
+import Nemo: ZZ, QQ
 
 @testset "Basic enumerative functions" begin
 
@@ -41,6 +41,8 @@ import Oscar: ZZ, QQ
   #@test bernoulli(54) == QQ(29149963634884862421418123812691)//QQ(798)
 
 end
+
+
 
 @testset "Partitions" begin
 

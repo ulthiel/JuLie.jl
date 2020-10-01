@@ -108,3 +108,8 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ### Programming guidelines
 
+1. Have a look at the file src/part.jl to see how the stuff works and how I want code to look like.
+2. Check out the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
+3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
+4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough.
+5. For every function you implement, there has to be a reasonable test in test/runtests.jl. You can run the complete unit test with ```Pkg.test("Combinatorics")```.
