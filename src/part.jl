@@ -29,9 +29,9 @@ function partitions(n::Integer;alg="zs1")
 
   # Some trivial cases
   if n==0
-    return Array{Int8,1}[ Array{Int8,1}[] ]
+    return Vector{Int8}[ [] ]
   elseif n==1
-    return Array{Int8,1}[ [1] ]
+    return Vector{Int8}[ [1] ]
   else
 
     if alg=="ks"
@@ -40,7 +40,7 @@ function partitions(n::Integer;alg="zs1")
       # by J. Kelleher and B. O'Sullivan, May 2014
       # https://arxiv.org/pdf/0909.2331.pdf
       # Partition sorting is ascending
-      P = Array{Int8,1}[]  #this will be the array of all partitions
+      P = Vector{Int8}[]  #this will be the array of all partitions
       a = zeros(Int8, n)
       k = 2
       y = n-1
@@ -73,7 +73,7 @@ function partitions(n::Integer;alg="zs1")
       # J Math Model Algor (2012) 11:89–104.
       # I think it's similar to "ks" and doesn't seem to be more
       # efficient.
-      P = Array{Int8,1}[]  #this will be the array of all partitions
+      P = Vector{Int8}[]  #this will be the array of all partitions
       a = zeros(Int8, n)
       k = 1
       x = 1
@@ -134,7 +134,7 @@ function partitions(n::Integer;alg="zs1")
       # "Fast algorithms for generating integer partitions"
       # Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
       # Partition sorting is descending
-      P = Array{Int8,1}[]  #this will be the array of all partitions
+      P = Vector{Int8}[]  #this will be the array of all partitions
       k = 1
       q = 1
       d = fill( Int8(1), n )
@@ -192,18 +192,18 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
   if m == 0
     if n == 0
-      return Array{Int8,1}[ Int8[] ]
+      return Vector{Int8}[ Int8[] ]
     else
-      return  Array{Int8,1}[ ]
+      return  Vector{Int8}[ ]
     end
   end
 
   if n == 0
-    return  Array{Int8,1}[ ]
+    return  Vector{Int8}[ ]
   end
 
   if n > m
-    return Array{Int8,1}[ ]
+    return Vector{Int8}[ ]
   end
 
   try
@@ -214,7 +214,7 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
   end
 
   #Algorithm starts here
-  P = Array{Int8,1}[]  #this will be the array of all partitions
+  P = Vector{Int8}[]  #this will be the array of all partitions
   x = zeros(Int8, n)
   y = zeros(Int8, n)
   num = 0
