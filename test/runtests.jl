@@ -46,12 +46,40 @@ end
 
 @testset "Partitions" begin
 
-  N = 0:22
+  # Unrestricted partitions
+  N = 1:22
   check = true
   for n in N
-    for P in [ partitions(n), partitions(n, alg="zs1"), partitions(n, alg="ks"), partitions(n, alg="m") ]
-      P = partitions(n)
+    for a in [ "zs1", "ks", "m" ]
+      P = partitions(n,alg=a)
       if length(P) != num_partitions(n)
+        check = false
+        break
+      end
+      if P != unique(P)
+        check = false
+        break
+      end
+      for lambda in P
+        if sum(lambda) != n
+          check = false
+          break
+        end
+      end
+    end
+    if check==false
+      break
+    end
+  end
+  @test check==true
+
+  #k-restricted partitions
+  N = 1:22
+  check = true
+  for n in N
+    for k = 0:n+1
+      P = partitions(n,k)
+      if length(P) != num_partitions(n,k)
         check = false
         break
       end

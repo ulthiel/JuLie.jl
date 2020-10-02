@@ -167,12 +167,54 @@ end
 """
     num_partitions(n::Integer)
 
-The number of integer partitions of the number n. Uses the function arith_number_of_partitions from FLINT [^1].
+The number of integer partitions of the number n. Uses the function from FLINT [^1].
 
 [^1]: http://flintlib.org/sphinx/arith.html
 """
 function num_partitions(n::Integer)
   z = ZZ()
+  # You can't beat this speed!
   ccall((:arith_number_of_partitions, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
   return z
+end
+
+
+"""
+    num_partitions(n::Integer, k::Integer)
+
+The number of integer partitions of the number n into k parts. Uses the recurrence relation and can probably be improved.
+"""
+function num_partitions(n::Integer, k::Integer)
+  n > 0 || throw(ArgumentError("n > 0 required"))
+  k >= 0 || throw(ArgumentError("k >= 0 required"))
+
+  #The following is taken from the GAP code in lib/combinat.gi
+  #It uses the standard recurrence relation but in a more intelligent
+  #way without recursion.
+  if n == k
+    return ZZ(1)
+  elseif n < k || k == 0
+    return ZZ(0)
+  elseif k == 1
+    return ZZ(1)
+  # Nice trick I found in Sage src/sage/combinat/partition.py
+  elseif n <= 2*k
+    if n-k <= 0
+      return ZZ(0)
+    else
+      # We have one column of length `k` and all (inner) partitions of
+      # size `n-k` can't have length more than `k`
+      return num_partitions(n-k)
+    end
+  else
+    p = fill( ZZ(1), n )
+    for l = 2:k
+      for m = l+1:n-l+1
+        p[m] = p[m] + p[m-l]
+      end
+    end
+  end
+
+  return p[n-k+1]
+
 end
