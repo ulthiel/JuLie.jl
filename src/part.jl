@@ -8,6 +8,9 @@ export partitions
     partitions(n::Integer;alg="zs1")
 
 The set of all partitions of an integer n.
+
+**Note.** For efficiency, this works with 8-bit integers and we assume n < 128.
+
 There are several algorithms that can be specified by the optional argument "alg".
 * Algorithm "zs1" (**default**) is by Zoghbi-Stojmenovic [^1]. Partitions are sorted **descendingly**.
 * Algorithm "ks" is by Kelleher-O'Sullivan [^2]. Partitions are sorted **ascendingly**.
@@ -22,14 +25,7 @@ There are several algorithms that can be specified by the optional argument "alg
 function partitions(n::Integer;alg="zs1")
 
   #Argument checking
-  if n < 0
-    throw(ArgumentError("n >= 0 required."))
-  end
-  try
-    n = convert(Int8, n)
-  catch
-    throw(ArgumentError("n <= 127 required."))
-  end
+  n in 1:127 || throw(ArgumentError("0 < n < 128 required"))
 
   # Some trivial cases
   if n==0

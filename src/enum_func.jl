@@ -167,7 +167,9 @@ end
 """
     num_partitions(n::Integer)
 
-The number of integer partitions of the number n.
+The number of integer partitions of the number n. Uses the function arith_number_of_partitions from FLINT [^1].
+
+[^1]: http://flintlib.org/sphinx/arith.html
 """
 function num_partitions(n::Integer)
   z = ZZ()
