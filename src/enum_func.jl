@@ -1,6 +1,6 @@
 ################################################################################
 # Basic enumerative functions.
-# Mostly wrappers to FlINT/GMP.
+# Mostly wrappers to FLINT/GMP.
 ################################################################################
 
 import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint

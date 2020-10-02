@@ -2,8 +2,6 @@
 # Partitions (of an integer).
 ################################################################################
 
-import Nemo: ZZ, fmpz
-
 export partitions
 
 """
@@ -12,10 +10,14 @@ export partitions
 The set of all partitions of an integer n.
 There are several algorithms that can be specified by the optional argument "alg".
 * Algorithm "zs1" (**default**) is by Zoghbi-Stojmenovic [^1]. Partitions are sorted **descendingly**.
-* Algorithm "ks" is by Kelleher-O'Sullivan. Partitions are sorted **ascendingly**.
-* Algorithm "m" is by Merca and is similar to "ks".
+* Algorithm "ks" is by Kelleher-O'Sullivan [^2]. Partitions are sorted **ascendingly**.
+* Algorithm "m" is by Merca and is similar to "ks" [^3]. Partition sorting is **descendingly**.
 
 [^1]: A. Zoghbi, I. Stojmenovic. *Fast algorithms for generating integer partitions*. Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
+
+[^2]: https://arxiv.org/pdf/0909.2331.pdf
+
+[^3]: M. Merca. *Fast Algorithm for Generating Ascending Compositions*. J. Math Model. Algor. (2012) 11:89–104.
 """
 function partitions(n::Integer;alg="zs1")
 
@@ -177,13 +179,11 @@ end
 """
     partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
-All partitions of an integer m >= 0 into n >= 1 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (**default**), 1 for distinct parts. The parts are arranged in nonincreasing order. The partitions are produced in lexicographic decreasing order.
+All partitions of an integer m >= 0 into n >= 1 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (**default**), 1 for distinct parts. The parts are arranged in nonincreasing order. The partitions are produced in lexicographic **decreasing** order.
+
+The algorithm used is "parta" from "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" by W. Riha and K. R. James (1976). De-gotoed by Elisa.
 """
 function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
-  # This is algorithm "parta" from
-  # "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted
-  # Partitions" by W. Riha and K. R. James (1976).
-  # De-gotoed by Elisa.
 
   #Argument checking
   if m < 0
@@ -284,12 +284,15 @@ end
 """
     partitions(m::Integer, n::Integer)
 
-All partitions of an integer m >= 0 into n >= 1 parts (no further restrictions). The parts are arranged in nonincreasing order. The partitions are produced in lexicographic decreasing order.
+All partitions of an integer m >= 0 into n >= 1 parts (no further restrictions). This simply calls partitions(m,n,1,m,z=0). The parts are arranged in nonincreasing order. The partitions are produced in lexicographic decreasing order.
 """
 function partitions(m::Integer, n::Integer)
   return partitions(m,n,1,m,z=0)
 end
 
+
+
+# The code below still has to be fixed.
 
 #=
 function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
