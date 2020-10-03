@@ -4,7 +4,7 @@
 
 import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt
 
-export num_partitions, catalan, stirling1, stirling2
+export num_partitions, catalan, stirling1, stirling2, lucas
 
 
 
@@ -189,22 +189,24 @@ function stirling2(n::Integer, k::Integer)
 end
 
 
-# """
-#     lucas(n::fmpz)
-#     lucas(n::Integer)
-#
-# The n-th Lucas number L_n. Uses GMP.
-# """
-# function lucas(n::Integer)
-#   z = BigInt()
-#   ccall((:__gmpz_lucnum_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, UInt(n))
-#   return ZZ(z)
-# end
-#
-# function lucas(n::Integer)
-#   return Int(lucas(ZZ(n)))
-# end
-#
+"""
+    lucas(n::fmpz)
+    lucas(n::Integer)
+
+The n-th Lucas number. For more information on these numbers, see https://oeis.org/A000032. The implementation is a wrapper to the function in GMP.
+"""
+function lucas(n::fmpz)
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+
+  z = BigInt()
+  ccall((:__gmpz_lucnum_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, UInt(n))
+  return ZZ(z)
+end
+
+function lucas(n::Integer)
+  return Int(lucas(ZZ(n)))
+end
+
 
 
 
