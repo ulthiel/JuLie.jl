@@ -4,7 +4,7 @@
 
 import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt
 
-export num_partitions
+export num_partitions, catalan
 
 
 
@@ -92,6 +92,53 @@ function num_partitions(n::Integer, k::Integer)
 end
 
 
+"""
+    catalan(n::fmpz; alg="binomial")
+    catalan(n::Integer; alg="binomial")
+
+The n-th Catalan number. This counts a gazillion of things, see https://oeis.org/A000108 for more information. There are algorithms implemented:
+
+1. "binomial" (*default*): uses a simple formula with binomial coefficients.
+2. "iterative": uses an iterative computation.
+
+The binomial computation is much faster:
+```
+julia> @time x=catalan( ZZ(10)^5 , alg="binomial");
+ 0.007727 seconds (9 allocations: 95.750 KiB)
+
+julia> @time x=catalan( ZZ(10)^5 , alg="iterative");
+ 1.572488 seconds (1.01 M allocations: 2.333 GiB, 1.36% gc time)
+```
+"""
+function catalan(n::fmpz; alg="binomial")
+
+  if n==0
+    return ZZ(1)
+  elseif n==1
+    return ZZ(0)
+  else
+
+    if alg=="binomial"
+      return div( binomial(2*n, n), (n + 1) )
+
+    elseif alg=="iterative"
+      C = ZZ(1)
+      for i=0:Int(n)-1
+        j = ZZ(i)
+        C = div( (4*j+2)*C , j+2)
+      end
+      return C
+    end
+
+  end
+end
+
+function catalan(n::Integer; alg="binomial")
+  z = catalan(ZZ(n),alg=alg)
+  return Int(z)
+end
+
+
 # """
 #     lucas(n::fmpz)
 #     lucas(n::Integer)
@@ -108,44 +155,7 @@ end
 #   return Int(lucas(ZZ(n)))
 # end
 #
-#
-# """
-#     catalan(n::fmpz; alg="binomial")
-#     catalan(n::Integer; alg="binomial")
-#
-# The n-th Catalan number. There are two algorithms:
-# 1. "binomial" (**default**): uses binomial coefficients. This is the fastest.
-# 2. "iterative": uses an iterative computation.
-# """
-# function catalan(n::fmpz; alg="binomial")
-#   # julia> @time x=catalan( ZZ(10)^5 , alg="iterative");
-#   #   1.572488 seconds (1.01 M allocations: 2.333 GiB, 1.36% gc time)
-#   #
-#   # julia> @time x=catalan( ZZ(10)^5 , alg="binomial");
-#   #   0.007727 seconds (9 allocations: 95.750 KiB)
-#
-#   if n==0
-#     return ZZ(1)
-#   elseif n==1
-#     return ZZ(0)
-#   else
-#     if alg=="binomial"
-#       return div( binomial(2*n, n), (n + 1) )
-#     elseif alg=="iterative"
-#       C = ZZ(1)
-#       for i=0:Int(n)-1
-#         j = ZZ(i)
-#         C = div( (4*j+2)*C , j+2)
-#       end
-#       return C
-#     end
-#   end
-# end
-#
-# function catalan(n::Integer; alg="binomial")
-#   z = catalan(ZZ(n),alg=alg)
-#   return Int(z)
-# end
+
 #
 #
 # """

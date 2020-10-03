@@ -21,6 +21,11 @@ import Nemo: ZZ, QQ
   @test num_partitions(ZZ(1991),ZZ(1991)) == ZZ(1)
   @test num_partitions(ZZ(1991),ZZ(1)) == ZZ(1)
 
+  # catalan
+  @test catalan(ZZ(87)) == ZZ(16435314834665426797069144960762886143367590394940)
+  @test catalan(ZZ(87), alg="binomial") == ZZ(16435314834665426797069144960762886143367590394940)
+  @test catalan(ZZ(87), alg="iterative") == ZZ(16435314834665426797069144960762886143367590394940)
+
   # @test fac(29) == ZZ(8841761993739701954543616000000)
   # @test fac(29, alg="gmp") == ZZ(8841761993739701954543616000000)
   # @test fac(29, alg="flint") == ZZ(8841761993739701954543616000000)
