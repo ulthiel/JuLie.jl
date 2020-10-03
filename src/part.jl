@@ -1,5 +1,5 @@
 ################################################################################
-# Partitions (of an integer).
+# Partitions.
 ################################################################################
 
 export partitions
@@ -7,24 +7,30 @@ export partitions
 """
     partitions(n::Integer;alg="zs1")
 
-The set of all partitions of an integer n.
+A list of all partitions of an integer n. Conventions are explained below.
 
-**Note.** For efficiency, we use arrays of 8-bit integers for partitions and we assume n < 128.
+A partition of a positive integer n is a *decreasing* sequence n1 >= n2 >= ... of positive integers whose sum is equal to n. This can be encoded as an array.
 
-Partitions are *descending* sequences by definition and we sort them *descendingly* here. This is what the default algorithm is doing. For testing purposes we have implemented two further algorithms which sort *oppositely* in both directions by design. There is not a huge speed difference. The algorithms are:
-1. "zs1" (**default**) by A. Zoghbi, I. Stojmenovic. *Fast algorithms for generating integer partitions*. Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
-2. "ks" by Kelleher-O'Sullivan, https://arxiv.org/pdf/0909.2331.pdf, May 2014.
-3. "m" by M. Merca. *Fast Algorithm for Generating Ascending Compositions*. J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
+**Note.** For efficiency, we assume n < 128 and use arrays of 8-bit integers for partitions. Producing the whole list of partitions for n >= 128 is probably not something you want to do anyways.
+
+The *default* algorithm "zs1" is by A. Zoghbi, I. Stojmenovic: Fast algorithms for generating integer partitions, Int. J. Comput. Math. 70 (1998), no. 2, 319–332. Here, the partitions are produced in lexicographically *descending* order.
+
+For testing purposes we have implemented two further algorithms "ks" and "m", see below. By design these work with "inverted" partitions, i.e. increasing sequences, and they are produced in ascending order. There's not a huge speed difference to "zs1":
+```
+julia> @btime x=partitions(90);
+ 3.979 s (56634200 allocations: 6.24 GiB)
+
+julia> @btime x=partitions(90,alg="ks");
+ 3.326 s (56634200 allocations: 6.24 GiB)
+
+julia> @btime x=partitions(90,alg="m");
+ 3.464 s (56634200 allocations: 6.24 GiB)
+```
+The alternative algorithms are:
+1. "ks" by J. Kelleher and B. O'Sullivan: https://arxiv.org/pdf/0909.2331.pdf, May 2014.
+2. "m" by M. Merca: Fast Algorithm for Generating Ascending Compositions, J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
 """
 function partitions(n::Integer;alg="zs1",sort="desc")
-  # julia> @btime x=partitions(90);
-  #   3.979 s (56634200 allocations: 6.24 GiB)
-  #
-  # julia> @btime x=partitions(90,alg="ks");
-  #   3.326 s (56634200 allocations: 6.24 GiB)
-  #
-  # julia> @btime x=partitions(90,alg="m");
-  #   3.464 s (56634200 allocations: 6.24 GiB)
 
   #Argument checking
   n in 1:127 || throw(ArgumentError("0 < n < 128 required"))
