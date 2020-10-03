@@ -1,10 +1,7 @@
 module Combinatorics
 
-#include("enum_func.jl") #basic enumerative functions
+include("enum_func.jl") #enumerative functions
 include("part.jl") #partitions
-
-import Nemo: ZZ, QQ
-
-export ZZ, QQ
+include("nemo_export.jl") #nemo export
 
 end # module
