@@ -2,7 +2,7 @@
 
 ## About
 
-This is (hopefully, eventually, some day) going to be a combinatorics package for [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de). The goal is to provide very efficient algorithms in combinatorics, especially for things relevant in representation theory.
+This is (some day, hopefully) going to be a combinatorics package for [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de). The goal is to provide very efficient algorithms in combinatorics, especially for things relevant in representation theory.
 
 Why would anyone want to do this, especially when there is so much combinatorics already in other computer algebra systems? Well, on the one hand, it's a great way to learn about algorithms, so why not? On the more serious side, have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different systems.
 
