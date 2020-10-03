@@ -8,7 +8,7 @@ Why would anyone want to do this, especially when there is so much combinatorics
 
 In **[Sage](https://www.sagemath.org)** (v9.1):
 
-```
+```python
 sage: time X=Partitions(90).list()
 Wall time: 3min 5s 
 #Uses 26.665GiB mem, quitting Sage takes quite a bit of time
@@ -16,15 +16,15 @@ Wall time: 3min 5s
 
 In **[GAP](https://www.gap-system.org)** (v4.11.0):
 
-```
+```python
 gap> L:=Partitions(90);; time/1000.0;
 51.962 
-#Uses 11.8477 GiB mem
+#Uses 11.8477 GiB mem, still works fine
 ```
 
 In **[Magma](http://magma.maths.usyd.edu.au/magma/)** (v2.25-5):
 
-```
+```c
 > time X:=Partitions(90);
 Time: 32.990 
 //Uses 15.688 GiB mem, Magma UNUSABLE from now on!!
@@ -32,15 +32,19 @@ Time: 32.990
 
 And now, in **[Julia](https://julialang.org)** (v1.5.2, my implementation):
 
-```
+```julia
 julia> @time partitions(90);
 5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time) 
 #No problem afterwards
+#And now, simply because I can do it:
+julia> @time x=partitions(120);
+1372.860293 seconds (1.84 G allocations: 210.607 GiB, 90.32% gc time)
+#No worries!
 ```
 
-In the last one I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using big integers, the Julia implementation is more efficient:
+In the Julia implementation I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using big integers, the Julia implementation is more efficient:
 
-```
+```julia
 julia> @time partitions(90); #this time with big integers (fmpz)
 23.333262 seconds (156.37 M allocations: 15.056 GiB, 47.95% gc time)
 #No problem
@@ -48,7 +52,7 @@ julia> @time partitions(90); #this time with big integers (fmpz)
 
 And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
 
-**Note.** There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned to go much farther (some day)—and I want to do it myself.
+**Note.** There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned a bit differently—and I want to do it myself.
 
 ## Using
 

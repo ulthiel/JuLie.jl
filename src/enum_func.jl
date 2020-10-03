@@ -1,100 +1,54 @@
 ################################################################################
 # Basic enumerative functions.
-# Mostly wrappers to FLINT/GMP.
 ################################################################################
 
-import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint
+import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt, bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
 
-export fac, rfac, bin, fib, lucas, catalan, bell, stirling1, stirling2, euler, num_partitions, harmonic, bernoulli
+export bell, bernoulli, binomial, factorial, fibonacci, harmonic, num_partitions, rising_factorial, stirling1, stirling2, euler, catalan, lucas
+
 
 """
-The factorial n!.
+    lucas(n::fmpz)
+    lucas(n::Integer)
+
+The n-th Lucas number L_n. Uses GMP.
 """
-function fac(n::Integer; alg="gmp")
-  if alg=="gmp"
-    z = BigInt()
-    ccall((:__gmpz_fac_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, n)
-    return ZZ(z)
-  elseif alg=="flint"
-    z = ZZ()
-    ccall((:fmpz_fac_ui, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
-    return z
-  end
+function lucas(n::Integer)
+  z = BigInt()
+  ccall((:__gmpz_lucnum_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, UInt(n))
+  return ZZ(z)
+end
+
+function lucas(n::Integer)
+  return Int(lucas(ZZ(n)))
 end
 
 
 """
-The rising factorial n*(n+1)*...*(n+k-1).
-"""
-function rfac(n::Integer, k::Integer)
-  z = ZZ()
-  ccall((:fmpz_rfac_uiui, libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
-  return z
-end
+    catalan(n::fmpz; alg="binomial")
+    catalan(n::Integer; alg="binomial")
 
+The n-th Catalan number. There are two algorithms:
+1. "binomial" (**default**): uses binomial coefficients. This is the fastest.
+2. "iterative": uses an iterative computation.
+"""
+function catalan(n::fmpz; alg="binomial")
+  # julia> @time x=catalan( ZZ(10)^5 , alg="iterative");
+  #   1.572488 seconds (1.01 M allocations: 2.333 GiB, 1.36% gc time)
+  #
+  # julia> @time x=catalan( ZZ(10)^5 , alg="binomial");
+  #   0.007727 seconds (9 allocations: 95.750 KiB)
 
-"""
-The binomial coefficient n choose k.
-"""
-# This function is faster than Base.binomial
-# (even though it's also using gmp, which doesn't make much sense).
-# Also, gmp is quicker than flint.
-function bin(n::Integer, k::Integer; alg="gmp")
-  if alg=="gmp"
-    z = BigInt()
-    ccall((:__gmpz_bin_uiui, :libgmp), Cvoid, (Ref{BigInt}, Culong, Culong), z, n, k)
-    return ZZ(z)
-  elseif alg=="flint"
-    z = ZZ()
-    ccall((:fmpz_bin_uiui, libflint), Cvoid, (Ref{fmpz}, Culong, Culong), z, n, k)
-    return z
-  end
-end
-
-
-"""
-The n-th Fibonacci number F_n.
-"""
-# gmp is quicker than flint
-function fib(n::Integer; alg="flint")
-  if alg=="gmp"
-    z = BigInt()
-    ccall((:__gmpz_fib_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, n)
-    return ZZ(z)
-  elseif alg=="flint"
-    z = ZZ()
-    ccall((:fmpz_fib_ui, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
-    return z
-  end
-end
-
-
-"""
-The n-th Lucas number L_n.
-"""
-function lucas(n::Integer; alg="gmp")
-  if alg=="gmp"
-    z = BigInt()
-    ccall((:__gmpz_lucnum_ui, :libgmp), Cvoid, (Ref{BigInt}, Culong), z, n)
-    return ZZ(z)
-  end
-end
-
-
-"""
-The n-th Catalan number C_n.
-"""
-function catalan(n::Integer; alg="binomial")
   if n==0
     return ZZ(1)
   elseif n==1
     return ZZ(0)
   else
     if alg=="binomial"
-      return div( bin(2*n, n), (n + 1) )
+      return div( binomial(2*n, n), (n + 1) )
     elseif alg=="iterative"
       C = ZZ(1)
-      for i=0:n-1
+      for i=0:Int(n)-1
         j = ZZ(i)
         C = div( (4*j+2)*C , j+2)
       end
@@ -103,88 +57,88 @@ function catalan(n::Integer; alg="binomial")
   end
 end
 
-
-"""
-The n-th Bell number B_n.
-"""
-function bell(n::Integer)
-  z = ZZ()
-  ccall((:arith_bell_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
-  return z
+function catalan(n::Integer; alg="binomial")
+  z = catalan(ZZ(n),alg=alg)
+  return Int(z)
 end
 
 
 """
-The Stirling number S_1(n,k) of the first kind.
+    stirling1(n::fmpz, k::fmpz)
+    stirling1(n::Integer, k::Integer)
+
+The Stirling number S_1(n,k) of the first kind. Uses FLINT.
 """
+function stirling1(n::fmpz, k::fmpz)
+  z = ZZ()
+  ccall((:arith_stirling_number_1, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
+  return z
+end
+
 function stirling1(n::Integer, k::Integer)
-  z = ZZ()
-  ccall((:arith_stirling_number_1, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
-  return z
+  return Int(stirling1(ZZ(n), ZZ(k)))
 end
 
 
 """
-The Stirling number S_2(n,k) of the second kind.
+    stirling2(n::fmpz, k::fmpz)
+    stirling2(n::Integer, k::Integer)
+
+The Stirling number S_2(n,k) of the second kind. Uses FLINT.
 """
+function stirling2(n::fmpz, k::fmpz)
+  z = ZZ()
+  ccall((:arith_stirling_number_2, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
+  return z
+end
+
 function stirling2(n::Integer, k::Integer)
-  z = ZZ()
-  ccall((:arith_stirling_number_2, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, n, k)
-  return z
+  return Int(stirling2(ZZ(n), ZZ(k)))
 end
 
 
 """
-The n-th Euler number.
+    euler(n::fmpz)
+    euler(n::Integer)
+
+The n-th Euler number. Uses FLINT.
 """
+function euler(n::fmpz)
+  z = ZZ()
+  ccall((:arith_euler_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, UInt(n))
+  return z
+end
+
 function euler(n::Integer)
-  z = ZZ()
-  ccall((:arith_euler_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
-  return z
+  return Int(euler(ZZ(n)))
 end
 
 
 """
-The n-th Harmonic number.
-"""
-function harmonic(n::Integer)
-  z = QQ()
-  ccall((:arith_harmonic_number, libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
-  return z
-end
-
-
-"""
-The n-th Bernoulli number.
-"""
-function bernoulli(n::Integer)
-  z = QQ()
-  ccall((:arith_bernoulli_number, libflint), Cvoid, (Ref{fmpq}, Clong), z, n)
-  return z
-end
-
-
-"""
+    num_partitions(n::fmpz)
     num_partitions(n::Integer)
 
-The number of integer partitions of the number n. Uses the function from FLINT [^1].
-
-[^1]: http://flintlib.org/sphinx/arith.html
+The number of integer partitions of the number n. Uses FLINT.
 """
-function num_partitions(n::Integer)
+function num_partitions(n::fmpz)
   z = ZZ()
   # You can't beat this speed!
-  ccall((:arith_number_of_partitions, libflint), Cvoid, (Ref{fmpz}, Culong), z, n)
+  ccall((:arith_number_of_partitions, libflint), Cvoid, (Ref{fmpz}, Culong), z, UInt(n))
   return z
+end
+
+function num_partitions(n::Integer)
+  return Int(num_partitions(ZZ(n)))
 end
 
 
 """
+    num_partitions(n::fmpz, k::fmpz)
     num_partitions(n::Integer, k::Integer)
 
-The number of integer partitions of the number n into k parts. Uses the recurrence relation and can probably be improved.
+The number of integer partitions of the number n into k parts. Uses the recurrence relation.
 """
-function num_partitions(n::Integer, k::Integer)
+function num_partitions(n::fmpz, k::fmpz)
   n > 0 || throw(ArgumentError("n > 0 required"))
   k >= 0 || throw(ArgumentError("k >= 0 required"))
 
@@ -197,7 +151,9 @@ function num_partitions(n::Integer, k::Integer)
     return ZZ(0)
   elseif k == 1
     return ZZ(1)
+
   # Nice trick I found in Sage src/sage/combinat/partition.py
+  # The GAP code would have run for ages
   elseif n <= 2*k
     if n-k <= 0
       return ZZ(0)
@@ -206,15 +162,21 @@ function num_partitions(n::Integer, k::Integer)
       # size `n-k` can't have length more than `k`
       return num_partitions(n-k)
     end
+
   else
-    p = fill( ZZ(1), n )
-    for l = 2:k
-      for m = l+1:n-l+1
+    p = fill( ZZ(1), Int(n) )
+    for l = 2:Int(k)
+      for m = l+1:Int(n)-l+1
         p[m] = p[m] + p[m-l]
       end
     end
+
   end
 
-  return p[n-k+1]
+  return p[Int(n)-Int(k)+1]
 
+end
+
+function num_partitions(n::Integer, k::Integer)
+  return Int(num_partitions(ZZ(n), ZZ(k)))
 end
