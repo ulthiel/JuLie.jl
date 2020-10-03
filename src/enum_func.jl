@@ -4,7 +4,7 @@
 
 import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt
 
-export num_partitions, catalan
+export num_partitions, catalan, stirling1, stirling2
 
 
 
@@ -14,7 +14,7 @@ export num_partitions, catalan
 
 The number of integer partitions of the integer n >= 0. Uses the function from FLINT, which is really fast.
 
-See https://oeis.org/A000041 for more information.
+For more information on these numbers, see https://oeis.org/A000041.
 """
 function num_partitions(n::fmpz)
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -35,7 +35,7 @@ end
 
 The number of integer partitions of the integer n >= 0 into k >= 0 parts. The implementation uses a recurrence relation.
 
-See https://oeis.org/A008284 for more information.
+For more information on these numbers, see https://oeis.org/A008284.
 """
 function num_partitions(n::fmpz, k::fmpz)
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -112,6 +112,8 @@ julia> @time x=catalan( ZZ(10)^5 , alg="iterative");
 """
 function catalan(n::fmpz; alg="binomial")
 
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+
   if n==0
     return ZZ(1)
   elseif n==1
@@ -139,6 +141,54 @@ function catalan(n::Integer; alg="binomial")
 end
 
 
+
+"""
+    stirling1(n::fmpz, k::fmpz)
+    stirling1(n::Integer, k::Integer)
+
+The Stirling number ``S_1(n,k)`` of the first kind. The absolute value of ``S_1(n,k)`` counts the number of permutations of n elements with k disjoint cycles. The implementation is a wrapper to the function in FLINT.
+
+For more information on these numbers, see https://oeis.org/A008275.
+"""
+function stirling1(n::fmpz, k::fmpz)
+
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+  k >= 0 || throw(ArgumentError("k >= 0 required"))
+
+  z = ZZ()
+  ccall((:arith_stirling_number_1, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
+  return z
+end
+
+function stirling1(n::Integer, k::Integer)
+  return Int(stirling1(ZZ(n), ZZ(k)))
+end
+
+
+
+"""
+    stirling2(n::fmpz, k::fmpz)
+    stirling2(n::Integer, k::Integer)
+
+The Stirling number ``S_2(n,k)`` of the second kind. This counts the number of partitions of an n-set into k non-empty subsets. The implementation is a wrapper to the function in FLINT.
+
+For more information on these numbers, see https://oeis.org/A008277.
+"""
+function stirling2(n::fmpz, k::fmpz)
+
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+  k >= 0 || throw(ArgumentError("k >= 0 required"))
+
+  z = ZZ()
+  ccall((:arith_stirling_number_2, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
+  return z
+end
+
+function stirling2(n::Integer, k::Integer)
+  return Int(stirling2(ZZ(n), ZZ(k)))
+end
+
+
 # """
 #     lucas(n::fmpz)
 #     lucas(n::Integer)
@@ -156,41 +206,8 @@ end
 # end
 #
 
-#
-#
-# """
-#     stirling1(n::fmpz, k::fmpz)
-#     stirling1(n::Integer, k::Integer)
-#
-# The Stirling number S_1(n,k) of the first kind. Uses FLINT.
-# """
-# function stirling1(n::fmpz, k::fmpz)
-#   z = ZZ()
-#   ccall((:arith_stirling_number_1, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
-#   return z
-# end
-#
-# function stirling1(n::Integer, k::Integer)
-#   return Int(stirling1(ZZ(n), ZZ(k)))
-# end
-#
-#
-# """
-#     stirling2(n::fmpz, k::fmpz)
-#     stirling2(n::Integer, k::Integer)
-#
-# The Stirling number S_2(n,k) of the second kind. Uses FLINT.
-# """
-# function stirling2(n::fmpz, k::fmpz)
-#   z = ZZ()
-#   ccall((:arith_stirling_number_2, libflint), Cvoid, (Ref{fmpz}, Clong, Clong), z, Int(n), Int(k))
-#   return z
-# end
-#
-# function stirling2(n::Integer, k::Integer)
-#   return Int(stirling2(ZZ(n), ZZ(k)))
-# end
-#
+
+
 #
 # """
 #     euler(n::fmpz)
