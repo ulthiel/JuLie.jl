@@ -37,8 +37,8 @@ julia> @time partitions(90);
 5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time)
 #No problem afterwards
 #And now, simply because I can do it:
-julia> @time x=partitions(120);
-1372.860293 seconds (1.84 G allocations: 210.607 GiB, 90.32% gc time)
+julia> @time partitions(127); #about 4 billion!
+5555.956745 seconds (3.91 G allocations: 447.441 GiB, 94.95% gc time)
 #No worries!
 ```
 

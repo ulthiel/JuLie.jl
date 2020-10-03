@@ -1,5 +1,7 @@
 ################################################################################
-# Partitions.
+# Functions for partitions.
+#
+# Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
 export partitions
@@ -7,15 +9,15 @@ export partitions
 """
     partitions(n::Integer;alg="zs1")
 
-A list of all partitions of an integer n. Conventions are explained below.
+A list of all partitions of an integer n >= 0. Conventions are explained below.
 
 A partition of a positive integer n is a *decreasing* sequence n1 >= n2 >= ... of positive integers whose sum is equal to n. This can be encoded as an array.
 
 **Note.** For efficiency, we assume n < 128 and use arrays of 8-bit integers for partitions. Producing the whole list of partitions for n >= 128 is probably not something you want to do anyways.
 
-The *default* algorithm "zs1" is by A. Zoghbi, I. Stojmenovic: Fast algorithms for generating integer partitions, Int. J. Comput. Math. 70 (1998), no. 2, 319–332. Here, the partitions are produced in lexicographically *descending* order.
+The *default* algorithm "zs1" is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332. Here, the partitions are produced in lexicographically *descending* order.
 
-For testing purposes we have implemented two further algorithms "ks" and "m", see below. By design these work with "inverted" partitions, i.e. increasing sequences, and they are produced in ascending order. There's not a huge speed difference to "zs1":
+For testing purposes we have implemented two further algorithms "ks" and "m", see below for references. By design these work with "inverted" partitions, i.e. *increasing* sequences, and they are produced in *ascending* order. There's not a huge speed difference to "zs1":
 ```
 julia> @btime x=partitions(90);
  3.979 s (56634200 allocations: 6.24 GiB)
@@ -27,13 +29,13 @@ julia> @btime x=partitions(90,alg="m");
  3.464 s (56634200 allocations: 6.24 GiB)
 ```
 The alternative algorithms are:
-1. "ks" by J. Kelleher and B. O'Sullivan: https://arxiv.org/pdf/0909.2331.pdf, May 2014.
-2. "m" by M. Merca: Fast Algorithm for Generating Ascending Compositions, J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
+1. "ks" is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", https://arxiv.org/pdf/0909.2331.pdf, May 2014.
+2. "m" is Algorithm 6 by M. Merca, "Fast Algorithm for Generating Ascending Compositions", J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
 """
 function partitions(n::Integer;alg="zs1",sort="desc")
 
   #Argument checking
-  n in 1:127 || throw(ArgumentError("0 < n < 128 required"))
+  n in 0:127 || throw(ArgumentError("0 =< n < 128 required"))
 
   # Some trivial cases
   if n==0
@@ -183,17 +185,18 @@ end
 """
     partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
-All partitions of an integer m >= 0 into n >= 1 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (**default**), 1 for distinct parts. The partitions are produced in  **decreasing** order.
+All partitions of an integer m >= 0 into n >= 0 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (*default*), 1 for distinct parts. The partitions are produced in  *decreasing* order.
+
+**Note.** For efficiency, we assume m < 128 and use arrays of 8-bit integers for partitions.
 
 The algorithm used is "parta" from "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" by W. Riha and K. R. James (1976). De-gotoed by Elisa!
 """
 function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
   #Argument checking
-  if m < 0
-    throw(ArgumentError("m >= 0 required."))
-  end
+  m in 0:127 || throw(ArgumentError("0 <= m < 128 required"))
 
+  #Argument checking
   if n < 0
     throw(ArgumentError("n >= 0 required."))
   end
@@ -285,10 +288,11 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
   return P
 end
 
+
 """
     partitions(m::Integer, n::Integer)
 
-All partitions of an integer m >= 0 into n >= 1 parts (no further restrictions). This simply calls partitions(m,n,1,m,z=0). The partitions are produced in lexicographic decreasing order.
+All partitions of an integer m >= 0 into n >= 1 parts (no further restrictions). This simply calls partitions(m,n,1,m,z=0).
 """
 function partitions(m::Integer, n::Integer)
   return partitions(m,n,1,m,z=0)
