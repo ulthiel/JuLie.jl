@@ -122,4 +122,4 @@ Now, changes you make in the code are immediately available in the Julia session
 3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
 4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough.
 5. For every function you implement, there has to be a reasonable test in test/runtests.jl. You can run the complete unit test with ```Pkg.test("Combinatorics")```.
-6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples.
+6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl). This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
