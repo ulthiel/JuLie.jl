@@ -2,8 +2,9 @@
 
 module Combinatorics
 
-include("enum_func.jl") #enumerative functions
-include("partitions.jl") #partitions
-include("nemo_export.jl") #nemo export
+include("enum_func.jl")
+include("partitions.jl")
+include("nemo_export.jl")
+include("quantum_numbers.jl")
 
 end # module
