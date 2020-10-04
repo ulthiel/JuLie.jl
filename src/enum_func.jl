@@ -1,5 +1,7 @@
 ################################################################################
 # Enumerative functions.
+#
+# Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
 import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt
@@ -90,6 +92,7 @@ end
 function num_partitions(n::Integer, k::Integer)
   return Int(num_partitions(ZZ(n), ZZ(k)))
 end
+
 
 
 """
@@ -187,6 +190,7 @@ end
 function stirling2(n::Integer, k::Integer)
   return Int(stirling2(ZZ(n), ZZ(k)))
 end
+
 
 
 """

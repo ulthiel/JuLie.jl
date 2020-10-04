@@ -40,11 +40,36 @@ end
 
   # Unrestricted partitions
   check = true
-  N = 0:30
+  N = 0:20
+  for n in N
+    P = partitions(n)
+    # check that number of partitions is correct
+    if length(P) != num_partitions(n)
+      check = false
+      break
+    end
+    # check that all partitions are distinct
+    if P != unique(P)
+      check = false
+      break
+    end
+    # check that partititons are really partitions of n
+    for lambda in P
+      if sum(lambda) != n
+        check = false
+        break
+      end
+    end
+  end
+  @test check==true
+
+  # ascending partitions, similar test as above
+  check = true
+  N = 0:20
   for n in N
     # go through all algorithms
-    for a in [ "zs1", "ks", "m" ]
-      P = partitions(n,alg=a)
+    for a in [ "ks", "m" ]
+      P = ascending_partitions(n,alg=a)
       # check that number of partitions is correct
       if length(P) != num_partitions(n)
         check = false
@@ -71,7 +96,7 @@ end
 
   # k-restricted partitions
   check = true
-  N = 0:30
+  N = 0:20
   for n in N
     for k = 0:n+1
       P = partitions(n,k)
