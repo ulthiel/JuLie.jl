@@ -233,7 +233,7 @@ end
 
 All partitions of an integer m >= 0 into n >= 0 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (*default*), 1 for distinct parts. The partitions are produced in  *decreasing* order.
 
-The algorithm used is "parta" from "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" by W. Riha and K. R. James (1976). De-gotoed by Elisa!
+The algorithm used is "parta" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976). De-gotoed from ALGOL code by Elisa!
 """
 function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
@@ -342,8 +342,8 @@ end
 
 
 
-# The code below still has to be fixed.
-
+# The code below still has to be fixed, I forgot what the problem was.
+# This is the (de-gotoed version of) algorithm partb by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
 #=
 function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
   r = length(v)
