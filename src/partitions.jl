@@ -9,22 +9,24 @@ export Partition, partitions, ascending_partitions
 
 
 """
-    struct Partition <: AbstractArray{Int8,1}
+    struct Partition{T} <: AbstractArray{T,1}
 
 A *partition* of an integer n >= 0 is a decreasing sequence n1, n2, ... of positive integers whose sum is equal to n. You can create a partition with
 ```
 P=Partition([3,2,1])
 ```
-and then work with it like with an array. In fact, Partition is a subtype of AbstractArray{UInt8,1}. You see here that I use UInt8 for efficiency. This means **n is bounded by 127**. I don't think this is really a restriction in practice, and if so we can always extend later.
-
+and then work with it like with an array. In fact, Partition is a subtype of AbstractArray{T,1}. You can increase performance by using smaller integer types, e.g.
+```
+P=Partition(Int8[3,2,1])
+```
 Note that for efficiency the Partition constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence. That's your job.
 
-I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have many functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is NO difference in runtime and memory consumption between using arrays and using an own structure.
+I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
 
 The implementation of a subtype of AbstractArray is explained in https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array.
 """
-struct Partition <: AbstractArray{Int8,1}
-   p::Array{Int8,1}
+struct Partition{T} <: AbstractArray{T,1}
+   p::Array{T,1}
 end
 
 function Base.show(io::IO, ::MIME"text/plain", P::Partition)
@@ -51,26 +53,34 @@ end
     partitions(n::Integer)
 
 A list of all partitions of an integer n >= 0, produced in lexicographically *descending* order (like in SAGE, but opposite to GAP (you can apply reverse() to reverse the order)). The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
+
+You can increase performance by casting n into a smaller integer type, e.g.
+```
+partitions(Int8(90))
+```
 """
 function partitions(n::Integer)
 
   #Argument checking
-  n in 0:127 || throw(ArgumentError("0 =< n < 128 required"))
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+
+  # Use type of n
+  T = typeof(n)
 
   # Some trivial cases
   if n==0
-    return Partition[ Partition([]) ]
+    return Partition{T}[ Partition{T}([]) ]
   elseif n==1
-    return Partition[ Partition([1]) ]
+    return Partition{T}[ Partition{T}([1]) ]
   end
 
   # Now, the algorithm starts
-  P = Partition[]  #this will be the array of all partitions
+  P = Partition{T}[]  #this will be the array of all partitions
   k = 1
   q = 1
-  d = fill( Int8(1), n )
+  d = fill( T(1), n )
   d[1] = n
-  push!(P, Partition(d[1:1]))
+  push!(P, Partition{T}(d[1:1]))
   while q != 0
     if d[q] == 2
       k += 1
@@ -95,7 +105,7 @@ function partitions(n::Integer)
         end
       end
     end
-    push!(P, Partition(d[1:k]))
+    push!(P, Partition{T}(d[1:k]))
   end
   return P
 
@@ -113,13 +123,13 @@ The ascending partitions are given here as arrays, not of type Partition since t
 
 I don't see a significant speed difference to the descending encoding:
 ```
-julia> @btime partitions(90);
+julia> @btime partitions(Int8(90));
   3.376 s (56634200 allocations: 6.24 GiB)
 
-julia> @btime ascending_partitions(90,alg="ks");
+julia> @btime ascending_partitions(Int8(90),alg="ks");
   3.395 s (56634200 allocations: 6.24 GiB)
 
-julia> @btime ascending_partitions(90,alg="m");
+julia> @btime ascending_partitions(Int8(90),alg="m");
   3.451 s (56634200 allocations: 6.24 GiB)
 ```
 
@@ -128,19 +138,22 @@ I am using "ks" as default since it looks slicker and I believe there is a tiny 
 function ascending_partitions(n::Integer;alg="ks")
 
   #Argument checking
-  n in 0:127 || throw(ArgumentError("0 =< n < 128 required"))
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
+
+  # Use type of n
+  T = typeof(n)
 
   # Some trivial cases
   if n==0
-    return Vector{Int8}[ [] ]
+    return Vector{T}[ [] ]
   elseif n==1
-    return Vector{Int8}[ [1] ]
+    return Vector{T}[ [1] ]
   end
 
   # Now, the algorithm starts
   if alg=="ks"
-    P = Vector{Int8}[]  #this will be the array of all partitions
-    a = zeros(Int8, n)
+    P = Vector{T}[]  #this will be the array of all partitions
+    a = zeros(T, n)
     k = 2
     y = n-1
     while k != 1
@@ -166,8 +179,8 @@ function ascending_partitions(n::Integer;alg="ks")
     return P
 
   elseif alg=="m"
-    P = Vector{Int8}[]  #this will be the array of all partitions
-    a = zeros(Int8, n)
+    P = Vector{T}[]  #this will be the array of all partitions
+    a = zeros(T, n)
     k = 1
     x = 1
     y = n-1
@@ -237,38 +250,39 @@ The algorithm used is "parta" by W. Riha and K. R. James, "Algorithm 29. Efficie
 """
 function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
-  #Argument checking
-  m in 0:127 || throw(ArgumentError("0 <= m < 128 required"))
-  n in 0:127 || throw(ArgumentError("0 <= n < 128 required"))
+  # Note that we are considering partitions of m here. I would switch m and n
+  # but the algorithm was given like that and I would otherwise confuse myself
+  # implementing it.
 
   #Argument checking
-  if n < 0
-    throw(ArgumentError("n >= 0 required."))
-  end
+  m >= 0 || throw(ArgumentError("m >= 0 required"))
+  n >= 0 || throw(ArgumentError("n >= 0 required"))
 
+  # Use type of n
+  T = typeof(m)
+  n = convert(T, n)
+
+  # Some trivial cases
   if m == 0
     if n == 0
-      return Partition[ Partition([]) ]
+      return Partition{T}[ Partition{T}([]) ]
     else
-      return Partition[]
+      return Partition{T}[]
     end
   end
 
   if n == 0
-    return Partition[]
+    return Partition{T}[]
   end
 
   if n > m
-    return Partition[]
+    return Partition{T}[]
   end
 
-  m = convert(Int8, m)
-  n = convert(Int8, n)
-
   #Algorithm starts here
-  P = Partition[]  #this will be the array of all partitions
-  x = zeros(Int8, n)
-  y = zeros(Int8, n)
+  P = Partition{T}[]  #this will be the array of all partitions
+  x = zeros(T, n)
+  y = zeros(T, n)
   num = 0
   j = z*n*(n-1)
   m = m-n*l1-div(j,2)
@@ -296,7 +310,7 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
       x[i] = y[i] + m
       num = num + 1
-      push!(P, Partition(x[1:n]))
+      push!(P, Partition{T}(x[1:n]))
 
       if i<n && m>1
         m = 1
@@ -304,7 +318,7 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
         i = i+1
         x[i] = y[i] + 1
         num = num + 1
-        push!(P, Partition(x[1:n]))
+        push!(P, Partition{T}(x[1:n]))
       end
 
       for j = i-1:-1:1

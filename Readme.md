@@ -33,7 +33,7 @@ Time: 32.990
 And now, in **[Julia](https://julialang.org)** (v1.5.2, my implementation):
 
 ```
-julia> @time partitions(90);
+julia> @time partitions(Int8(90));
 5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time)
 #No problem afterwards
 #And now, simply because I can do it:
@@ -42,11 +42,11 @@ julia> @time partitions(127); #about 4 billion!
 #No worries!
 ```
 
-In the Julia implementation I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using big integers, the Julia implementation is more efficient:
+In the Julia implementation I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using bigger integers, the Julia implementation is more efficient:
 
 ```
-julia> @time partitions(90); #this time with big integers (fmpz)
-23.333262 seconds (156.37 M allocations: 15.056 GiB, 47.95% gc time)
+julia> @time partitions(Int64(90)); #this time with 64-bit integers
+ 16.481893 seconds (56.63 M allocations: 13.570 GiB, 57.15% gc time)
 #No problem
 ```
 
@@ -122,4 +122,4 @@ Now, changes you make in the code are immediately available in the Julia session
 3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
 4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough.
 5. For every function you implement, there has to be a reasonable test in test/runtests.jl. You can run the complete unit test with ```Pkg.test("Combinatorics")```.
-6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl). This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
+6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl). This is all part of the [OSCAR](https://oscar.computeralgebra.de) system. See src/quantum_numbers.jl for examples. 
