@@ -4,6 +4,8 @@
 
 This is (some day, hopefully) going to be a combinatorics package for [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de). The goal is to provide very efficient algorithms in combinatorics, especially for things relevant in representation theory.
 
+## Motivation
+
 Why would anyone want to do this, especially when there is so much combinatorics already in other computer algebra systems? Well, on the one hand, it's a great way to learn about algorithms, so why not? On the more serious side, have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different systems.
 
 In **[Sage](https://www.sagemath.org)** (v9.1):
@@ -36,10 +38,6 @@ And now, in **[Julia](https://julialang.org)** (v1.5.2, my implementation):
 julia> @time partitions(Int8(90));
 5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time)
 #No problem afterwards
-#And now, simply because I can do it:
-julia> @time partitions(127); #about 4 billion!
-5555.956745 seconds (3.91 G allocations: 447.441 GiB, 94.95% gc time)
-#No worries!
 ```
 
 In the Julia implementation I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using bigger integers, the Julia implementation is more efficient:
@@ -50,7 +48,13 @@ julia> @time partitions(Int64(90)); #this time with 64-bit integers
 #No problem
 ```
 
-And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
+And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain? Here's one more, just because I can do it:
+
+```
+julia> @time partitions(127); #about 4 billion!
+5555.956745 seconds (3.91 G allocations: 447.441 GiB, 94.95% gc time)
+#No worries!
+```
 
 **Note.** There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned a bit differently—and I want to do it myself.
 
