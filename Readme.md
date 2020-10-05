@@ -40,7 +40,7 @@ julia> @time partitions(Int8(90));
 #No problem afterwards
 ```
 
-In the Julia implementation I'm cheating a bit because I'm using 8-bit integers (thus saving memory). But even when using bigger integers, the Julia implementation is more efficient:
+I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still more efficient:
 
 ```
 julia> @time partitions(Int64(90)); #this time with 64-bit integers
@@ -48,12 +48,12 @@ julia> @time partitions(Int64(90)); #this time with 64-bit integers
 #No problem
 ```
 
-And having the possibility to also work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain? Here's one more, just because I can do it:
+Having the possibility to work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain? Here's one more, just because I can do it:
 
 ```
-julia> @time partitions(127); #about 4 billion!
-5555.956745 seconds (3.91 G allocations: 447.441 GiB, 94.95% gc time)
-#No worries!
+julia> @time partitions(Int16(130)); #~5.4 billion!
+12910.885498 seconds (5.37 G allocations: 739.784 GiB, 96.51% gc time)
+#No worries! (Of course, it's better to use a partition iterator in this case.)
 ```
 
 **Note.** There is a [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) already but this here is planned a bit differently—and I want to do it myself.
@@ -126,4 +126,4 @@ Now, changes you make in the code are immediately available in the Julia session
 3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
 4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough.
 5. For every function you implement, there has to be a reasonable test in test/runtests.jl. You can run the complete unit test with ```Pkg.test("Combinatorics")```.
-6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl). This is all part of the [OSCAR](https://oscar.computeralgebra.de) system. See src/quantum_numbers.jl for examples. 
+6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file src/enum_func.jl for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see src/quantum_numbers.jl for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.

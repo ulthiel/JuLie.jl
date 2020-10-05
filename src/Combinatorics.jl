@@ -1,4 +1,10 @@
+################################################################################
+# Combinatorics.jl
+#
+#	A combinatorics package for Julia.
+#
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
+################################################################################
 
 module Combinatorics
 
