@@ -114,7 +114,7 @@ I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). B
 
 ```
 julia> @time partitions(Int64(90)); #this time with 64-bit integers
- 16.481893 seconds (56.63 M allocations: 13.570 GiB, 57.15% gc time)
+16.481893 seconds (56.63 M allocations: 13.570 GiB, 57.15% gc time)
 #No problem
 ```
 
