@@ -1,5 +1,5 @@
 ################################################################################
-# Partitions.
+# Functions for partitions.
 #
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
@@ -48,6 +48,58 @@ end
 # I do not implement setindex since I think you won't actually modify partitions.
 
 
+
+"""
+    partition_to_partcount(p::Partition)
+
+returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
+
+e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
+
+for performance, partitions with trailing zeroes will not be allowed
+"""
+function partition_to_partcount(p::Partition)
+
+  T = typeof(getindex(p,1)) #Type of the elements in p
+
+  if getindex(p,1) == 0
+    return [getindex(p,1)]
+  end
+
+  pc = zeros(T,p[1])
+
+  for i = 1:length(p)
+    pc[p[i]] += 1
+  end
+  return pc
+
+end
+
+"""
+    partcount_to_partition(pc::Array{Integer,1})
+
+returns the partition from a part-count representation pc of a partition.
+
+e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
+"""
+function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+  l = sum(pc)       #length of resulting partition
+  if l == 0
+    return Partition{T}([0])
+  end
+
+  p = zeros(T,l)
+
+  k=1
+  for i = length(pc):-1:1
+    for j = 1:pc[i]
+      p[k] = i
+      k += 1
+    end
+  end
+  return Partition{T}(p)
+end
 
 """
     partitions(n::Integer)
@@ -358,7 +410,15 @@ end
 
 # The code below still has to be fixed, I forgot what the problem was.
 # This is the (de-gotoed version of) algorithm partb by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
-#=
+
+
+"""
+    partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
+
+All partitions of an integer m >= 0 into n >= 0 parts, where each part is an element in v and each v[i] occurse a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
+
+The algorithm used is a de-gotoed version of "partb" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
+"""
 function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
   r = length(v)
   j = 1
@@ -366,12 +426,14 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
   ll = v[1]
   x = zeros(Int8, n)
   y = zeros(Int8, n)
+  ii = zeros(Int8, n)
   i_1 = 0
-  P = zeros(Int8, n)
+  T=typeof(m)
+  P = Partition{T}[]
 
   num = 0
-  lgotob2 = false
-  lgotob1 = true
+  gotob2 = false
+  gotob1 = true
 
   for i = n:-1:1
      x[i] = ll
@@ -388,7 +450,6 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
      end
    end #for i
 
-
   lr = v[r]
   ll = v[1]
 
@@ -396,19 +457,19 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
     return P
   end
 
-  if m = 0
-    println(x)
+  if m == 0
+    push!(P,Partition{T}(x[1:n]))
     return P
   end
 
   i = 1
   m = m + y[1]
 
-  while lgotob1 == true
-    if !lgotob2
+  while gotob1 == true
+    if !gotob2
       for j = mu[r]:-1:1
         if m<=lr
-          lgotb2 = true
+          gotob2 = true
           break
         end
         x[i]=lr
@@ -417,48 +478,52 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
         m = m - lr + y[i]
       end #for j
 
-      if !lgotob2
+      if !gotob2
         r = r - 1
       end
 
-      lgotob2 = true
+      gotob2 = true
     end #if
 
-    if lgotob2
+    if gotob2
       while v[r] > m
         r = r - 1
       end
 
       lr = v[r]
-      if m = lr
+      if m == lr
         x[i] = lr
-        println(x)
-        r = r  - 1
-        lr = v[r]
+        push!(P,Partition{T}(x[1:n]))
 
+        r = r - 1
+        lr = v[r]
       end #if
+
       k = y[i]
       if lr > k && m - lr <= (n-i)*(lr - ll)
+        gotob2 = false
         continue
       else
         x[i] = k
       end #if
       i_1 = i - 1
-      for i=i_1:-1:1
+      for i_0=i_1:-1:1
+        i = i_0
         r = ii[i]
         lr = v[r]
         m = m + x[i] - k
         k = y[i]
-
         if lr > k && m - lr <= (n-i)*(lr-ll)
+          gotob2 = false
           break
         else
           x[i] = k
         end #if
-        lgotob1 = false
       end #for
-
-    end #if lgotob2
+      if gotob2
+        gotob1 = false
+      end
+    end #if gotob2
   end #while
+  return P
 end
-=#
