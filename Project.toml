@@ -1,4 +1,4 @@
-name = "Combinatorics"
+name = "JuLie"
 uuid = "0fac7475-a920-4e58-b2d0-2357b2a71519"
 authors = ["Ulrich Thiel <mail@ulthiel.com>"]
 version = "0.1.0"
