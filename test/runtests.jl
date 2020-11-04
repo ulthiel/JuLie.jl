@@ -1,5 +1,6 @@
 using Test
 using Combinatorics
+#using Random
 import Nemo: ZZ, QQ
 import AbstractAlgebra: LaurentPolynomialRing
 
@@ -130,6 +131,115 @@ end
 		end
 	end
 	@test check==true
+
+
+
+
+#= v-mu-restricted partitions aren't yet functional in this package
+
+	# v-mu-restricted partitions
+	check = true
+	N = 0:20
+	for n in N
+		for k = 1:n+1
+			for i = 1:20
+				v=convert(Array{Integer,1},rand(1:20,i))
+				unique!(v)
+				sort!(v)
+				mu=convert(Array{Integer,1},rand((0:k).+1,length(v)))
+				println(mu,n,v,k)
+				P = partitions(mu,n,v,k)
+				# check that partitions have k parts
+				if length(P) !=0 && unique([ length(p) for p in P ]) != [k]
+					check = false
+					break
+				end
+				# check that all partitions are distinct
+				if P != unique(P)
+					check = false
+					break
+				end
+				# check that partititons are really partitions of n
+				for lambda in P
+					if sum(lambda) != n
+						check = false
+						break
+					end
+				end
+			end
+		end
+		if check==false
+			break
+		end
+	end
+	@test check==true
+
+=#
+
+
+
+
+
+end
+
+@testset "Multi-partitions" begin
+
+	# multi-partitions
+	check = true
+	N = 0:15
+	for n in N
+		MP = multipartitions(n)
+		# check that all multipartitions are distinct
+		if MP != unique(MP)
+			check = false
+			break
+		end
+		# check that multipartititons are really multipartitions of n
+		for mp in MP
+			lambda=0
+			for p in mp
+				lambda = lambda + sum(p)
+			end
+			if lambda != n
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
+
+	# k-restricted multipartitions
+	check = true
+	N = 0:15
+	K = 1:15
+	for n in N
+		for k in K
+			MP = multipartitions(n,k)
+			# check that all multipartitions are distinct
+			if MP != unique(MP)
+				check = false
+				break
+			end
+			# check that all multipartititons are really multipartitions of n
+			for mp in MP
+				lambda=0
+				for p in mp
+					lambda = lambda + sum(p)
+				end
+				if lambda != n
+					check = false
+					break
+				end
+			end
+			# check that all multipartitions have k parts
+			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
+
 
 end
 
