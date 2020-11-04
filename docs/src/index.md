@@ -80,10 +80,3 @@ quantum
 ```@index
 ```
 
-
-
-
-
-
-- link to [`func(x)`](@ref)
-- link to [`partitions`](@ref)
