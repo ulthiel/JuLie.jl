@@ -1,5 +1,5 @@
 using Test
-using Combinatorics
+#using Combinatorics
 import Nemo: ZZ, QQ
 import AbstractAlgebra: LaurentPolynomialRing
 
@@ -175,17 +175,17 @@ end
 
 @testset "Multi-partitions" begin
 
-	# multi-partitions
+	# multi-set-partitions
 	check = true
 	N = 0:15
 	for n in N
-		MP = multipartitions(n)
-		# check that all multipartitions are distinct
+		MP = multisetpartitions(n)
+		# check that all multisetpartitions are distinct
 		if MP != unique(MP)
 			check = false
 			break
 		end
-		# check that multipartititons are really multipartitions of n
+		# check that multisetpartititons are really multisetpartitions of n
 		for mp in MP
 			lambda=0
 			for p in mp
@@ -199,19 +199,19 @@ end
 	end
 	@test check==true
 
-	# k-restricted multipartitions
+	# k-restricted multisetpartitions
 	check = true
 	N = 0:15
 	K = 1:15
 	for n in N
 		for k in K
-			MP = multipartitions(n,k)
-			# check that all multipartitions are distinct
+			MP = multisetpartitions(n,k)
+			# check that all multisetpartitions are distinct
 			if MP != unique(MP)
 				check = false
 				break
 			end
-			# check that all multipartititons are really multipartitions of n
+			# check that all multisetpartititons are really multisetpartitions of n
 			for mp in MP
 				lambda=0
 				for p in mp
@@ -222,7 +222,7 @@ end
 					break
 				end
 			end
-			# check that all multipartitions have k parts
+			# check that all multisetpartitions have k parts
 			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
 				check = false
 				break
@@ -230,7 +230,42 @@ end
 		end
 	end
 	@test check==true
+
+	# multi-partitions
+	check = true
+	N = 0:10
+	R = 1:5
+	for n in N
+		for r in R
+			MP = multipartitions(n,r)
+			# check that all multipartitions are distinct
+			if MP != unique(MP)
+				check = false
+				break
+			end
+			# check that multipartititons are really multipartitions of n
+			for mp in MP
+				lambda=0
+				for p in mp
+					lambda = lambda + sum(p)
+				end
+				if lambda != n
+					check = false
+					break
+				end
+			end
+			# check that all multisetpartitions have k parts
+			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [r]
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
 end
+
+
+
 
 @testset "Quantum numbers" begin
 	R,q = LaurentPolynomialRing(ZZ, "q")

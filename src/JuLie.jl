@@ -10,6 +10,7 @@ module JuLie
 
 include("enum_func.jl")
 include("partitions.jl")
+include("multi-partitions.jl")
 #include("permutations.jl")
 include("nemo_export.jl")
 include("quantum_numbers.jl")
