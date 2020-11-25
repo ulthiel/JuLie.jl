@@ -1,6 +1,5 @@
 using Test
-using Combinatorics
-#using Random
+#using Combinatorics
 import Nemo: ZZ, QQ
 import AbstractAlgebra: LaurentPolynomialRing
 
@@ -132,10 +131,7 @@ end
 	end
 	@test check==true
 
-
-
-
-#= v-mu-restricted partitions aren't yet functional in this package
+	#= v-mu-restricted partitions aren't yet functional in this package
 
 	# v-mu-restricted partitions
 	check = true
@@ -174,27 +170,22 @@ end
 	end
 	@test check==true
 
-=#
-
-
-
-
-
+	=#
 end
 
 @testset "Multi-partitions" begin
 
-	# multi-partitions
+	# multi-set-partitions
 	check = true
 	N = 0:15
 	for n in N
-		MP = multipartitions(n)
-		# check that all multipartitions are distinct
+		MP = multisetpartitions(n)
+		# check that all multisetpartitions are distinct
 		if MP != unique(MP)
 			check = false
 			break
 		end
-		# check that multipartititons are really multipartitions of n
+		# check that multisetpartititons are really multisetpartitions of n
 		for mp in MP
 			lambda=0
 			for p in mp
@@ -208,19 +199,19 @@ end
 	end
 	@test check==true
 
-	# k-restricted multipartitions
+	# k-restricted multisetpartitions
 	check = true
 	N = 0:15
 	K = 1:15
 	for n in N
 		for k in K
-			MP = multipartitions(n,k)
-			# check that all multipartitions are distinct
+			MP = multisetpartitions(n,k)
+			# check that all multisetpartitions are distinct
 			if MP != unique(MP)
 				check = false
 				break
 			end
-			# check that all multipartititons are really multipartitions of n
+			# check that all multisetpartititons are really multisetpartitions of n
 			for mp in MP
 				lambda=0
 				for p in mp
@@ -231,7 +222,7 @@ end
 					break
 				end
 			end
-			# check that all multipartitions have k parts
+			# check that all multisetpartitions have k parts
 			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
 				check = false
 				break
@@ -240,8 +231,39 @@ end
 	end
 	@test check==true
 
-
+	# multi-partitions
+	check = true
+	N = 0:10
+	R = 1:5
+	for n in N
+		for r in R
+			MP = multipartitions(n,r)
+			# check that all multipartitions are distinct
+			if MP != unique(MP)
+				check = false
+				break
+			end
+			# check that multipartititons are really multipartitions of n
+			for mp in MP
+				lambda=0
+				for p in mp
+					lambda = lambda + sum(p)
+				end
+				if lambda != n
+					check = false
+					break
+				end
+			end
+			# check that all multisetpartitions have k parts
+			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [r]
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
 end
+
 
 
 
@@ -255,4 +277,28 @@ end
 	@test quantum(5) == q^-4 + q^-2 + 1 + q^2 + q^4
 	@test quantum(-5) == -quantum(5)
 	@test quantum(5, QQ(11)) == QQ(216145205//14641)
+end
+
+
+@testset "Tableaux" begin
+	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
+	check = true
+	shapes = [[3,2,1],[3,3,1],[2,2,2]]
+	for s in shapes
+		SST = semistandard_tableaux(s)
+		#check that all tableaux are distinct
+		if SST != unique(SST)
+			check = false
+			break
+		end
+		#check that all tableaux are semistandard_tableaux
+		for tab in SST
+			if !is_semistandard(tab)
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
+
 end

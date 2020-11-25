@@ -1,5 +1,5 @@
 ################################################################################
-# Functions for partitions.
+# Partitions.
 #
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
@@ -48,58 +48,6 @@ end
 # I do not implement setindex since I think you won't actually modify partitions.
 
 
-
-"""
-    partition_to_partcount(p::Partition)
-
-returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
-
-e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
-
-for performance, partitions with trailing zeroes will not be allowed
-"""
-function partition_to_partcount(p::Partition)
-
-  T = typeof(getindex(p,1)) #Type of the elements in p
-
-  if getindex(p,1) == 0
-    return [getindex(p,1)]
-  end
-
-  pc = zeros(T,p[1])
-
-  for i = 1:length(p)
-    pc[p[i]] += 1
-  end
-  return pc
-
-end
-
-"""
-    partcount_to_partition(pc::Array{Integer,1})
-
-returns the partition from a part-count representation pc of a partition.
-
-e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
-"""
-function partcount_to_partition(pc::Array{T,1}) where T<:Integer
-
-  l = sum(pc)       #length of resulting partition
-  if l == 0
-    return Partition{T}([0])
-  end
-
-  p = zeros(T,l)
-
-  k=1
-  for i = length(pc):-1:1
-    for j = 1:pc[i]
-      p[k] = i
-      k += 1
-    end
-  end
-  return Partition{T}(p)
-end
 
 """
     partitions(n::Integer)
@@ -408,10 +356,10 @@ end
 
 
 
+
 # The code below still has to be fixed, I forgot what the problem was.
 # This is the (de-gotoed version of) algorithm partb by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
-
-
+#=
 """
     partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
 
@@ -526,4 +474,59 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
     end #if gotob2
   end #while
   return P
+end
+
+=#
+
+
+"""
+    partition_to_partcount(p::Partition)
+
+returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
+
+e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
+
+for performance, partitions with trailing zeroes will not be allowed
+"""
+function partition_to_partcount(p::Partition)
+
+  T = typeof(getindex(p,1)) #Type of the elements in p
+
+  if getindex(p,1) == 0
+    return [getindex(p,1)]
+  end
+
+  pc = zeros(T,p[1])
+
+  for i = 1:length(p)
+    pc[p[i]] += 1
+  end
+  return pc
+
+end
+
+"""
+    partcount_to_partition(pc::Array{Integer,1})
+
+returns the partition from a part-count representation pc of a partition.
+
+e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
+"""
+function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+  l = sum(pc)       #length of resulting partition
+  if l == 0
+    return Partition{T}([0])
+  end
+
+  p = zeros(T,l)
+
+  k=1
+  for i = length(pc):-1:1
+    for j = 1:pc[i]
+      p[k] = i
+      k += 1
+    end
+  end
+  return Partition{T}(p)
 end
