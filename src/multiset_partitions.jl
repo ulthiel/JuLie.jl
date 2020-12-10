@@ -1,6 +1,10 @@
+################################################################################
+# Multipartitions.
+#
+# Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
+################################################################################
 
 export Multipartition, multipartitions, multisetpartitions
-include("partitions.jl")
 
 struct Multipartition{T} <: AbstractArray{Partition{T},1}
    mp::Array{Partition{T},1}
@@ -337,53 +341,4 @@ function multisetpartitions(p::Partition, r::Integer)
     a = f[l]
     gotoM2 = false
   end#while true
-end
-
-
-
-
-"""
-    function multipartitions(n::T,r::T) where T<:Integer
-
-A list of all multipartitions of length r such that the sum equals to n.
-
-
-"""
-function multipartitions(n::T,r::T) where T<:Integer
-  #Argument checking
-  n >= 0 || throw(ArgumentError("n >= 0 required"))
-  r >= 1 || throw(ArgumentError("r >= 1 required"))
-
-  MP = Multipartition{T}[]
-
-  #recursively produces all Integer Arrays p of length r such that the sum of all the Elements equals n. Then calls recMultipartitions!
-  function recP!(p::Array{T,1}, i::T, n::T) #where T<:Integer
-    if i==length(p) || n==0
-      p[i] = n
-      recMultipartitions!(fill(Partition(T[]),r), p, T(1))
-    else
-      for j=0:n
-        p[i] = T(j)
-        recP!(copy(p), T(i+1), T(n-j))
-      end
-    end
-  end
-
-  #recursively produces all multipartitions such that the i-th partition sums up to p[i]
-  function recMultipartitions!(mp::Array{Partition{T},1}, p::Array{T,1}, i::T) #where T<:Integer
-    if i == length(p)
-      for q in partitions(p[i])
-        mp[i] = q
-        push!(MP, Multipartition{T}(copy(mp)))
-      end
-    else
-      for q in partitions(p[i])
-        mp[i] = q
-        recMultipartitions!(copy(mp), p, T(i+1))
-      end
-    end
-  end
-
-  recP!(zeros(T,r), T(1), n)
-  return MP
 end

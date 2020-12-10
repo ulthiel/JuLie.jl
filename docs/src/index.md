@@ -1,16 +1,11 @@
 # JuLie.jl
-A Julia package for Combinatorics
+An early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package for things around algebraic Lie theory, representation theory, and relevant combinatorics. Contributions are very much welcome!
 
-```@contents
-Depth = 3
-```
+By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and contributors.
 
 ```@meta
 CurrentModule = JuLie
 ```
-
-
-
 
 ## Using
 
@@ -45,15 +40,14 @@ You can get help for a function by putting a question mark in front, e.g.
 
 ```@docs
 Partition
-
 partitions
 ascending_partitions
 ```
 
-## Multipartitions
+### Multipartitions
 
 ```@docs
-Multipartition
+MultiPartition
 multipartitions
 ```
 
@@ -74,9 +68,7 @@ quantum_number
 quantum
 ```
 
-
 ## Index
 
 ```@index
 ```
-
