@@ -11,7 +11,7 @@ export Partition, partitions, ascending_partitions, dominates
 """
     struct Partition{T} <: AbstractArray{T,1}
 
-A **partition** of an integer ``n >= 0`` is a *decreasing* (convention) sequence ``n_1, n_2, \\ldots`` of positive integers whose sum is equal to ``n``. You can create a partition with
+A **partition** of an integer ``n \\geq 0`` is a *decreasing* (our convention) sequence ``n_1, n_2, \\ldots`` of positive integers whose sum is equal to ``n``. You can create a partition with
 ```
 P=Partition([3,2,1])
 ```
@@ -21,7 +21,7 @@ P=Partition(Int8[3,2,1])
 ```
 Note that for efficiency the Partition constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence. That's your job.
 
-I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
+**Remark.** I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
 
 The implementation of a subtype of AbstractArray is explained in [the Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
 """
@@ -488,57 +488,6 @@ end
 =#
 
 
-"""
-    partition_to_partcount(p::Partition)
-
-returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
-
-e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
-
-for performance, partitions with trailing zeroes will not be allowed
-"""
-function partition_to_partcount(p::Partition)
-
-  T = typeof(getindex(p,1)) #Type of the elements in p
-
-  if getindex(p,1) == 0
-    return [getindex(p,1)]
-  end
-
-  pc = zeros(T,p[1])
-
-  for i = 1:length(p)
-    pc[p[i]] += 1
-  end
-  return pc
-
-end
-
-"""
-    partcount_to_partition(pc::Array{Integer,1})
-
-returns the partition from a part-count representation pc of a partition.
-
-e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
-"""
-function partcount_to_partition(pc::Array{T,1}) where T<:Integer
-
-  l = sum(pc)       #length of resulting partition
-  if l == 0
-    return Partition{T}([0])
-  end
-
-  p = zeros(T,l)
-
-  k=1
-  for i = length(pc):-1:1
-    for j = 1:pc[i]
-      p[k] = i
-      k += 1
-    end
-  end
-  return Partition{T}(p)
-end
 
 
 """

@@ -16,7 +16,7 @@ export num_partitions, catalan, stirling1, stirling2, lucas
 
 The number of integer partitions of the integer n >= 0. Uses the function from FLINT, which is really fast.
 
-For more information on these numbers, see https://oeis.org/A000041.
+For more information on these numbers, see [OEIS](https://oeis.org/A000041).
 """
 function num_partitions(n::fmpz)
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -37,7 +37,7 @@ end
 
 The number of integer partitions of the integer n >= 0 into k >= 0 parts. The implementation uses a recurrence relation.
 
-For more information on these numbers, see https://oeis.org/A008284.
+For more information on these numbers, see [OEIS](https://oeis.org/A008284).
 """
 function num_partitions(n::fmpz, k::fmpz)
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -99,7 +99,7 @@ end
     catalan(n::fmpz; alg="binomial")
     catalan(n::Integer; alg="binomial")
 
-The n-th Catalan number. This counts a gazillion of things, see https://oeis.org/A000108 for more information. There are algorithms implemented:
+The n-th Catalan number. This counts a gazillion of things, see [OEIS](https://oeis.org/A000108) for more information. There are two algorithms implemented:
 
 1. "binomial" (*default*): uses a simple formula with binomial coefficients.
 2. "iterative": uses an iterative computation.
@@ -151,7 +151,7 @@ end
 
 The Stirling number ``S_1(n,k)`` of the first kind. The absolute value of ``S_1(n,k)`` counts the number of permutations of n elements with k disjoint cycles. The implementation is a wrapper to the function in FLINT.
 
-For more information on these numbers, see https://oeis.org/A008275.
+For more information on these numbers, see [OEIS](https://oeis.org/A008275).
 """
 function stirling1(n::fmpz, k::fmpz)
 
@@ -175,7 +175,7 @@ end
 
 The Stirling number ``S_2(n,k)`` of the second kind. This counts the number of partitions of an n-set into k non-empty subsets. The implementation is a wrapper to the function in FLINT.
 
-For more information on these numbers, see https://oeis.org/A008277.
+For more information on these numbers, see [OEIS](https://oeis.org/A008277).
 """
 function stirling2(n::fmpz, k::fmpz)
 
@@ -197,7 +197,7 @@ end
     lucas(n::fmpz)
     lucas(n::Integer)
 
-The n-th Lucas number. For more information on these numbers, see https://oeis.org/A000032. The implementation is a wrapper to the function in GMP.
+The n-th Lucas number. For more information on these numbers, see [OEIS](https://oeis.org/A000032). The implementation is a wrapper to the function in GMP.
 """
 function lucas(n::fmpz)
   n >= 0 || throw(ArgumentError("n >= 0 required"))

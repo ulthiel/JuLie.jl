@@ -47,7 +47,7 @@ ascending_partitions
 ### Multipartitions
 
 ```@docs
-MultiPartition
+Multipartition
 multipartitions
 ```
 
