@@ -4,7 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export Partition, partitions, ascending_partitions, dominates
+export Partition, partitions, ascending_partitions, dominates, conjugate, getelement
 
 
 
@@ -49,6 +49,9 @@ function Base.setindex!(P::Partition, x::Integer, i::Int)
   return setindex!(P.p,x,i)
 end
 
+function getelement(P::Partition, i::Int)
+  return (i>length(P.p) ? 0 : getindex(P.p,i))
+end
 
 """
     partitions(n::Integer)
@@ -559,4 +562,26 @@ function dominates(lambda::Partition, mu::Partition)
     end
   end
   return true
+end
+
+
+"""
+    conjugate(p::Partition{T}) where T<:Integer
+
+returns the conjugate partition of p.
+"""
+function conjugate(p::Partition{T}) where T<:Integer
+  if isempty(p)
+    return copy(p)
+  end
+
+  q = zeros(T, p[1])
+
+  for i = 1:length(p)
+    for j = 1:p[i]
+      q[j] += 1
+    end
+  end
+
+  return Partition(q)
 end
