@@ -4,7 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export Partition, partitions, ascending_partitions
+export Partition, partitions, ascending_partitions, dominates
 
 
 
@@ -45,8 +45,9 @@ function Base.getindex(P::Partition, i::Int)
   return getindex(P.p,i)
 end
 
-# I do not implement setindex since I think you won't actually modify partitions.
-
+function Base.setindex!(P::Partition, x::Integer, i::Int)
+  return setindex!(P.p,x,i)
+end
 
 
 """
@@ -529,4 +530,33 @@ function partcount_to_partition(pc::Array{T,1}) where T<:Integer
     end
   end
   return Partition{T}(p)
+end
+
+
+"""
+    dominates(lambda::Partition, mu::Partition)
+
+returns true if lambda >= mu according to the dominance order on partitions:
+lambda >= mu  :<=>  lambda[1] + ... + lambda[i] >= mu[1] + ... + mu[i] for all i
+"""
+function dominates(lambda::Partition, mu::Partition)
+  dif = 0
+  i = 1
+  while i <= min(length(lambda), length(mu))
+    dif += lambda[i] - mu[i]
+    i += 1
+    if dif < 0
+      return false
+    end
+  end
+  if length(lambda) < length(mu)
+    while i <= length(mu)
+      dif -= mu[i]
+      i += 1
+    end
+    if dif < 0
+      return false
+    end
+  end
+  return true
 end
