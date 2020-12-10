@@ -1,40 +1,50 @@
+################################################################################
+# Multipartitions.
+#
+# Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
+################################################################################
 
-export Multipartition, multipartitions, multisetpartitions
-include("partitions.jl")
+export multiset_partitions
 
-struct Multipartition{T} <: AbstractArray{Partition{T},1}
-   mp::Array{Partition{T},1}
-end
-
-
-
-function Base.show(io::IO, ::MIME"text/plain", MP::Multipartition)
-  print(io, MP.mp)
-end
-
-function Base.size(MP::Multipartition)
-  return size(MP.mp)
-end
-
-function Base.length(MP::Multipartition)
-  return length(MP.mp)
-end
-
-function Base.getindex(MP::Multipartition, i::Int)
-  return getindex(MP.mp,i)
-end
 
 """
-    multisetpartitions(n::Integer)
+    struct Permutation{T} <: AbstractArray{T,1}
 
-A list of all multisetpartitions of an integer n >= 0.
+A **multiset** is a set together with a multiplicity for each of its elements, i.e. it's basically a "set" which may contain multiple instances of the same element.
+"""
+# struct Multipartition{T} <: AbstractArray{Partition{T},1}
+#    mp::Array{Partition{T},1}
+# end
+#
+#
+#
+# function Base.show(io::IO, ::MIME"text/plain", MP::Multipartition)
+#   print(io, MP.mp)
+# end
+#
+# function Base.size(MP::Multipartition)
+#   return size(MP.mp)
+# end
+#
+# function Base.length(MP::Multipartition)
+#   return length(MP.mp)
+# end
+#
+# function Base.getindex(MP::Multipartition, i::Int)
+#   return getindex(MP.mp,i)
+# end
+
+"""
+    multiset_partitions(n::Integer)
+
+A list of all multiset_partitions of an integer n >= 0.
 
 The performance will suffer by casting n into a smaller integer type, e.g.
 ```
-multisetpartitions(Int8(20))
+multiset_partitions(Int8(20))
 ```
 """
-function multisetpartitions(n::Integer)
+function multiset_partitions(n::Integer)
 
     #Argument checking
     n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -52,21 +62,72 @@ function multisetpartitions(n::Integer)
     # Now, the algorithm starts
     MP = Multipartition{T}[]
     for p in partitions(n)
-        append!(MP, multisetpartitions(p))
+        append!(MP, multiset_partitions(p))
     end
     return MP
 end
 
 
+"""
+    partition_to_partcount(p::Partition)
+
+returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
+
+e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
+
+for performance, partitions with trailing zeroes will not be allowed
+"""
+function partition_to_partcount(p::Partition)
+
+  T = typeof(getindex(p,1)) #Type of the elements in p
+
+  if getindex(p,1) == 0
+    return [getindex(p,1)]
+  end
+
+  pc = zeros(T,p[1])
+
+  for i = 1:length(p)
+    pc[p[i]] += 1
+  end
+  return pc
+
+end
 
 """
-    multisetpartitions(p::Partition)
+    partcount_to_partition(pc::Array{Integer,1})
 
-A list of all possible multisetpartitions of a Partition, by regrouping its parts in Partitions.
+returns the partition from a part-count representation pc of a partition.
+
+e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
+"""
+function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+  l = sum(pc)       #length of resulting partition
+  if l == 0
+    return Partition{T}([0])
+  end
+
+  p = zeros(T,l)
+
+  k=1
+  for i = length(pc):-1:1
+    for j = 1:pc[i]
+      p[k] = i
+      k += 1
+    end
+  end
+  return Partition{T}(p)
+end
+
+"""
+    multiset_partitions(p::Partition)
+
+A list of all possible multiset_partitions of a Partition, by regrouping its parts in Partitions.
 
 The algorithm used is the algorithm M by A. Zoghbi and I. Stojmenovic, "The Art of Computer Programming - A Draft oF Sections 7.2.1.4-5: Generating all Partitions", 39–40 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
 """
-function multisetpartitions(p::Partition)
+function multiset_partitions(p::Partition)
   T = typeof(getindex(p,1))
   MP = Multipartition{T}[]
 
@@ -185,11 +246,11 @@ end
 
 
 """
-    multisetpartitions(n::Integer, r::Integer)
+    multiset_partitions(n::Integer, r::Integer)
 
-A list of all multisetpartitions of an integer n >= 0 into r >= 1 parts.
+A list of all multiset_partitions of an integer n >= 0 into r >= 1 parts.
 """
-function multisetpartitions(n::Integer, r::Integer)
+function multiset_partitions(n::Integer, r::Integer)
 
   #Argument checking
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -209,7 +270,7 @@ function multisetpartitions(n::Integer, r::Integer)
   MP = Multipartition{T}[]
   for p in partitions(n)
     if length(p) >= r
-      append!(MP,multisetpartitions(p,r))
+      append!(MP,multiset_partitions(p,r))
     end
   end
   return MP
@@ -218,15 +279,15 @@ end
 
 
 """
-    multisetpartitions(p::Partition, r::Integer)
+    multiset_partitions(p::Partition, r::Integer)
 
-A list of all possible r-restricted multisetpartitions of a Partition, by regrouping its parts into Partitions.
+A list of all possible r-restricted multiset_partitions of a Partition, by regrouping its parts into Partitions.
 
 The algorithm used is the algorithm M by A. Zoghbi and I. Stojmenovic, "The Art of Computer Programming - A Draft oF Sections 7.2.1.4-5: Generating all Partitions", 39–40 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
 
-The algorithm is almost the same as multisetpartitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multisetpartitions
+The algorithm is almost the same as multiset_partitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multiset_partitions
 """
-function multisetpartitions(p::Partition, r::Integer)
+function multiset_partitions(p::Partition, r::Integer)
   T = typeof(getindex(p,1))
   MP = Multipartition{T}[]
 
@@ -337,53 +398,4 @@ function multisetpartitions(p::Partition, r::Integer)
     a = f[l]
     gotoM2 = false
   end#while true
-end
-
-
-
-
-"""
-    function multipartitions(n::T,r::T) where T<:Integer
-
-A list of all multipartitions of length r such that the sum equals to n.
-
-
-"""
-function multipartitions(n::T,r::T) where T<:Integer
-  #Argument checking
-  n >= 0 || throw(ArgumentError("n >= 0 required"))
-  r >= 1 || throw(ArgumentError("r >= 1 required"))
-
-  MP = Multipartition{T}[]
-
-  #recursively produces all Integer Arrays p of length r such that the sum of all the Elements equals n. Then calls recMultipartitions!
-  function recP!(p::Array{T,1}, i::T, n::T) #where T<:Integer
-    if i==length(p) || n==0
-      p[i] = n
-      recMultipartitions!(fill(Partition(T[]),r), p, T(1))
-    else
-      for j=0:n
-        p[i] = T(j)
-        recP!(copy(p), T(i+1), T(n-j))
-      end
-    end
-  end
-
-  #recursively produces all multipartitions such that the i-th partition sums up to p[i]
-  function recMultipartitions!(mp::Array{Partition{T},1}, p::Array{T,1}, i::T) #where T<:Integer
-    if i == length(p)
-      for q in partitions(p[i])
-        mp[i] = q
-        push!(MP, Multipartition{T}(copy(mp)))
-      end
-    else
-      for q in partitions(p[i])
-        mp[i] = q
-        recMultipartitions!(copy(mp), p, T(i+1))
-      end
-    end
-  end
-
-  recP!(zeros(T,r), T(1), n)
-  return MP
 end

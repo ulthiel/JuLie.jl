@@ -2,7 +2,9 @@
 
 ## About
 
-This is a *planned* [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package for things around algebraic Lie theory, representation theory, and relevant combinatorics. The package is at a very early stage—contributions are very much welcome.
+This is an *early-stage* [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package for things around algebraic Lie theory, representation theory, and relevant combinatorics. Contributions are very much welcome!
+
+By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and contributors.
 
 ## Using
 
@@ -125,4 +127,3 @@ julia> @time partitions(Int16(130)); #~5.4 billion!
 12910.885498 seconds (5.37 G allocations: 739.784 GiB, 96.51% gc time)
 #No worries! (Of course, it's better to use a partition iterator in this case.)
 ```
-

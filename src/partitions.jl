@@ -11,7 +11,7 @@ export Partition, partitions, ascending_partitions, dominates, conjugate, getele
 """
     struct Partition{T} <: AbstractArray{T,1}
 
-A *partition* of an integer n >= 0 is a decreasing sequence n1, n2, ... of positive integers whose sum is equal to n. You can create a partition with
+A **partition** of an integer ``n \\geq 0`` is a *decreasing* (our convention) sequence ``n_1, n_2, \\ldots`` of positive integers whose sum is equal to ``n``. You can create a partition with
 ```
 P=Partition([3,2,1])
 ```
@@ -21,14 +21,15 @@ P=Partition(Int8[3,2,1])
 ```
 Note that for efficiency the Partition constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence. That's your job.
 
-I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
+**Remark.** I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
 
-The implementation of a subtype of AbstractArray is explained in https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array.
+The implementation of a subtype of AbstractArray is explained in [the Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
 """
 struct Partition{T} <: AbstractArray{T,1}
    p::Array{T,1}
 end
 
+# The following are functions to make the Partition struct array-like.
 function Base.show(io::IO, ::MIME"text/plain", P::Partition)
   print(io, P.p)
 end
@@ -49,8 +50,21 @@ function Base.setindex!(P::Partition, x::Integer, i::Int)
   return setindex!(P.p,x,i)
 end
 
+"""
+    getelement(P::Partition, i::Int)
+
+returns the i-th Element of P, if i>length(P) this returns 0 instead of throwing an Exception
+"""
 function getelement(P::Partition, i::Int)
   return (i>length(P.p) ? 0 : getindex(P.p,i))
+end
+
+# The empty array is of "Any" type, and this is stupid. We want it here
+# to get it into the default type Int64. This constructor is also called by
+# MultiPartition, and this casts the whole array into "Any" whenever there's
+# the empty partition inside.
+function Partition(p::Array{Any,1})
+  return Partition(Array{Int64,1}(p))
 end
 
 """
@@ -58,7 +72,7 @@ end
 
 A list of all partitions of an integer n >= 0, produced in lexicographically *descending* order (like in SAGE, but opposite to GAP (you can apply reverse() to reverse the order)). The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
 
-You can increase performance by casting n into a smaller integer type, e.g.
+You can increase performance by casting ``n`` into a smaller integer type, e.g.
 ```
 partitions(Int8(90))
 ```
@@ -121,7 +135,7 @@ end
     ascending_partitions(n::Integer;alg="ks")
 
 Instead of encoding a partition of an integer n >= 0 as a descending sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
-1. "ks" (**default**) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", https://arxiv.org/pdf/0909.2331.pdf, May 2014.
+1. "ks" (*default*) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", https://arxiv.org/pdf/0909.2331.pdf, May 2014.
 2. "m" is Algorithm 6 by M. Merca, "Fast Algorithm for Generating Ascending Compositions", J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
 The ascending partitions are given here as arrays, not of type Partition since these are descending by convention.
 
@@ -483,57 +497,6 @@ end
 =#
 
 
-"""
-    partition_to_partcount(p::Partition)
-
-returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
-
-e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
-
-for performance, partitions with trailing zeroes will not be allowed
-"""
-function partition_to_partcount(p::Partition)
-
-  T = typeof(getindex(p,1)) #Type of the elements in p
-
-  if getindex(p,1) == 0
-    return [getindex(p,1)]
-  end
-
-  pc = zeros(T,p[1])
-
-  for i = 1:length(p)
-    pc[p[i]] += 1
-  end
-  return pc
-
-end
-
-"""
-    partcount_to_partition(pc::Array{Integer,1})
-
-returns the partition from a part-count representation pc of a partition.
-
-e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
-"""
-function partcount_to_partition(pc::Array{T,1}) where T<:Integer
-
-  l = sum(pc)       #length of resulting partition
-  if l == 0
-    return Partition{T}([0])
-  end
-
-  p = zeros(T,l)
-
-  k=1
-  for i = length(pc):-1:1
-    for j = 1:pc[i]
-      p[k] = i
-      k += 1
-    end
-  end
-  return Partition{T}(p)
-end
 
 
 """
