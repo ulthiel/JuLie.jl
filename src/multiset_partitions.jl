@@ -7,11 +7,6 @@
 export multiset_partitions
 
 
-"""
-    struct Permutation{T} <: AbstractArray{T,1}
-
-A **multiset** is a set together with a multiplicity for each of its elements, i.e. it's basically a "set" which may contain multiple instances of the same element.
-"""
 # struct Multipartition{T} <: AbstractArray{Partition{T},1}
 #    mp::Array{Partition{T},1}
 # end
