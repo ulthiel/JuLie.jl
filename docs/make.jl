@@ -1,3 +1,3 @@
 using Documenter, JuLie
 
-makedocs(sitename="JuLie Documentation", modules = [JuLie])
+makedocs(sitename = "JuLie Documentation", modules = [JuLie])

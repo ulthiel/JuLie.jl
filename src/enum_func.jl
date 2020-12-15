@@ -14,7 +14,7 @@ export num_partitions, catalan, stirling1, stirling2, lucas
     num_partitions(n::fmpz)
     num_partitions(n::Integer)
 
-The number of integer partitions of the integer n >= 0. Uses the function from FLINT, which is really fast.
+The number of integer partitions of the integer ``n ≥ 0``. Uses the function from FLINT, which is really fast.
 
 For more information on these numbers, see [OEIS](https://oeis.org/A000041).
 """
@@ -35,7 +35,7 @@ end
     num_partitions(n::fmpz, k::fmpz)
     num_partitions(n::Integer, k::Integer)
 
-The number of integer partitions of the integer n >= 0 into k >= 0 parts. The implementation uses a recurrence relation.
+The number of integer partitions of the integer ``n ≥ 0`` into ``k ≥ 0`` parts. The implementation uses a recurrence relation.
 
 For more information on these numbers, see [OEIS](https://oeis.org/A008284).
 """
@@ -149,7 +149,7 @@ end
     stirling1(n::fmpz, k::fmpz)
     stirling1(n::Integer, k::Integer)
 
-The Stirling number ``S_1(n,k)`` of the first kind. The absolute value of ``S_1(n,k)`` counts the number of permutations of n elements with k disjoint cycles. The implementation is a wrapper to the function in FLINT.
+The Stirling number ``S_1(n,k)`` of the first kind. The absolute value of ``S_1(n,k)`` counts the number of permutations of ``n`` elements with ``k`` disjoint cycles. The implementation is a wrapper to the function in FLINT.
 
 For more information on these numbers, see [OEIS](https://oeis.org/A008275).
 """
@@ -173,7 +173,7 @@ end
     stirling2(n::fmpz, k::fmpz)
     stirling2(n::Integer, k::Integer)
 
-The Stirling number ``S_2(n,k)`` of the second kind. This counts the number of partitions of an n-set into k non-empty subsets. The implementation is a wrapper to the function in FLINT.
+The Stirling number ``S_2(n,k)`` of the second kind. This counts the number of partitions of an ``n``-set into ``k`` non-empty subsets. The implementation is a wrapper to the function in FLINT.
 
 For more information on these numbers, see [OEIS](https://oeis.org/A008277).
 """

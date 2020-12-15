@@ -14,6 +14,8 @@ include("partitions.jl")
 include("multipartitions.jl")
 include("multiset_partitions.jl")
 include("tableaux.jl")
+include("kostka_polynomials.jl")
+include("schur_polynomials.jl")
 
 include("nemo_export.jl")
 

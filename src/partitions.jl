@@ -53,7 +53,9 @@ end
 """
     getelement(P::Partition, i::Int)
 
-returns the i-th Element of P, if i>length(P) this returns 0 instead of throwing an Exception
+returns the ``i``-th Element of ``P``, if ``i > length(P)`` this returns 0 instead of throwing an Exception.
+
+If you are sure that ``P[i]`` exists, use **getindex** which is faster.
 """
 function getelement(P::Partition, i::Int)
   return (i>length(P.p) ? 0 : getindex(P.p,i))
@@ -70,7 +72,9 @@ end
 """
     partitions(n::Integer)
 
-A list of all partitions of an integer n >= 0, produced in lexicographically *descending* order (like in SAGE, but opposite to GAP (you can apply reverse() to reverse the order)). The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
+A list of all partitions of an integer ``n ≥ 0``, produced in lexicographically *descending* order (like in SAGE, but opposite to GAP (you can apply reverse() to reverse the order)).
+
+The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
 
 You can increase performance by casting ``n`` into a smaller integer type, e.g.
 ```
@@ -134,7 +138,7 @@ end
 """
     ascending_partitions(n::Integer;alg="ks")
 
-Instead of encoding a partition of an integer n >= 0 as a descending sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
+Instead of encoding a partition of an integer ``n ≥ 0`` as a descending sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
 1. "ks" (*default*) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", https://arxiv.org/pdf/0909.2331.pdf, May 2014.
 2. "m" is Algorithm 6 by M. Merca, "Fast Algorithm for Generating Ascending Compositions", J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
 The ascending partitions are given here as arrays, not of type Partition since these are descending by convention.
@@ -153,7 +157,7 @@ julia> @btime ascending_partitions(Int8(90),alg="m");
 
 I am using "ks" as default since it looks slicker and I believe there is a tiny mistake in the publication of "m" (which I fixed).
 """
-function ascending_partitions(n::Integer;alg="ks")
+function ascending_partitions(n::Integer; alg="ks")
 
   #Argument checking
   n >= 0 || throw(ArgumentError("n >= 0 required"))
@@ -262,7 +266,7 @@ end
 """
     partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
-All partitions of an integer m >= 0 into n >= 0 parts with lower bound l1>=0 and upper bound l2>=l1. Parameter z should be set to 0 for arbitrary choice of parts (*default*), 1 for distinct parts. The partitions are produced in  *decreasing* order.
+All partitions of an integer ``m ≥ 0`` into ``n ≥ 0`` parts with lower bound ``l1 ≥ 0`` and upper bound ``l2 ≥ l1``. Parameter ``z`` should be set to 0 for arbitrary choice of parts (*default*), 1 for distinct parts. The partitions are produced in  *decreasing* order.
 
 The algorithm used is "parta" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976). De-gotoed from ALGOL code by Elisa!
 """
@@ -366,7 +370,8 @@ end
 """
     partitions(m::Integer, n::Integer)
 
-All partitions of an integer m >= 0 into n >= 1 parts (no further restrictions). This simply calls partitions(m,n,1,m,z=0).
+All partitions of an integer ``m ≥ 0`` into ``n ≥ 1`` parts (no further restrictions).
+This simply calls ```partitions(m,n,1,m,z=0)```.
 """
 function partitions(m::Integer, n::Integer)
   return partitions(m,n,1,m,z=0)
@@ -502,8 +507,9 @@ end
 """
     dominates(lambda::Partition, mu::Partition)
 
-returns true if lambda >= mu according to the dominance order on partitions:
-lambda >= mu  :<=>  lambda[1] + ... + lambda[i] >= mu[1] + ... + mu[i] for all i
+returns true if ``lambda ≥ mu`` according to the dominance order on partitions:
+
+``λ ≥ μ :⟺   λ[1] + ... + λ[i] ≥ μ[1] + ... + μ[i]`` for all ``i``
 """
 function dominates(lambda::Partition, mu::Partition)
   dif = 0
@@ -531,7 +537,11 @@ end
 """
     conjugate(p::Partition{T}) where T<:Integer
 
-returns the conjugate partition of p.
+returns the **conjugate** partition of ``p``.
+
+The **conjugate** of a partition ``p`` is obtained by writing ``p`` as a **diagram** and then flipping it along it's main diagonal.
+
+For more information see: [Wikipedia:Partition](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions)
 """
 function conjugate(p::Partition{T}) where T<:Integer
   if isempty(p)
