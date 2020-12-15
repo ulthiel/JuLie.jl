@@ -4,7 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export multiset_partitions
+export multiset_partitions, partition_to_partcount, partcount_to_partition
 
 
 # struct Multipartition{T} <: AbstractArray{Partition{T},1}
@@ -30,22 +30,19 @@ export multiset_partitions
 # end
 
 """
-    multiset_partitions(n::Integer)
+    multiset_partitions(n::T) where T<:Integer
 
-A list of all multiset_partitions of an integer n >= 0.
+A list of all multiset_partitions of an integer ``n ⋝ 0``.
 
-The performance will suffer by casting n into a smaller integer type, e.g.
+The performance will suffer by casting ``n`` into a smaller integer type, e.g.
 ```
 multiset_partitions(Int8(20))
 ```
 """
-function multiset_partitions(n::Integer)
+function multiset_partitions(n::T) where T<:Integer
 
     #Argument checking
     n >= 0 || throw(ArgumentError("n >= 0 required"))
-
-    # Use type of n
-    T = typeof(n)
 
     # Some trivial cases
     if n == 0
@@ -64,66 +61,13 @@ end
 
 
 """
-    partition_to_partcount(p::Partition)
+    multiset_partitions(p::Partition{T})  where T<:Integer
 
-returns the part-count representation of a partition p, where the nth element is the count of appearances of n in p.
+A list of all possible multiset_partitions of a Partition, by regrouping its parts into Partitions.
 
-e.g. partition_to_partcount([5,3,3,3,2,1,1]) returns [2,1,3,0,1]
-
-for performance, partitions with trailing zeroes will not be allowed
+The algorithm used is the algorithm M by , ["The Art of Computer Programming - Volume 4A, Combinatotial Algorithms, Part 1"](http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf) by Donald E. Knuth(2011), 429–430. De-gotoed, index-shifted and generalized.
 """
-function partition_to_partcount(p::Partition)
-
-  T = typeof(getindex(p,1)) #Type of the elements in p
-
-  if getindex(p,1) == 0
-    return [getindex(p,1)]
-  end
-
-  pc = zeros(T,p[1])
-
-  for i = 1:length(p)
-    pc[p[i]] += 1
-  end
-  return pc
-
-end
-
-"""
-    partcount_to_partition(pc::Array{Integer,1})
-
-returns the partition from a part-count representation pc of a partition.
-
-e.g. partcount_to_partition([2,0,1]) returns [3,1,1]
-"""
-function partcount_to_partition(pc::Array{T,1}) where T<:Integer
-
-  l = sum(pc)       #length of resulting partition
-  if l == 0
-    return Partition{T}([0])
-  end
-
-  p = zeros(T,l)
-
-  k=1
-  for i = length(pc):-1:1
-    for j = 1:pc[i]
-      p[k] = i
-      k += 1
-    end
-  end
-  return Partition{T}(p)
-end
-
-"""
-    multiset_partitions(p::Partition)
-
-A list of all possible multiset_partitions of a Partition, by regrouping its parts in Partitions.
-
-The algorithm used is the algorithm M by A. Zoghbi and I. Stojmenovic, "The Art of Computer Programming - A Draft oF Sections 7.2.1.4-5: Generating all Partitions", 39–40 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
-"""
-function multiset_partitions(p::Partition)
-  T = typeof(getindex(p,1))
+function multiset_partitions(p::Partition{T})  where T<:Integer
   MP = Multipartition{T}[]
 
   partcount = partition_to_partcount(p)
@@ -236,23 +180,16 @@ end
 
 
 
-
-
-
-
 """
-    multiset_partitions(n::Integer, r::Integer)
+    multiset_partitions(n::T, r::Integer) where T<:Integer
 
-A list of all multiset_partitions of an integer n >= 0 into r >= 1 parts.
+A list of all multiset_partitions of an integer ``n ⋝ 0`` into ``r ⋝ 1`` parts.
 """
-function multiset_partitions(n::Integer, r::Integer)
+function multiset_partitions(n::T, r::Integer) where T<:Integer
 
   #Argument checking
   n >= 0 || throw(ArgumentError("n >= 0 required"))
   r >= 1 || throw(ArgumentError("r >= 1 required"))
-
-  # Use type of n
-  T = typeof(n)
 
   # Some trivial cases
   if n < r
@@ -274,16 +211,15 @@ end
 
 
 """
-    multiset_partitions(p::Partition, r::Integer)
+    multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
 
-A list of all possible r-restricted multiset_partitions of a Partition, by regrouping its parts into Partitions.
+A list of all possible ``r``-restricted multiset_partitions of a Partition, by regrouping its parts into Partitions.
 
-The algorithm used is the algorithm M by A. Zoghbi and I. Stojmenovic, "The Art of Computer Programming - A Draft oF Sections 7.2.1.4-5: Generating all Partitions", 39–40 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
-
-The algorithm is almost the same as multiset_partitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multiset_partitions
+The algorithm used is a version of the algorithm M by , "The Art of Computer Programming - Volume 4A, Combinatotial Algorithms, Part 1" by Donald E. Knuth, 429–430 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
 """
-function multiset_partitions(p::Partition, r::Integer)
-  T = typeof(getindex(p,1))
+function multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
+  #The algorithm is almost the same as multiset_partitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multiset_partitions.
+
   MP = Multipartition{T}[]
 
   partcount = partition_to_partcount(p)
@@ -297,10 +233,10 @@ function multiset_partitions(p::Partition, r::Integer)
   u = zeros(T,nn)   #u : yet unpartitioned amount in c remaining
   v = zeros(T,nn)   #v : c component of the current part
 
-  m = 0
+  m::T = 0
   for j = 1:length(partcount)
     if partcount[j] != 0
-      m = m + T(1)
+      m = m + 1
       c[m] = j
       u[m] = partcount[j]
       v[m] = partcount[j]
@@ -393,4 +329,68 @@ function multiset_partitions(p::Partition, r::Integer)
     a = f[l]
     gotoM2 = false
   end#while true
+end
+
+
+"""
+    partition_to_partcount(p::Partition{T})  where T<:Integer
+
+returns the **part-count** representation of a partition ``p``, where the ``n``-th element is the count of appearances of ``n`` in ``p``.
+
+```
+julia> partition_to_partcount([5,3,3,3,2,1,1])
+  5-element Array{Int64,1}:
+  2
+  1
+  3
+  0
+  1
+```
+
+for performance, partitions with trailing zeroes will not be allowed.
+"""
+function partition_to_partcount(p::Partition{T})  where T<:Integer
+
+  if isempty(p) || getindex(p,1) == 0
+    return []
+  end
+
+  p[end]!=0 || throw(ArgumentError("p can't have any trailing zeroes"))
+
+  pc = zeros(T,p[1])
+
+  for i = 1:length(p)
+    pc[p[i]] += 1
+  end
+  return pc
+
+end
+
+
+"""
+    partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+returns the partition from a part-count representation ``pc`` of a partition.
+```
+julia> partcount_to_partition([2,0,1])
+  [3,1,1]
+```
+"""
+function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+  l = sum(pc)       #length of resulting partition
+  if l == 0
+    return Partition{T}([0])
+  end
+
+  p = zeros(T,l)
+
+  k=1
+  for i = length(pc):-1:1
+    for j = 1:pc[i]
+      p[k] = i
+      k += 1
+    end
+  end
+  return Partition{T}(p)
 end

@@ -40,6 +40,9 @@ You can get help for a function by putting a question mark in front, e.g.
 
 ```@docs
 Partition
+getelement
+dominates
+conjugate
 partitions
 ascending_partitions
 ```
@@ -49,6 +52,61 @@ ascending_partitions
 ```@docs
 Multipartition
 multipartitions
+```
+
+### Multiset_partitions
+
+A **Multiset_partition** is a Multipartition ``λ^{(1)},...,λ^{(r)}`` where each ``\lambda^{(i)}`` is a non-empty partition.``\\``
+Furthermore the ordering of the Partitions ``\lambda^{(i)}`` is not important, i.e. ``\lambda^{(1)},...,\lambda^{(r)}``=``\lambda^{(\sigma(1))},...,\lambda^{(\sigma(r))}`` ``\\``
+**Note:** This equality-relation is not implemented in this Module.
+
+```@docs
+multiset_partitions
+partition_to_partcount
+partcount_to_partition
+```
+
+## Tableaux
+
+```@docs
+Tableau
+shape
+weight
+reading_word
+hook_length
+hook_length_formula
+schensted
+bump!
+```
+
+### semistandard Tableaux
+
+A **semistandard tableaux** is a tableaux where the values are non decreasing in each row, and strictly increasing in each column.
+
+```@docs
+semistandard_tableaux
+is_semistandard
+```
+
+### standard Tableaux
+
+A **standard tableaux** is a tableaux where the values are strictly increasing in each row and column. A standard tableaux also requires each Integer from 1 to the amount of boxes to occur exactly once.
+
+```@docs
+standard_tableaux
+is_standard
+```
+
+## Kostka Polynomials
+
+```@docs
+kostka_polynomial
+```
+
+## Schur Polynomials
+
+```@docs
+schur_polynomial
 ```
 
 ## Enumerative functions

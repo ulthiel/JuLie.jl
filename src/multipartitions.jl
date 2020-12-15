@@ -53,14 +53,14 @@ function Multipartition(mp::Array{Array{Any,1},1})
 end
 
 """
-    function multipartitions(n::T,r::T) where T<:Integer
+    function multipartitions(n::T, r::Integer) where T<:Integer
 
-A list of all ``r``-component multipartitions of ``n``. As for partitions, you can cast n and r into smaller type for efficiency, e.g.
+A list of all ``r``-component multipartitions of ``n``. As for partitions, you can cast ``n`` into smaller type for efficiency, e.g.
 ```
-multipartitions(Int8(3),Int8(2))
+multipartitions(Int8(3),2)
 ```
 """
-function multipartitions(n::T,r::T) where T<:Integer
+function multipartitions(n::T, r::Integer) where T<:Integer
   #Argument checking
   n >= 0 || throw(ArgumentError("n >= 0 required"))
   r >= 1 || throw(ArgumentError("r >= 1 required"))
