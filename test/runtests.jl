@@ -171,6 +171,15 @@ end
 	@test check==true
 
 	=#
+
+	# Dominance order
+	@test dominates(Partition([4,2]), Partition([3,2,1])) == true
+	@test dominates(Partition([4,1,1]), Partition([3,3])) == false
+	@test dominates(Partition([3,3]), Partition([4,1,1])) == false
+
+	# Conjugate partition
+	@test conjugate(Partition([6,4,3,1])) == Partition([4, 3, 3, 2, 1, 1])
+
 end
 
 @testset "Multi-partitions" begin

@@ -10,20 +10,19 @@ export Tableau, shape, semistandard_tableaux, is_standard, is_semistandard, sche
 """
     struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
 
-A **tableau** or Young tableau is a finite collection of boxes, each holding a value. The boxes are arranged in left-justified rows. These rows are read from top to bottom. The row lengths have to be non-increasing order.
-You can create a tableau with
+A **Young diagram** is a diagram of finitely many empty "boxes" arranged in left-justified rows, with the row lengths in non-increasing order. Listing the number of boxes in each row gives a partition λ of a non-negative integer n (the total number of boxes of the diagram). The diagram is then said to be of **shape** λ. It's clear that there is a bijection between partitions of n and Young diagrams with n boxes.
+
+A **Young tableau** of shape λ is a filling of the boxes of the Young diagram of λ with elements from some set. After relabeling we can (and will) assume that we fill from a set of integers from 1 up to some number, which in applications is often equal to n. We can encode a tableau as an array of arrays and we have implemented an own type ```Tableau{T}```  as subtype of ```AbstractArray{AbstractArray{T,1},1}``` to work with tableaux. You can create a tableau with
 ```
 Tab=Tableau([[1,2,3],[4,5],[6]])
 ```
-and then work with it like with an array of arrays. In fact, Tableau is a subtype of  AbstractArray{AbstractArray{T,1},1}.
-Note that for efficiency the Tableau constructor does not check whether the given array is in fact a Tableau, i.e. a sequence of Arrays with decreasing lenghts. That's your job.
-The implementation of a subtype of AbstractArray is explained in [the Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
+and then work with it like with an array of arrays. As for partitions, you may increase performance by casting into smaller integer types, e.g.
+```
+Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]])
+```
+For efficiency, we do not check whether the given array is really a tableau, i.e. whether the structure of the array defines a partition.
 
-Furthermore there are two spezial types of tableaux:
-
-A **semistandard tableaux** is a tableaux where the values are non decreasing in each row, and strictly increasing in each column.
-
-A **standard tableaux** is a tableaux where the values are strictly increasing in each row and column. A standard tableaux also requires each Integer from 1 to the amount of boxes to occur exactly once.
+For more information see [Wikipedia](https://en.wikipedia.org/wiki/Young_tableau).
 """
 struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
    t::Array{Array{T,1},1}
@@ -52,13 +51,7 @@ end
 """
     shape(Tab::Tableau{T})
 
-returns the shape of ``Tab`` as a Partition
-
-The **shape** of a Tableau describes the length of each row. i.e:
-```
-julia> shape([ [1,2,3,4], [5,6], [7] ])
-  [4, 2, 1]
-```
+Returns the shape of the tableau Tab as a partition (of type ```Partition```).
 """
 function shape(Tab::Tableau{T}) where T
   return Partition{T}([ length(Tab[i]) for i=1:length(Tab) ])
@@ -66,10 +59,159 @@ end
 
 
 """
+    weight(Tab::Tableau)
+
+The **weight** of a tableau is the number of times each number appears in the tableau.
+"""
+function weight(Tab::Tableau)
+  max=0
+  for i=1:length(Tab)
+    if max<Tab[i][end]
+      max=Tab[i][end]
+    end
+  end
+
+  w = zeros(Int,max)
+  for rows in Tab
+    for box in rows
+      w[box] += 1
+    end
+  end
+  return w
+end
+
+
+"""
+    reading_word(Tab::Tableau)
+
+Returns an array containing the filling of the tableau read from left to right and from bottom to top.
+```
+julia> reading_word([ [1,2,3] , [4,5] , [6] ])
+6-element Array{Int64,1}:
+ 6
+ 4
+ 5
+ 1
+ 2
+ 3
+```
+"""
+function reading_word(Tab::Tableau)
+  w=zeros(Int,sum(shape(Tab)))
+  k=0
+  for i = length(Tab):-1:1
+    for j = 1:length(Tab[i])
+      k += 1
+      w[k] = Tab[i,j]
+    end
+  end
+  return w
+end
+
+
+
+"""
+    hook_length(Tab::Tableau, i::Integer, j::Integer)
+
+The **hook length** of a box, is the number of boxes to the right in the same row + the number of boxes below in the same column + 1. The function returns the hook length of the box with coordinate (i,j), i.e. ``Tab[i][j]``. The functions assumes that the box exists.
+"""
+function hook_length(Tab::Tableau, i::Integer, j::Integer)
+  s = shape(Tab)
+  h = s[i] - j + 1
+  k = j + 1
+  while k<=length(s) && s[k]>=j
+    k += 1
+    h += 1
+  end
+  return h
+end
+
+
+"""
+    hook_length(s::Partition, i::Integer, j::Integer)
+
+returns the **hook length** of ``Tab[i][j]`` for a Tableau ``Tab`` of shape ``s``.
+
+assumes that ``i≤length(s)`` and ``j≤s[i]``
+"""
+function hook_length(s::Partition, i::Integer, j::Integer)
+  h = s[i] - j + 1
+  k = i + 1
+  while k<=length(s) && s[k]>=j
+    k += 1
+    h += 1
+  end
+  return h
+end
+
+
+"""
+    hook_length_formula(s::Partition)
+
+returns the **hook length formula** for a tableau of shape ``s``.
+
+```math
+f^{λ} = {\\dfrac{n!}{∏ h_λ(i,j)}}
+```
+where the product is over all cells ``(i,j)`` in ``Tab``, and ``h_λ`` is the [hook_length](index.html#JuLie.hook_length).
+
+Equals the number of standard tableaux of shape ``s``
+"""
+function hook_length_formula(s::Partition)
+  h=factorial(big(sum(s)))
+  for i = 1:length(s)
+    for j = 1:s[i]
+      h=Integer(h/hook_length(s,i,j))
+    end
+  end
+  return h
+end
+
+
+"""
+    is_semistandard(Tab::Tableau)
+
+A tableau is called **semistandard** if the entries weakly increase along each row and strictly increase down each column.
+"""
+function is_semistandard(Tab::Tableau)
+  #correct shape
+  s = shape(Tab)
+  for i = 1:length(s)-1
+    if s[i] < s[i+1]
+      return false
+    end
+  end
+
+  #increasing first row
+  for j = 2:length(s[1])
+    if Tab[i][j] < Tab[i][j-1]
+      return false
+    end
+  end
+
+  #increasing first column
+  for i = 2:length(s)
+    if Tab[i][1] <= Tab[i-1][1]
+      return false
+    end
+  end
+
+  #increasing rows and columns
+  for i = 2:length(Tab)
+    for j = 2:length(Tab[i])
+      if Tab[i][j] < Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
+        return false
+      end
+    end
+  end
+  return true
+end
+
+
+"""
     semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer) where T<:Integer
 
-returns an Array containing all **semistandard tableaux** of shape ``shape`` and elements `` ≤ max\\_val``.
-The tableaux are in lexicographic order from left to right and top to bottom.
+Returns a list of all semistandard tableaux of given shape and filling elements bounded by `max_val`. By default, `max_val` is equal to the sum of the shape partition (the number of boxes in the Young diagram). The list of tableaux is in lexicographic order from left to right and top to bottom.
 """
 function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::T) where T<:Integer
   return semistandard_tableaux(Array{T,1}(shape), max_val)
@@ -79,8 +221,7 @@ end
 """
     semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer) where T<:Integer
 
-returns an Array containing all **semistandard tableaux** of shape ``shape`` and elements `` ≤ max\\_val``.
-The tableaux are in lexicographic order from left to right and top to bottom
+Same as for [`semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::T) where T<:Integer`](@ref), where the array is interpreted as a partition.
 """
 function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer) where T<:Integer
   SST = Array{Tableau{T},1}()
@@ -142,7 +283,7 @@ end
 """
     semistandard_tableaux(box_num::T, max_val=box_num::T) where T<:Integer
 
-returns an Array containing all **semistandard tableaux** made from ``box\\_num`` boxes and elements `` ≤ max\\_val``.
+Returns a list of all semistandard tableaux consisting of `box_num` boxes and filling elements bounded by `max_val`.
 """
 function semistandard_tableaux(box_num::T, max_val=box_num::T) where T<:Integer
   SST = Array{Tableau{T},1}()
@@ -161,9 +302,8 @@ end
 """
     semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer
 
-returns an Array containing all **semistandard tableaux** with shape ``s`` and weights ``weight``.
-
-requires that ``sum(s) = sum(weight)``
+Returns a list of all semistandard tableaux with shape s and given weight. This
+requires that sum(s) = sum(weight).
 """
 function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer
   n_max = sum(s)
@@ -263,29 +403,81 @@ end
 """
     semistandard_tableaux(s::Partition{T}, weight::Partition{T}) where T<:Integer
 
-returns an Array containing all **semistandard tableaux** with shape ``s`` and weights ``weight``.
-
-requires that ``sum(s) = sum(weight)``
+Same as for [`semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer`](@ref).
 """
 function semistandard_tableaux(s::Partition{T}, weight::Partition{T}) where T<:Integer
   return semistandard_tableaux(Array{T,1}(s),Array{T,1}(weight))
 end
 
 
-"""
-    standard_tableaux(s::Array{Integer,1})
 
-returns a list of all **standard tableaux** of a given shape ``s``
+
+
 """
-function standard_tableaux(s::Array{T,1}) where T<:Integer
-  return standard_tableaux(Partition(s))
+    is_standard(Tab::Tableau)
+
+A tableau is called **standard** if it is semistandard and the entries are in bijection with 1,…n, where n is the number of boxes.
+"""
+function is_standard(Tab::Tableau)
+  #correct shape
+  s = shape(Tab)
+  for i = 1:length(s)-1
+    if s[i] < s[i+1]
+      return false
+    end
+  end
+
+  #contains all numbers from 1 to n
+  numbs = falses(sum(s))
+  for i = 1:length(s)
+    for j = 1:s[i]
+      numbs[Tab[i][j]] = true
+    end
+  end
+  if false in numbs
+    return false
+  end
+
+  #increasing first row
+  for j = 2:length(s[1])
+    if Tab[1][j] <= Tab[1][j-1]
+      return false
+    end
+  end
+
+  #increasing first column
+  for i = 2:length(s)
+    if Tab[i][1] <= Tab[i-1][1]
+      return false
+    end
+  end
+
+  #increasing rows and columns
+  for i = 2:length(Tab)
+    for j = 2:length(Tab[i])
+      if Tab[i][j] <= Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
+        return false
+      end
+    end
+  end
+  return true
 end
 
 
 """
     standard_tableaux(s::Partition)
 
-returns a list of all **standard tableaux** of a given shape ``s``
+Returns a list of all standard tableaux of a given shape.
+
+Performance:
+```
+julia> @time standard_tableaux([10,5,3,2]) #28779300 tableaux
+ 40.143980 seconds (172.68 M allocations: 16.976 GiB, 69.19% gc time)
+```
+```
+magma> time X:=StandardTableaux([10,5,3,2]);
+Time: 188.850
+```
 """
 function standard_tableaux(s::Partition)
   Tabs = Array{Tableau,1}()
@@ -339,9 +531,19 @@ end
 
 
 """
+    standard_tableaux(s::Array{Integer,1})
+
+Same as [`standard_tableaux(s::Partition)`](@ref).
+"""
+function standard_tableaux(s::Array{T,1}) where T<:Integer
+  return standard_tableaux(Partition(s))
+end
+
+
+"""
     standard_tableaux(n::Integer)
 
-returns a list of all **standard tableaux** of size ``n``
+Returns a list of all standard tableaux with n boxes.
 """
 function standard_tableaux(n::Integer)
   ST = Array{Tableau,1}()
@@ -351,96 +553,6 @@ function standard_tableaux(n::Integer)
   return ST
 end
 
-
-"""
-    is_standard(Tab::Tableau)
-
-Checks if ``Tab`` is a **standard tableau**. i.e. a Tableau with strictly increasing columns and rows, where each number from 1 to n appears exactly once.
-"""
-function is_standard(Tab::Tableau)
-  #correct shape
-  s = shape(Tab)
-  for i = 1:length(s)-1
-    if s[i] < s[i+1]
-      return false
-    end
-  end
-
-  #contains all numbers from 1 to n
-  numbs = falses(sum(s))
-  for i = 1:length(s)
-    for j = 1:s[i]
-      numbs[Tab[i][j]] = true
-    end
-  end
-  if false in numbs
-    return false
-  end
-
-  #increasing first row
-  for j = 2:length(s[1])
-    if Tab[1][j] <= Tab[1][j-1]
-      return false
-    end
-  end
-
-  #increasing first column
-  for i = 2:length(s)
-    if Tab[i][1] <= Tab[i-1][1]
-      return false
-    end
-  end
-
-  #increasing rows and columns
-  for i = 2:length(Tab)
-    for j = 2:length(Tab[i])
-      if Tab[i][j] <= Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
-        return false
-      end
-    end
-  end
-  return true
-end
-
-
-"""
-    is_semistandard(Tab::Tableau)
-
-Checks if ``Tab`` is a **semistandard tableau**. i.e. a Tableau with non decresing rows and strictly increasing columns.
-"""
-function is_semistandard(Tab::Tableau)
-  #correct shape
-  s = shape(Tab)
-  for i = 1:length(s)-1
-    if s[i] < s[i+1]
-      return false
-    end
-  end
-
-  #increasing first row
-  for j = 2:length(s[1])
-    if Tab[i][j] < Tab[i][j-1]
-      return false
-    end
-  end
-
-  #increasing first column
-  for i = 2:length(s)
-    if Tab[i][1] <= Tab[i-1][1]
-      return false
-    end
-  end
-
-  #increasing rows and columns
-  for i = 2:length(Tab)
-    for j = 2:length(Tab[i])
-      if Tab[i][j] < Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
-        return false
-      end
-    end
-  end
-  return true
-end
 
 
 """
@@ -519,120 +631,4 @@ function bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
   push!(Q.t, [y])
 
   return Tab,Q
-end
-
-
-"""
-    hook_length(Tab::Tableau, i::Integer, j::Integer)
-
-returns the **hook length** of ``Tab[i][j]``.
-
-The **hook length** of a cell, is the count of cells to the right in the same row + the count of cells below in the same column + 1
-
-assumes that ``Tab[i][j]`` exists
-"""
-function hook_length(Tab::Tableau, i::Integer, j::Integer)
-  s = shape(Tab)
-  h = s[i] - j + 1
-  k = j + 1
-  while k<=length(s) && s[k]>=j
-    k += 1
-    h += 1
-  end
-  return h
-end
-
-
-"""
-    hook_length(s::Partition, i::Integer, j::Integer)
-
-returns the **hook length** of ``Tab[i][j]`` for a Tableau ``Tab`` of shape ``s``.
-
-assumes that ``i≤length(s)`` and ``j≤s[i]``
-"""
-function hook_length(s::Partition, i::Integer, j::Integer)
-  h = s[i] - j + 1
-  k = i + 1
-  while k<=length(s) && s[k]>=j
-    k += 1
-    h += 1
-  end
-  return h
-end
-
-
-"""
-    hook_length_formula(s::Partition)
-
-returns the **hook length formula** for a tableau of shape ``s``.
-
-```math
-f^{λ} = {\\dfrac{n!}{∏ h_λ(i,j)}}
-```
-where the product is over all cells ``(i,j)`` in ``Tab``, and ``h_λ`` is the [hook_length](index.html#JuLie.hook_length).
-
-Equals the number of standard tableaux of shape ``s``
-"""
-function hook_length_formula(s::Partition)
-  h=factorial(big(sum(s)))
-  for i = 1:length(s)
-    for j = 1:s[i]
-      h=Integer(h/hook_length(s,i,j))
-    end
-  end
-  return h
-end
-
-
-"""
-    weight(Tab::Tableau)
-
-returns the **weight** of the tableau ``Tab``.
-
-i.e. ``w``::Array{Int,1} such that ``w[i]`` = number of appearances of ``i`` in ``Tab``
-"""
-function weight(Tab::Tableau)
-  max=0
-  for i=1:length(Tab)
-    if max<Tab[i][end]
-      max=Tab[i][end]
-    end
-  end
-
-  w = zeros(Int,max)
-  for rows in Tab
-    for box in rows
-      w[box] += 1
-    end
-  end
-  return w
-end
-
-
-"""
-    reading_word(Tab::Tableau)
-
-returns an Array containing the cells of ``Tab`` read from left to right and from bottom to top.
-
-```
-julia> reading_word([ [1,2,3] , [4,5] , [6] ])
-6-element Array{Int64,1}:
- 6
- 4
- 5
- 1
- 2
- 3
-```
-"""
-function reading_word(Tab::Tableau)
-  w=zeros(Int,sum(shape(Tab)))
-  k=0
-  for i = length(Tab):-1:1
-    for j = 1:length(Tab[i])
-      k += 1
-      w[k] = Tab[i,j]
-    end
-  end
-  return w
 end

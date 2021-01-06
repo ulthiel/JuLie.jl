@@ -6,20 +6,24 @@
 
 export Partition, partitions, ascending_partitions, dominates, conjugate, getelement
 
-
-
 """
     struct Partition{T} <: AbstractArray{T,1}
 
-A **partition** of an integer ``n \\geq 0`` is a *decreasing* (our convention) sequence ``n_1, n_2, \\ldots`` of positive integers whose sum is equal to ``n``. You can create a partition with
+A **partition** of an integer n ≥ 0 is a decreasing sequence n₁, n₂, … of positive integers nᵢ whose sum is equal to n. The nᵢ are called the **parts** of the partition. We can encode a partition as an array and we have implemented an own type ```Partition{T}``` as subtype of ```AbstractArray{T,1}``` to be able to conceptually work with partitions. As an example, you can create the partition 3+2+1 of 6 using
 ```
-P=Partition([3,2,1])
+julia> P=Partition([3,2,1])
+julia> sum(P)
+6
+julia> P[1]
+3
 ```
-and then work with it like with an array. In fact, Partition is a subtype of AbstractArray{T,1}. You can increase performance by using smaller integer types, e.g.
+You may increase performance by using smaller integer types, e.g.
 ```
-P=Partition(Int8[3,2,1])
+julia> P=Partition(Int8[3,2,1])
 ```
-Note that for efficiency the Partition constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence. That's your job.
+For efficiency, the ```Partition``` constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence—that's your job.
+
+For more general information on partitions, check out [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)).
 
 **Remark.** I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
 
@@ -50,17 +54,6 @@ function Base.setindex!(P::Partition, x::Integer, i::Int)
   return setindex!(P.p,x,i)
 end
 
-"""
-    getelement(P::Partition, i::Int)
-
-returns the ``i``-th Element of ``P``, if ``i > length(P)`` this returns 0 instead of throwing an Exception.
-
-If you are sure that ``P[i]`` exists, use **getindex** which is faster.
-"""
-function getelement(P::Partition, i::Int)
-  return (i>length(P.p) ? 0 : getindex(P.p,i))
-end
-
 # The empty array is of "Any" type, and this is stupid. We want it here
 # to get it into the default type Int64. This constructor is also called by
 # MultiPartition, and this casts the whole array into "Any" whenever there's
@@ -70,15 +63,29 @@ function Partition(p::Array{Any,1})
 end
 
 """
+    getelement(P::Partition, i::Int)
+
+Sometimes in algorithms for partitions it is convenient to be able to access parts beyond the length of the partition, and then you want to get zero instead of an error. This function is a shortcut for
+```
+return (i>length(P.p) ? 0 : getindex(P.p,i))
+```
+If you are sure that ```P[i]``` exists, use **getindex** because this will be faster.
+"""
+function getelement(P::Partition, i::Int)
+  return (i>length(P.p) ? 0 : getindex(P.p,i))
+end
+
+
+"""
     partitions(n::Integer)
 
-A list of all partitions of an integer ``n ≥ 0``, produced in lexicographically *descending* order (like in SAGE, but opposite to GAP (you can apply reverse() to reverse the order)).
+A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in SAGE, but opposite to GAP. You can apply reverse() to reverse the order.
 
 The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
 
-You can increase performance by casting ``n`` into a smaller integer type, e.g.
+As usual, you may increase performance by casting n into a smaller integer type, e.g.
 ```
-partitions(Int8(90))
+julia> partitions(Int8(90))
 ```
 """
 function partitions(n::Integer)
@@ -138,10 +145,10 @@ end
 """
     ascending_partitions(n::Integer;alg="ks")
 
-Instead of encoding a partition of an integer ``n ≥ 0`` as a descending sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
-1. "ks" (*default*) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", https://arxiv.org/pdf/0909.2331.pdf, May 2014.
+Instead of encoding a partition of an integer n ≥ 0 as a *descending* sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
+1. "ks" (*default*) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", [https://arxiv.org/pdf/0909.2331.pdf](https://arxiv.org/pdf/0909.2331.pdf), May 2014.
 2. "m" is Algorithm 6 by M. Merca, "Fast Algorithm for Generating Ascending Compositions", J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
-The ascending partitions are given here as arrays, not of type Partition since these are descending by convention.
+The ascending partitions are given here as arrays, not of type Partition since these are descending by our convention.
 
 I don't see a significant speed difference to the descending encoding:
 ```
@@ -266,7 +273,10 @@ end
 """
     partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
-All partitions of an integer ``m ≥ 0`` into ``n ≥ 0`` parts with lower bound ``l1 ≥ 0`` and upper bound ``l2 ≥ l1``. Parameter ``z`` should be set to 0 for arbitrary choice of parts (*default*), 1 for distinct parts. The partitions are produced in  *decreasing* order.
+A list of all partitions of an integer m ≥ 0 into n ≥ 0 parts with lower bound l1 ≥ 0 and upper bound l2 ≥ l1 for the parts. There are two choices for the parameter z:
+* z=0: no further restriction (*default*);
+* z=1: only distinct parts.
+The partitions are produced in *decreasing* order.
 
 The algorithm used is "parta" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976). De-gotoed from ALGOL code by Elisa!
 """
@@ -370,7 +380,7 @@ end
 """
     partitions(m::Integer, n::Integer)
 
-All partitions of an integer ``m ≥ 0`` into ``n ≥ 1`` parts (no further restrictions).
+All partitions of an integer m ≥ 0 into n ≥ 1 parts (no further restrictions).
 This simply calls ```partitions(m,n,1,m,z=0)```.
 """
 function partitions(m::Integer, n::Integer)
@@ -507,9 +517,9 @@ end
 """
     dominates(lambda::Partition, mu::Partition)
 
-returns true if ``lambda ≥ mu`` according to the dominance order on partitions:
+Returns true if lambda ≥ mu in the **dominance order** on partitions, which is the partial order defined by λ ≥ μ if and only if λ₁ + … + λᵢ ≥ μ₁ + … + μᵢ for all i.
 
-``λ ≥ μ :⟺   λ[1] + ... + λ[i] ≥ μ[1] + ... + μ[i]`` for all ``i``
+For more information see [Wikipedia](https://en.wikipedia.org/wiki/Dominance_order).
 """
 function dominates(lambda::Partition, mu::Partition)
   dif = 0
@@ -535,26 +545,24 @@ end
 
 
 """
-    conjugate(p::Partition{T}) where T<:Integer
+    conjugate(P::Partition{T}) where T<:Integer
 
-returns the **conjugate** partition of ``p``.
+Returns the **conjugate** of a partition P. The **conjugate** is obtained by writing P as a **diagram** and then flipping it along it's main diagonal.
 
-The **conjugate** of a partition ``p`` is obtained by writing ``p`` as a **diagram** and then flipping it along it's main diagonal.
-
-For more information see: [Wikipedia:Partition](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions)
+For more information see [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions).
 """
-function conjugate(p::Partition{T}) where T<:Integer
-  if isempty(p)
-    return copy(p)
+function conjugate(P::Partition{T}) where T<:Integer
+  if isempty(P)
+    return copy(P)
   end
 
-  q = zeros(T, p[1])
+  Q = zeros(T, P[1])
 
-  for i = 1:length(p)
-    for j = 1:p[i]
-      q[j] += 1
+  for i = 1:length(P)
+    for j = 1:P[i]
+      Q[j] += 1
     end
   end
 
-  return Partition(q)
+  return Partition(Q)
 end

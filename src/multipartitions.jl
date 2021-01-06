@@ -9,15 +9,17 @@ export Multipartition, multipartitions
 """
     struct Multipartition{T} <: AbstractArray{Partition{T},1}
 
-An ``r``-component **multipartition** of an integer ``n`` is an ``r``-tuple of partitions ``\\lambda^{(1)},...,\\lambda^{(r)}`` where each ``\\lambda^{(i)}`` is a partition of some ``a_i`` and the ``a_i`` sum to ``n``.
-
-You can create a multipartition with
+An r-component **multipartition** of an integer n is an r-tuple of partitions λ¹, λ², …, λʳ where each λⁱ is a partition of some integer aᵢ ≥ 0 and the aᵢ sum to n. As for partitions, we have implemented an own type ```Multipartition{T}``` which is a subtype of ```AbstractArray{Partition{T},1}```. Here's an example:
 ```
-Multipartition( [[2,1], [], [3,2,1]] )
+julia> P=Multipartition( [[2,1], [], [3,2,1]] )
+julia> sum(P)
+9
+julia> P[2]
+Int64[]
 ```
-As with partitions, you can cast into smaller integer types to increase performance:
+As with partitions, you can cast into smaller integer types to increase performance, e.g.
 ```
-Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] )
+julia> Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] )
 ```
 """
 struct Multipartition{T} <: AbstractArray{Partition{T},1}
@@ -52,12 +54,27 @@ function Multipartition(mp::Array{Array{Any,1},1})
    return Multipartition([Partition(p) for p in mp])
 end
 
+
+"""
+    function sum(P::Multipartition{T}) where T<:Integer
+
+If P is a multipartition of the integer n, this function returns n.
+"""
+function Base.sum(P::Multipartition{T}) where T<:Integer
+  s = zero(T)
+  for i=1:length(P)
+    s += sum(P[i])
+  end
+  return s
+end
+
+
 """
     function multipartitions(n::T, r::Integer) where T<:Integer
 
-A list of all ``r``-component multipartitions of ``n``. As for partitions, you can cast ``n`` into smaller type for efficiency, e.g.
+A list of all r-component multipartitions of n. As for partitions, you can cast n into smaller type for efficiency, e.g.
 ```
-multipartitions(Int8(3),2)
+julia> multipartitions(Int8(3),2)
 ```
 """
 function multipartitions(n::T, r::Integer) where T<:Integer
