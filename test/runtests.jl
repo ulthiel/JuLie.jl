@@ -290,6 +290,9 @@ end
 
 
 @testset "Tableaux" begin
+
+	@test reading_word(Tableau([ [1,2,5,7], [3,4] , [6]])) == [6,3,4,1,2,5,7]
+
 	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
 	check = true
 	shapes = [[3,2,1],[3,3,1],[2,2,2]]

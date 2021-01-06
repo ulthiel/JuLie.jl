@@ -4,25 +4,26 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export Tableau, shape, semistandard_tableaux, is_standard, is_semistandard, schensted, hook_length, hook_length_formula, standard_tableaux, reading_word, weight
+export Tableau, shape, semistandard_tableaux, is_standard, is_semistandard, standard_tableaux, schensted, hook_length, hook_lengths, num_standard_tableaux, reading_word, weight, bump!
 
+import Nemo: ZZ
 
 """
-    struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
+    Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
 
-A **Young diagram** is a diagram of finitely many empty "boxes" arranged in left-justified rows, with the row lengths in non-increasing order. Listing the number of boxes in each row gives a partition λ of a non-negative integer n (the total number of boxes of the diagram). The diagram is then said to be of **shape** λ. It's clear that there is a bijection between partitions of n and Young diagrams with n boxes.
+A **Young diagram** is a diagram of finitely many empty "boxes" arranged in left-justified rows, with the row lengths in non-increasing order. The box in row i and and column j has the **coordinates** (i,j). Listing the number of boxes in each row gives a partition λ of a non-negative integer n (the total number of boxes of the diagram). The diagram is then said to be of **shape** λ. Conversely, one can associate to any partition λ a Young diagram in the obvious way, so Young diagrams are just another way to look at partitions.
 
-A **Young tableau** of shape λ is a filling of the boxes of the Young diagram of λ with elements from some set. After relabeling we can (and will) assume that we fill from a set of integers from 1 up to some number, which in applications is often equal to n. We can encode a tableau as an array of arrays and we have implemented an own type ```Tableau{T}```  as subtype of ```AbstractArray{AbstractArray{T,1},1}``` to work with tableaux. You can create a tableau with
-```
-Tab=Tableau([[1,2,3],[4,5],[6]])
-```
-and then work with it like with an array of arrays. As for partitions, you may increase performance by casting into smaller integer types, e.g.
-```
-Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]])
-```
+A **Young tableau** of shape λ is a filling of the boxes of the Young diagram of λ with elements from some set. After relabeling we can (and will) assume that we fill from a set of integers from 1 up to some number, which in applications is often equal to n. We encode a tableau as an array of arrays and we have implemented an own type ```Tableau{T}```  as subtype of ```AbstractArray{AbstractArray{T,1},1}``` to work with tableaux. As for partitions, you may increase performance by casting into smaller integer types, e.g.
+
 For efficiency, we do not check whether the given array is really a tableau, i.e. whether the structure of the array defines a partition.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Young_tableau).
+
+# Example
+```julia-repl
+Tab=Tableau([[1,2,3],[4,5],[6]])
+Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]]) #Using 8 bit integers
+```
 """
 struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
    t::Array{Array{T,1},1}
@@ -48,10 +49,13 @@ function Base.getindex(Tab::Tableau, I::Vararg{Int, 2})
   return getindex(getindex(Tab.t,I[1]), I[2])
 end
 
+
+
+
 """
     shape(Tab::Tableau{T})
 
-Returns the shape of the tableau Tab as a partition (of type ```Partition```).
+Returns the shape of a tableau.
 """
 function shape(Tab::Tableau{T}) where T
   return Partition{T}([ length(Tab[i]) for i=1:length(Tab) ])
@@ -61,7 +65,7 @@ end
 """
     weight(Tab::Tableau)
 
-The **weight** of a tableau is the number of times each number appears in the tableau.
+The **weight** of a tableau is the number of times each number appears in the tableau. The return value is an array whose i-th element gives the number of times the integer i appears in the tableau.
 """
 function weight(Tab::Tableau)
   max=0
@@ -84,9 +88,11 @@ end
 """
     reading_word(Tab::Tableau)
 
-Returns an array containing the filling of the tableau read from left to right and from bottom to top.
+The **reading word** of a tableau is the word obtained by concatenating the fillings of the rows, starting from the *bottom* row. The word is here returned as an array.
+
+# Example
 ```
-julia> reading_word([ [1,2,3] , [4,5] , [6] ])
+julia> reading_word(Tableau([ [1,2,3] , [4,5] , [6] ]))
 6-element Array{Int64,1}:
  6
  4
@@ -106,65 +112,6 @@ function reading_word(Tab::Tableau)
     end
   end
   return w
-end
-
-
-
-"""
-    hook_length(Tab::Tableau, i::Integer, j::Integer)
-
-The **hook length** of a box, is the number of boxes to the right in the same row + the number of boxes below in the same column + 1. The function returns the hook length of the box with coordinate (i,j), i.e. ``Tab[i][j]``. The functions assumes that the box exists.
-"""
-function hook_length(Tab::Tableau, i::Integer, j::Integer)
-  s = shape(Tab)
-  h = s[i] - j + 1
-  k = j + 1
-  while k<=length(s) && s[k]>=j
-    k += 1
-    h += 1
-  end
-  return h
-end
-
-
-"""
-    hook_length(s::Partition, i::Integer, j::Integer)
-
-returns the **hook length** of ``Tab[i][j]`` for a Tableau ``Tab`` of shape ``s``.
-
-assumes that ``i≤length(s)`` and ``j≤s[i]``
-"""
-function hook_length(s::Partition, i::Integer, j::Integer)
-  h = s[i] - j + 1
-  k = i + 1
-  while k<=length(s) && s[k]>=j
-    k += 1
-    h += 1
-  end
-  return h
-end
-
-
-"""
-    hook_length_formula(s::Partition)
-
-returns the **hook length formula** for a tableau of shape ``s``.
-
-```math
-f^{λ} = {\\dfrac{n!}{∏ h_λ(i,j)}}
-```
-where the product is over all cells ``(i,j)`` in ``Tab``, and ``h_λ`` is the [hook_length](index.html#JuLie.hook_length).
-
-Equals the number of standard tableaux of shape ``s``
-"""
-function hook_length_formula(s::Partition)
-  h=factorial(big(sum(s)))
-  for i = 1:length(s)
-    for j = 1:s[i]
-      h=Integer(h/hook_length(s,i,j))
-    end
-  end
-  return h
 end
 
 
@@ -208,22 +155,13 @@ function is_semistandard(Tab::Tableau)
 end
 
 
+
 """
     semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer) where T<:Integer
 
 Returns a list of all semistandard tableaux of given shape and filling elements bounded by `max_val`. By default, `max_val` is equal to the sum of the shape partition (the number of boxes in the Young diagram). The list of tableaux is in lexicographic order from left to right and top to bottom.
 """
-function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::T) where T<:Integer
-  return semistandard_tableaux(Array{T,1}(shape), max_val)
-end
-
-
-"""
-    semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer) where T<:Integer
-
-Same as for [`semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::T) where T<:Integer`](@ref), where the array is interpreted as a partition.
-"""
-function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer) where T<:Integer
+function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer) where T<:Integer
   SST = Array{Tableau{T},1}()
   len = length(shape)
   if max_val < len
@@ -278,6 +216,15 @@ function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer) w
     m = len
     n = shape[len]
   end
+end
+
+"""
+    semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer) where T<:Integer
+
+Shortcut for ```semistandard_tableaux(Partition(shape),max_val)```.
+"""
+function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::T) where T<:Integer
+  return semistandard_tableaux(Partition(shape), max_val)
 end
 
 """
@@ -411,8 +358,6 @@ end
 
 
 
-
-
 """
     is_standard(Tab::Tableau)
 
@@ -468,16 +413,6 @@ end
     standard_tableaux(s::Partition)
 
 Returns a list of all standard tableaux of a given shape.
-
-Performance:
-```
-julia> @time standard_tableaux([10,5,3,2]) #28779300 tableaux
- 40.143980 seconds (172.68 M allocations: 16.976 GiB, 69.19% gc time)
-```
-```
-magma> time X:=StandardTableaux([10,5,3,2]);
-Time: 188.850
-```
 """
 function standard_tableaux(s::Partition)
   Tabs = Array{Tableau,1}()
@@ -533,7 +468,7 @@ end
 """
     standard_tableaux(s::Array{Integer,1})
 
-Same as [`standard_tableaux(s::Partition)`](@ref).
+Shortcut for ```standard_tableaux(Partition(s))```.
 """
 function standard_tableaux(s::Array{T,1}) where T<:Integer
   return standard_tableaux(Partition(s))
@@ -556,12 +491,78 @@ end
 
 
 """
+    hook_length(lambda::Partition, i::Integer, j::Integer)
+
+Consider the Young diagram of a partition λ. The **hook length** of a box, is the number of boxes to the right in the same row + the number of boxes below in the same column + 1. The function returns the hook length of the box with coordinates (i,j). The functions assumes that the box exists.
+"""
+function hook_length(lambda::Partition, i::Integer, j::Integer)
+  h = lambda[i] - j + 1
+  k = i + 1
+  while k<=length(lambda) && lambda[k]>=j
+    k += 1
+    h += 1
+  end
+  return h
+end
+
+"""
+    hook_length(Tab::Tableau, i::Integer, j::Integer)
+
+Shortcut for ```hook_length(shape(Tab),i,j)```.
+"""
+function hook_length(Tab::Tableau, i::Integer, j::Integer)
+  return hook_length(shape(Tab),i,j)
+end
+
+
+"""
+    hook_lengths(lambda::Partition)
+
+Returns the tableau of shape λ in which the entry at position (i,j) is equal to the hook length of the corresponding box.
+"""
+function hook_lengths(lambda::Partition)
+  Tab = [ [hook_length(lambda,i,j) for j in 1:lambda[i]] for i in 1:length(lambda) ]
+  return Tableau(Tab)
+end
+
+
+
+
+"""
+    num_standard_tableaux(lambda::Partition)
+
+Returns the number ``f^\\lambda`` of standard tableaux of shape λ using the hook length formula
+```math
+f^{\\lambda} = \\frac{n!}{\\prod_{i,j} h_\\lambda(i,j)} \\;,
+```
+where the product is taken over all boxes in the Young diagram of ``\\lambda`` and ``h_\\lambda`` denotes the hook length of the box (i,j).
+
+For my information, see [Wikipedia](https://en.wikipedia.org/wiki/Hook_length_formula).
+"""
+function num_standard_tableaux(lambda::Partition)
+  n = sum(lambda)
+  h=factorial(ZZ(n))
+  for i = 1:length(lambda)
+    for j = 1:lambda[i]
+      h = div(h,ZZ(hook_length(lambda,i,j)))
+    end
+  end
+  return h
+end
+
+
+"""
     schensted(sigma::Array{Integer,1})
 
-An implementation of the Schensted algorithm from the Robinson-Schensted correspondence.
-``sigma`` represents the second line of a Permutation in two-line notation:
-``1->sigma[1] , 2->sigma[2] ,…``
-Returns a pair of **standard tableaux** ``P,Q`` (insertion- and recording- tableaux)
+The Robinson–Schensted correspondence is a bijection between permutations and pairs of standard Young tableaux of the same shape. For a permutation sigma (given as an array), this function performs the Schnested algorithm and returns the corresponding pair of standard tableaux (the insertion and recording tableaux).
+
+For more information, see [Wikipedia](https://en.wikipedia.org/wiki/Robinson–Schensted_correspondence).
+
+# Example
+```julia-repl
+julia> schensted([3,1,6,2,5,4])
+(AbstractArray{Int64,1}[[1, 2, 4], [3, 5], [6]], AbstractArray{Int64,1}[[1, 3, 5], [2, 4], [6]])
+```
 """
 function schensted(sigma::Array{T,1}) where T<:Integer
   P = Tableau{T}([[sigma[1]]])
@@ -576,7 +577,7 @@ end
 """
     bump!(Tab::Tableau, x::Int)
 
-Inserts ``x`` into ``Tab`` according to the [Bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
+Inserts the integer x into the tableau Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
 """
 function bump!(Tab::Tableau, x::Integer)
   i = 1
@@ -604,8 +605,7 @@ end
 """
     bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
 
-Inserts ``x`` into ``Tab`` according to the [Bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
-Traces the change with ``Q`` by inserting ``y`` at the same Position in ``Q`` as ``x`` in ``Tab``.
+Inserts x into Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion. Traces the change with Q by inserting y at the same Position in Q as x in Tab.
 """
 function bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
   i = 1

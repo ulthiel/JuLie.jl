@@ -7,27 +7,27 @@
 export Partition, partitions, ascending_partitions, dominates, conjugate, getelement
 
 """
-    struct Partition{T} <: AbstractArray{T,1}
+    Partition{T} <: AbstractArray{T,1}
 
-A **partition** of an integer n ≥ 0 is a decreasing sequence n₁, n₂, … of positive integers nᵢ whose sum is equal to n. The nᵢ are called the **parts** of the partition. We can encode a partition as an array and we have implemented an own type ```Partition{T}``` as subtype of ```AbstractArray{T,1}``` to be able to conceptually work with partitions. As an example, you can create the partition 3+2+1 of 6 using
-```
-julia> P=Partition([3,2,1])
-julia> sum(P)
-6
-julia> P[1]
-3
-```
-You may increase performance by using smaller integer types, e.g.
-```
-julia> P=Partition(Int8[3,2,1])
-```
-For efficiency, the ```Partition``` constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence—that's your job.
+A **partition** of an integer n ≥ 0 is a decreasing sequence λ=(λ₁,…,λᵣ) of positive integers λᵢ whose sum is equal to n. The λᵢ are called the **parts** of the partition. We encode a partition as an array with elements λᵢ. To be able to conceptually work with partitions we have implemented an own type ```Partition{T}``` as subtype of ```AbstractArray{T,1}```. All functions for arrays then also work for partitions. You may increase performance by using smaller integer types, see the example below. For efficiency, the ```Partition``` constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence.
 
 For more general information on partitions, check out [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)).
 
-**Remark.** I was thinking back and forth whether to implement an own structure for this because it's actually just an array of integers. But it makes sense since we have several functions just acting on partitons and it would be strange implementing them for arrays in general (where mostly they don't make sense). I was hesitating because I feared that an own structure for partitions will have a performance impact. But it does not! In my standard example creating the partitions of 90 there is really NO difference in runtime and memory consumption between using arrays and using an own structure.
+# Example
+```julia-repl
+julia> P=Partition([3,2,1]) #The partition 3+2+1 of 6
+julia> sum(P) #The sum of the parts.
+6
+julia> P[1] #First component
+3
+julia> P=Partition(Int8[3,2,1]) #Same partition but using 8 bit integers
+```
 
-The implementation of a subtype of AbstractArray is explained in [the Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
+# Remarks
+
+* Usually, |λ| ≔ n is called the **size** of λ. In Julia, the function ```size``` for arrays already exists and returns the dimension of an array. Instead, you can use ```sum``` to get the sum of the parts.
+
+* There is no performance impact by using an own type for partitions rather than simply using arrays—I've tested this. Julia is great. The implementation of a subtype of AbstractArray is explained in the [Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
 """
 struct Partition{T} <: AbstractArray{T,1}
    p::Array{T,1}
@@ -79,13 +79,13 @@ end
 """
     partitions(n::Integer)
 
-A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in SAGE, but opposite to GAP. You can apply reverse() to reverse the order.
+A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in SAGE, but opposite to GAP. You can apply reverse() to reverse the order. As usual, you may increase performance by using smaller integer types.
 
 The algorithm used is the algorithm ZS1 by A. Zoghbi and I. Stojmenovic, "Fast algorithms for generating integer partitions", Int. J. Comput. Math. 70 (1998), no. 2, 319–332.
 
-As usual, you may increase performance by casting n into a smaller integer type, e.g.
-```
-julia> partitions(Int8(90))
+# Example
+```julia-repl
+julia> partitions(Int8(90)) #Using 8-bit integers
 ```
 """
 function partitions(n::Integer)
@@ -148,10 +148,13 @@ end
 Instead of encoding a partition of an integer n ≥ 0 as a *descending* sequence (which is our convention), one can also encode it as an *ascending* sequence. In the papers below it is claimed that generating the list of all ascending partitions is more efficient than generating descending ones. To test this, I have implemented the algorithms:
 1. "ks" (*default*) is the algorithm AccelAsc (Algorithm 4.1) by J. Kelleher and B. O'Sullivan, "Generating All Partitions: A Comparison Of Two Encodings", [https://arxiv.org/pdf/0909.2331.pdf](https://arxiv.org/pdf/0909.2331.pdf), May 2014.
 2. "m" is Algorithm 6 by M. Merca, "Fast Algorithm for Generating Ascending Compositions", J. Math Model. Algor. (2012) 11:89–104. This is similar to "ks".
-The ascending partitions are given here as arrays, not of type Partition since these are descending by our convention.
+
+The ascending partitions are given here as arrays, not of type Partition since these are descending by our convention. I am using "ks" as default since it looks slicker and I believe there is a tiny mistake in the publication of "m" (which I fixed).
+
+# Comparison
 
 I don't see a significant speed difference to the descending encoding:
-```
+```julia-repl
 julia> @btime partitions(Int8(90));
   3.376 s (56634200 allocations: 6.24 GiB)
 
@@ -161,8 +164,6 @@ julia> @btime ascending_partitions(Int8(90),alg="ks");
 julia> @btime ascending_partitions(Int8(90),alg="m");
   3.451 s (56634200 allocations: 6.24 GiB)
 ```
-
-I am using "ks" as default since it looks slicker and I believe there is a tiny mistake in the publication of "m" (which I fixed).
 """
 function ascending_partitions(n::Integer; alg="ks")
 
@@ -512,12 +513,10 @@ end
 =#
 
 
-
-
 """
     dominates(lambda::Partition, mu::Partition)
 
-Returns true if lambda ≥ mu in the **dominance order** on partitions, which is the partial order defined by λ ≥ μ if and only if λ₁ + … + λᵢ ≥ μ₁ + … + μᵢ for all i.
+The **dominance order** on partitions is the partial order ⊵ defined by λ ⊵ μ if and only if λ₁ + … + λᵢ ≥ μ₁ + … + μᵢ for all i. This function returns true if λ ⊵ μ.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Dominance_order).
 """
@@ -547,7 +546,7 @@ end
 """
     conjugate(P::Partition{T}) where T<:Integer
 
-Returns the **conjugate** of a partition P. The **conjugate** is obtained by writing P as a **diagram** and then flipping it along it's main diagonal.
+The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableaux](@ref)) and then flipping it along its main diagonal.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions).
 """

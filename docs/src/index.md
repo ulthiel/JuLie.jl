@@ -1,6 +1,6 @@
 # JuLie.jl
 
-JuLie.jl is an early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package for things around [algebraic Lie theory](https://en.wikipedia.org/wiki/Lie_theory), [representation theory](https://en.wikipedia.org/wiki/Representation_theory), and relevant [combinatorics](https://en.wikipedia.org/wiki/Combinatorics). I hope this package will grow with time—contributions are necessary and very much welcome!
+JuLie.jl is an early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package with the goal to provide structures and fast algorithms for things around [algebraic Lie theory](https://en.wikipedia.org/wiki/Lie_theory), [representation theory](https://en.wikipedia.org/wiki/Representation_theory), and relevant [combinatorics](https://en.wikipedia.org/wiki/Combinatorics). These fields are huge and this package is still small—I hope it will grow with time. Contributions are necessary and very much welcome!
 
 By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and contributors.
 
@@ -8,27 +8,27 @@ By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and contributors.
 
 To install the package, you first need to install [Julia](https://julialang.org). Then after starting Julia, type the following:
 
-```
-using Pkg
-Pkg.add(url="https://github.com/ulthiel/JuLie.jl")
+```julia-repl
+julia> using Pkg
+julia> Pkg.add(url="https://github.com/ulthiel/JuLie.jl")
 ```
 
 Now, you can start using the package as follows:
 
-```
-using JuLie
-partitions(10)
+```julia-repl
+julia> using JuLie
+julia> partitions(10)
 ```
 
 You can get help for a function by putting a question mark in front, e.g.
 
-```
-?partitions
+```julia-repl
+julia> ?partitions
 ```
 
 ## Motivation
 
-Especially for combinatorics there's a lot already in other computer algebra systems. So, why another package? On the one hand, it's a great way to learn about algorithms, so why not? On the more serious side, have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different systems.
+Especially for combinatorics there's a lot already in other computer algebra systems. So, why another package? First, I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project. What convinced me of Julia as programming language is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Pyhton). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems.
 
 In **[Sage](https://www.sagemath.org)** (v9.1):
 
@@ -62,7 +62,7 @@ julia> @time partitions(Int8(90));
 #No problem afterwards
 ```
 
-I find the performance by Julia very convincing and this is the real reason why I want to have a Julia package for the things I'm interested in. I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still more efficient:
+I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still more efficient:
 
 ```
 julia> @time partitions(Int64(90)); #this time with 64-bit integers
@@ -70,14 +70,9 @@ julia> @time partitions(Int64(90)); #this time with 64-bit integers
 #No problem
 ```
 
-Having the possibility to work with special integer types is very useful sometimes. Of course, you can do the same in C. But Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain? Here's one more, just because I can do it:
+Having the possibility to work with special integer types is very useful sometimes. Of course, you can do the same in C—but Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
 
-```
-julia> @time partitions(Int16(130)); #~5.4 billion!
-12910.885498 seconds (5.37 G allocations: 739.784 GiB, 96.51% gc time)
-#No worries! (Of course, it's better to use a partition iterator in this case.)
-```
-
+The [Nemo](http://nemocas.github.io/Nemo.jl/latest/) package (part of OSCAR) provides incredibly fast arithmetic in various rings like integers, algebraic number fields, polynomial rings etc. that will be used here as well.
 
 ## Developing
 
@@ -114,14 +109,14 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ### Programming guidelines
 
-1. Have a look at the file src/partitions.jl to see how the stuff works and how I want code to look like.
-2. Check out the Julia [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
+2. Check out the Julia [Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
 3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
-4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough.
-5. For every function you implement, there has to be a reasonable test in test/runtests.jl. You can run the complete unit test with ```Pkg.test("JuLie")```.
+4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try.)
+5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. You can run the complete unit test with ```Pkg.test("JuLie")```.
 6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
 
 
 ## Contributors
 
-* Tom Schmit (TU Kaiserslautern)
+* Tom Schmit (TU Kaiserslautern, 2020–)
