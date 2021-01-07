@@ -1,3 +1,5 @@
+name: Travisbuild
+
 jobs:
   include:
     - stage: "Documentation"
