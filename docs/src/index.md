@@ -1,132 +1,122 @@
 # JuLie.jl
-An early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package for things around algebraic Lie theory, representation theory, and relevant combinatorics. Contributions are very much welcome!
+
+JuLie.jl is an early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package with the goal to provide structures and fast algorithms for things around [algebraic Lie theory](https://en.wikipedia.org/wiki/Lie_theory), [representation theory](https://en.wikipedia.org/wiki/Representation_theory), and relevant [combinatorics](https://en.wikipedia.org/wiki/Combinatorics). These fields are huge and this package is still small—I hope it will grow with time. Contributions are necessary and very much welcome!
 
 By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and contributors.
 
-```@meta
-CurrentModule = JuLie
-```
-
 ## Using
 
-To install the package, do the following In Julia:
+To install the package, you first need to install [Julia](https://julialang.org). Then after starting Julia, type the following:
 
-```
-using Pkg
-Pkg.add(url="https://github.com/ulthiel/JuLie.jl")
-```
-
-Then you can start using the package as follows:
-
-```
-using JuLie
-partitions(10)
+```julia-repl
+julia> using Pkg
+julia> Pkg.add(url="https://github.com/ulthiel/JuLie.jl")
 ```
 
-You can get a list of exported functions using
+Now, you can start using the package as follows:
 
-```
-names(JuLie)
+```julia-repl
+julia> using JuLie
+julia> partitions(10)
 ```
 
 You can get help for a function by putting a question mark in front, e.g.
 
-```
-?partitions
-```
-
-
-## Partitions
-
-```@docs
-Partition
-getelement
-dominates
-conjugate
-partitions
-ascending_partitions
+```julia-repl
+julia> ?partitions
 ```
 
-### Multipartitions
+## Motivation
 
-```@docs
-Multipartition
-multipartitions
+Especially for combinatorics there's a lot already in other computer algebra systems. So, why another package? First, I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project. What convinced me of Julia as programming language is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Pyhton). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems.
+
+In **[Sage](https://www.sagemath.org)** (v9.1):
+
+```
+sage: time X=Partitions(90).list()
+Wall time: 3min 5s
+#Uses 26.665GiB mem, quitting Sage takes quite a bit of time
 ```
 
-### Multiset_partitions
+In **[GAP](https://www.gap-system.org)** (v4.11.0):
 
-A **Multiset_partition** is a Multipartition ``λ^{(1)},...,λ^{(r)}`` where each ``\lambda^{(i)}`` is a non-empty partition.``\\``
-Furthermore the ordering of the Partitions ``\lambda^{(i)}`` is not important, i.e. ``\lambda^{(1)},...,\lambda^{(r)}``=``\lambda^{(\sigma(1))},...,\lambda^{(\sigma(r))}`` ``\\``
-**Note:** This equality-relation is not implemented in this Module.
-
-```@docs
-multiset_partitions
-partition_to_partcount
-partcount_to_partition
+```
+gap> L:=Partitions(90);; time/1000.0;
+51.962
+#Uses 11.8477 GiB mem, still works fine
 ```
 
-## Tableaux
+In **[Magma](http://magma.maths.usyd.edu.au/magma/)** (v2.25-5):
 
-```@docs
-Tableau
-shape
-weight
-reading_word
-hook_length
-hook_length_formula
-schensted
-bump!
+```
+> time X:=Partitions(90);
+Time: 32.990
+//Uses 15.688 GiB mem, Magma UNUSABLE from now on!!
 ```
 
-### semistandard Tableaux
+And now, in **[Julia](https://julialang.org)** (v1.5.2, my implementation):
 
-A **semistandard tableaux** is a tableaux where the values are non decreasing in each row, and strictly increasing in each column.
-
-```@docs
-semistandard_tableaux
-is_semistandard
+```
+julia> @time partitions(Int8(90));
+5.447290 seconds (56.63 M allocations: 6.239 GiB, 46.77% gc time)
+#No problem afterwards
 ```
 
-### standard Tableaux
+I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still more efficient:
 
-A **standard tableaux** is a tableaux where the values are strictly increasing in each row and column. A standard tableaux also requires each Integer from 1 to the amount of boxes to occur exactly once.
-
-```@docs
-standard_tableaux
-is_standard
+```
+julia> @time partitions(Int64(90)); #this time with 64-bit integers
+16.481893 seconds (56.63 M allocations: 13.570 GiB, 57.15% gc time)
+#No problem
 ```
 
-## Kostka Polynomials
+Having the possibility to work with special integer types is very useful sometimes. Of course, you can do the same in C—but Julia is a high-level language with a similar simple syntax like Python, so why would anyone still go through such a pain?
 
-```@docs
-kostka_polynomial
+The [Nemo](http://nemocas.github.io/Nemo.jl/latest/) package (part of OSCAR) provides incredibly fast arithmetic in various rings like integers, algebraic number fields, polynomial rings etc. that will be used here as well.
+
+## Developing
+
+### Setting up the repository
+
+Clone this repository to somewhere on your computer:
+
+```
+git clone https://github.com/ulthiel/JuLie.jl
 ```
 
-## Schur Polynomials
+Enter the directory "JuLie.jl", start Julia, hit the "]" key to enter REPL mode, and then add the package to the registry:
 
-```@docs
-schur_polynomial
+```
+dev .
 ```
 
-## Enumerative functions
+Exit the REPL mode by hitting the backspace key. Then you can start using the package as usual with
 
-```@docs
-num_partitions
-catalan
-stirling1
-stirling2
-lucas
+```
+using JuLie
 ```
 
-## Quantum numbers
+Any changes you make to the code now will not be available in the current Julia session—you have to restart it. This is simply the way Julia works but this is annoying when developing. A solution is to load the [Revise](https://timholy.github.io/Revise.jl/v0.6/) package before loading the package.
 
-```@docs
-quantum_number
-quantum
+```
+using Pkg
+Pkg.add("Revise")
+using Revise
+using JuLie
 ```
 
-## Index
+Now, changes you make in the code are immediately available in the Julia session (except for changes to structures, here you need to restart).
 
-```@index
-```
+### Programming guidelines
+
+1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
+2. Check out the Julia [Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
+4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try.)
+5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. You can run the complete unit test with ```Pkg.test("JuLie")```.
+6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
+
+
+## Contributors
+
+* Tom Schmit (TU Kaiserslautern, 2020–)

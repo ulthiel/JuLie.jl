@@ -7,17 +7,18 @@
 export Multipartition, multipartitions
 
 """
-    struct Multipartition{T} <: AbstractArray{Partition{T},1}
+    Multipartition{T} <: AbstractArray{Partition{T},1}
 
-An ``r``-component **multipartition** of an integer ``n`` is an ``r``-tuple of partitions ``\\lambda^{(1)},...,\\lambda^{(r)}`` where each ``\\lambda^{(i)}`` is a partition of some ``a_i`` and the ``a_i`` sum to ``n``.
+Multipartitions are generalizations of partitions. An r-component **multipartition** of an integer n is an r-tuple of partitions λ¹, λ², …, λʳ where each λⁱ is a partition of some integer nᵢ ≥ 0 and the nᵢ sum to n. As for partitions, we have implemented an own type ```Multipartition{T}``` which is a subtype of ```AbstractArray{Partition{T},1}```. As with partitions, you can can use smaller integer types to increase performance.
 
-You can create a multipartition with
-```
-Multipartition( [[2,1], [], [3,2,1]] )
-```
-As with partitions, you can cast into smaller integer types to increase performance:
-```
-Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] )
+# Example
+```julia-repl
+julia> P=Multipartition( [[2,1], [], [3,2,1]] )
+julia> sum(P)
+9
+julia> P[2]
+Int64[]
+julia> Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] ) #Using 8-bit integers
 ```
 """
 struct Multipartition{T} <: AbstractArray{Partition{T},1}
@@ -52,12 +53,29 @@ function Multipartition(mp::Array{Array{Any,1},1})
    return Multipartition([Partition(p) for p in mp])
 end
 
-"""
-    function multipartitions(n::T, r::Integer) where T<:Integer
 
-A list of all ``r``-component multipartitions of ``n``. As for partitions, you can cast ``n`` into smaller type for efficiency, e.g.
-```
-multipartitions(Int8(3),2)
+"""
+    sum(P::Multipartition{T}) where T<:Integer
+
+If P is a multipartition of the integer n, this function returns n.
+"""
+function Base.sum(P::Multipartition{T}) where T<:Integer
+  s = zero(T)
+  for i=1:length(P)
+    s += sum(P[i])
+  end
+  return s
+end
+
+
+"""
+    multipartitions(n::T, r::Integer) where T<:Integer
+
+A list of all r-component multipartitions of n.
+
+# Example
+```julia-repl
+julia> multipartitions(Int8(3),2) #Using 8-bit integers
 ```
 """
 function multipartitions(n::T, r::Integer) where T<:Integer

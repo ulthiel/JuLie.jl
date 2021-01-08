@@ -2,6 +2,9 @@
 # Cartan Matrices.
 #
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
+#
+# Contributed by Tom Schmit.
+#
 ################################################################################
 
 import AbstractAlgebra: MatElem, MatrixAlgebra, diagonal_matrix, matrix, zero_matrix
@@ -12,7 +15,7 @@ export is_cartan_matrix, CartanMatrix
 """
     struct CartanMatrix{T} <: MatElem{T}
 
-A (generalized) **Cartan matrix** ``C`` is a square matrix over the Integers, satistfying the following rules:
+A (generalized) **Cartan matrix** ``C`` is a square matrix over the integers, satisfying the following rules:
 
 ```math
 \\begin{aligned}
@@ -20,7 +23,7 @@ A (generalized) **Cartan matrix** ``C`` is a square matrix over the Integers, sa
 
 & C_{i,j} ≤ 0 \\quad \\text{ for } \\quad i≠j \\\\
 
-& C_{i,j} = 0 \\quad ⟺ \\quad  C_{j,i} = 0``
+& C_{i,j} = 0 \\quad \\Leftrightarrow \\quad  C_{j,i} = 0``
 \\end{aligned}
 ```
 

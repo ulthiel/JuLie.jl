@@ -13,29 +13,34 @@ export kostka_polynomial, charge
 """
     kostka_polynomial(lambda::Partition{T}, mu::Partition{T})
 
-returns the Kostka polynomial ``K_{lambda,mu}`` as a fmpz_poly over ZZ in t.
-
-The Kostka polynomials are a Family of polynomials ``K_{λμ}`` relating [Hall-Littlewood polynomials](https://en.wikipedia.org/wiki/Hall%E2%80%93Littlewood_polynomials) ``P_μ``
-to [Schur polynomials](https://en.wikipedia.org/wiki/Schur_polynomial) ``s_λ`` :
+The (one-variable) **Kostka polymial** ``K_{λμ}(t)`` associated to partitions λ and μ can be defined as
 
 ```math
-s_λ(x_1,…,x_n) =\\sum_μ K_{λμ}(t)P_μ(x_1,…,x_n;t)
+K_{λμ}(t) = ∑_{T ∈ SSYT(λ,μ)} t^{charge(T)} ∈ ℕ[t]  \\;,
 ```
 
-They can be formulated as:
-
+where SSYT(λ,μ) is the set of all semistandard Young tableaux of shape λ and weight μ, and charge(T) is the charge of the tableau T. The Kostka polynomials relate the Hall–Littlewood polynomials ``P_μ``
+to the Schur polynomials ``s_λ`` via
 ```math
-K_{λμ}(t) = ∑_{T ∈ SSYT(λ,μ)} t^{charge(T)}
+s_λ(x_1,…,x_n) = \\sum_μ K_{λμ}(t)P_μ(x_1,…,x_n;t)
+```
+This function returns the Kostka polynomial ``K_{λμ}(t)`` as an fmpz_poly over ZZ in t.
+
+# Example
+```julia-repl
+julia> kostka_polynomial([4,2,1],[3,2,1,1])
+t^3 + 2*t^2 + t
 ```
 
-But I used the following fomula:
+# Algorithm
+The computation here is not based on the above formula but on an explicit description due to Kirillov–Reshetikhin in "The Bethe ansatz and the combinatorics of Young tableaux", J. Sov. Math. 41 (1988) 925., which is summarized by Dorey–Tonga–Turner in "[A matrix model for WZW](https://inspirehep.net/files/ab8568896dcce9b3115b76dc9d096da4)" (Apendix B). Namely:
 
 ```math
 K_{λ,μ}(t)=∑_{\\{v\\}}∏_{K=1}^{l(λ)-1}∏_{n≥1}
 \\begin{bmatrix}
 ℙ_n^{(K)}+m_n(v^{(K)})\\\\
 m_n(v^{(K)})
-\\end{bmatrix}_t
+\\end{bmatrix}_t \\;,
 ```
 
 where the sum is over all admissible configurations ``\\{v\\}`` i.e. sequences of partitions ``v^{(K)}`` with
@@ -46,17 +51,15 @@ v^{(0)}=μ \\text{ ,\\hspace{2mm} } |v^{(K)}|=∑_{j≥K+1}λ_j \\text{\\hspace{
 
 ```math
 \\begin{aligned}
-& ℙ_n^{(K)} := ∑_{j≥1}\\left[min\\left(n,v_j^{(K+1)}\\right) - 2⋅min\\left(n,v_j^{(K)}\\right) + min\\left(n,v_j^{(K-1)}\\right)\\right]
+& ℙ_n^{(K)} := ∑_{j≥1}\\left[\\min\\left(n,v_j^{(K+1)}\\right) - 2⋅\\min\\left(n,v_j^{(K)}\\right) + \\min\\left(n,v_j^{(K-1)}\\right)\\right]
 \\\\
 & c(v) := ∑_{i≥1}(i-1)μ_i + ∑_{K=1}^{l(λ)-1}\\left(𝕄\\left[v^{(K)}, v^{(K)}\\right] - 𝕄\\left[v^{(K)}, v^{(K-1)}\\right]\\right)
 \\\\
-& 𝕄[ρ,κ] := ∑_{i,j≥1} min(ρ_i,κ_j)
+& 𝕄[ρ,κ] := ∑_{i,j≥1} \\min(ρ_i,κ_j)
 \\end{aligned}
 ```
 
-``\\left[\\genfrac{[}{]}{0pt}{0}{m}{n} \\right]_t`` the [Gaussian binomial coefficient](https://en.wikipedia.org/wiki/Gaussian_binomial_coefficient)
-
-The Algorithm is based on [A matrix model for WZW](https://inspirehep.net/files/ab8568896dcce9b3115b76dc9d096da4) (Apendix B) by Nick Dorey, David Tonga and Carl Turner
+Here, ``\\left[\\genfrac{[}{]}{0pt}{0}{m}{n} \\right]_t`` is the [Gaussian binomial coefficient](https://en.wikipedia.org/wiki/Gaussian_binomial_coefficient).
 """
 function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Integer
   sum(lambda) == sum(mu) || throw(ArgumentError("lambda and mu have to be Partitions of the same Integer"))

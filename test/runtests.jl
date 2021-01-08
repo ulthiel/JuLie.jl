@@ -1,5 +1,5 @@
 using Test
-#using Combinatorics
+using JuLie
 import Nemo: ZZ, QQ
 import AbstractAlgebra: LaurentPolynomialRing
 
@@ -171,65 +171,74 @@ end
 	@test check==true
 
 	=#
+
+	# Dominance order
+	@test dominates(Partition([4,2]), Partition([3,2,1])) == true
+	@test dominates(Partition([4,1,1]), Partition([3,3])) == false
+	@test dominates(Partition([3,3]), Partition([4,1,1])) == false
+
+	# Conjugate partition
+	@test conjugate(Partition([6,4,3,1])) == Partition([4, 3, 3, 2, 1, 1])
+
 end
 
 @testset "Multi-partitions" begin
 
-	# multi-set-partitions
-	check = true
-	N = 0:15
-	for n in N
-		MP = multisetpartitions(n)
-		# check that all multisetpartitions are distinct
-		if MP != unique(MP)
-			check = false
-			break
-		end
-		# check that multisetpartititons are really multisetpartitions of n
-		for mp in MP
-			lambda=0
-			for p in mp
-				lambda = lambda + sum(p)
-			end
-			if lambda != n
-				check = false
-				break
-			end
-		end
-	end
-	@test check==true
+	# # multi-set-partitions
+	# check = true
+	# N = 0:15
+	# for n in N
+	# 	MP = multisetpartitions(n)
+	# 	# check that all multisetpartitions are distinct
+	# 	if MP != unique(MP)
+	# 		check = false
+	# 		break
+	# 	end
+	# 	# check that multisetpartititons are really multisetpartitions of n
+	# 	for mp in MP
+	# 		lambda=0
+	# 		for p in mp
+	# 			lambda = lambda + sum(p)
+	# 		end
+	# 		if lambda != n
+	# 			check = false
+	# 			break
+	# 		end
+	# 	end
+	# end
+	# @test check==true
 
-	# k-restricted multisetpartitions
-	check = true
-	N = 0:15
-	K = 1:15
-	for n in N
-		for k in K
-			MP = multisetpartitions(n,k)
-			# check that all multisetpartitions are distinct
-			if MP != unique(MP)
-				check = false
-				break
-			end
-			# check that all multisetpartititons are really multisetpartitions of n
-			for mp in MP
-				lambda=0
-				for p in mp
-					lambda = lambda + sum(p)
-				end
-				if lambda != n
-					check = false
-					break
-				end
-			end
-			# check that all multisetpartitions have k parts
-			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
-				check = false
-				break
-			end
-		end
-	end
-	@test check==true
+	# # k-restricted multisetpartitions
+	# check = true
+	# N = 0:15
+	# K = 1:15
+	# for n in N
+	# 	for k in K
+	# 		MP = multisetpartitions(n,k)
+	# 		# check that all multisetpartitions are distinct
+	# 		if MP != unique(MP)
+	# 			check = false
+	# 			break
+	# 		end
+	# 		# check that all multisetpartititons are really multisetpartitions of n
+	# 		for mp in MP
+	# 			lambda=0
+	# 			for p in mp
+	# 				lambda = lambda + sum(p)
+	# 			end
+	# 			if lambda != n
+	# 				check = false
+	# 				break
+	# 			end
+	# 		end
+	# 		# check that all multisetpartitions have k parts
+	# 		if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
+	# 			check = false
+	# 			break
+	# 		end
+	# 	end
+	# end
+	# @test check==true
 
 	# multi-partitions
 	check = true
@@ -281,6 +290,9 @@ end
 
 
 @testset "Tableaux" begin
+
+	@test reading_word(Tableau([ [1,2,5,7], [3,4] , [6]])) == [6,3,4,1,2,5,7]
+
 	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
 	check = true
 	shapes = [[3,2,1],[3,3,1],[2,2,2]]
@@ -321,7 +333,7 @@ end
 					break
 				end
 			end
-			println(length(SST))
+			#println(length(SST))
 		end
 	end
 	@test check==true
@@ -345,7 +357,7 @@ end
 				end
 			end
 			#check that all tableaux where found
-			if length(ST)!=hook_length_formula(s)
+			if length(ST)!=num_standard_tableaux(s)
 				check = false
 				break
 			end
