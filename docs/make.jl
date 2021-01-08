@@ -17,3 +17,7 @@ makedocs(
         "Lie theory" => "lie-theory.md"
     ]
 )
+
+deploydocs(
+    repo = "github.com/schto223/JuLie.jl.git",
+)
