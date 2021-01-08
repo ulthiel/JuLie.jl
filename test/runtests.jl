@@ -171,6 +171,15 @@ end
 	@test check==true
 
 	=#
+
+	# Dominance order
+	@test dominates(Partition([4,2]), Partition([3,2,1])) == true
+	@test dominates(Partition([4,1,1]), Partition([3,3])) == false
+	@test dominates(Partition([3,3]), Partition([4,1,1])) == false
+
+	# Conjugate partition
+	@test conjugate(Partition([6,4,3,1])) == Partition([4, 3, 3, 2, 1, 1])
+
 end
 
 @testset "Multi-partitions" begin
@@ -281,6 +290,9 @@ end
 
 
 @testset "Tableaux" begin
+
+	@test reading_word(Tableau([ [1,2,5,7], [3,4] , [6]])) == [6,3,4,1,2,5,7]
+
 	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
 	check = true
 	shapes = [[3,2,1],[3,3,1],[2,2,2]]
@@ -301,4 +313,55 @@ end
 	end
 	@test check==true
 
+
+	# semistandard_tableaux(s::Array{T,1}, weight::Array{T,1})
+	check = true
+	shapes = [[5,3,1,1],[4,3,2,1],[2,2,2,2,2]]
+	weights = [[1,1,1,1,1,1,1,1,1,1],[3,0,2,0,0,5],[4,3,2,1,0]]
+	for s in shapes
+		for w in weights
+			SST = semistandard_tableaux(s,w)
+			#check that all tableaux are distinct
+			if SST != unique(SST)
+				check = false
+				break
+			end
+			#check that all tableaux are semistandard_tableaux
+			for tab in SST
+				if !is_semistandard(tab)
+					check = false
+					break
+				end
+			end
+			println(length(SST))
+		end
+	end
+	@test check==true
+
+
+	# standard_tableaux(s::Partition)
+	check = true
+	for i=1:10
+		for s in partitions(i)
+			ST = standard_tableaux(s)
+			#check that all tableaux are distinct
+			if ST != unique(ST)
+				check = false
+				break
+			end
+			#check that all tableaux are standard_tableaux
+			for tab in ST
+				if !is_standard(tab)
+					check = false
+					break
+				end
+			end
+			#check that all tableaux where found
+			if length(ST)!=hook_length_formula(s)
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
 end
