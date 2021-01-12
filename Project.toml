@@ -8,6 +8,7 @@ AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
-Documenter = "0.26"  #avoids errors due to possible updates in Documenter
+Documenter = "0.25, 0.26"  #avoids errors due to possible updates in Documenter

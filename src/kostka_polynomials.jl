@@ -12,6 +12,7 @@ export kostka_polynomial, charge
 
 """
     kostka_polynomial(lambda::Partition{T}, mu::Partition{T})
+    kostka_polynomial(lambda::Array{Int,1}, mu::Array{Int,1})
 
 The (one-variable) **Kostka polymial** ``K_{λμ}(t)`` associated to partitions λ and μ can be defined as
 
@@ -140,6 +141,7 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
 
     if pointer == len_lam + 1
       summand = t^charge(v)
+      divisor = one(R)
       for k = 2:len_lam
         m = partition_to_partcount(v[k])
         for n = 1:length(m)
@@ -148,15 +150,15 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
             if P_nk > 0
               #multiply by the q-binomial coefficient [P_nk+m[n] ; m[n]]
               high = P_nk + m[n]
-              for i = 0:m[n] - 1
+              for i = 0:m[n]-1
                 mul!(summand, summand, (1-t^(high-i)))
-                summand = divexact(summand, (1-t^(i+1)))
+                mul!(divisor, divisor, (1-t^(i+1)))
               end
             end
           end
         end
       end
-      addeq!(kos_poly, summand)
+      addeq!(kos_poly, divexact(summand, divisor))
       pointer -= 1
       index[pointer] += 1
 
@@ -207,11 +209,6 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
 end
 
 
-"""
-    kostka_polynomial(lambda::Array{Integer,1}, mu::Array{Integer,1})
-
-Shortcut for ```kostka_polynomial```.
-"""
 function kostka_polynomial(lambda::Array{Int,1}, mu::Array{Int,1})
    return kostka_polynomial(Partition(lambda), Partition(mu))
 end
@@ -220,31 +217,48 @@ end
 """
     charge(config::Array{Partition{T},1})
 
-returns the charge of an admissible configuration ``config``.
+The **charge** ``c`` of an admissible configuration ``v:=`` ```config```, is defined by:
+
+```math
+\\begin{aligned}
+& c(v) := ∑_{i≥1}(i-1)v^{(0)}_i + ∑_{K=1}^{l(λ)-1}\\left(𝕄\\left[v^{(K)}, v^{(K)}\\right] - 𝕄\\left[v^{(K)}, v^{(K-1)}\\right]\\right)
+\\\\
+& 𝕄[ρ,κ] := ∑_{i,j≥1} \\min(ρ_i,κ_j)
+\\end{aligned}
+```
 """
 function charge(config::Array{Partition{T},1}) where T<:Integer
   function M(p::Partition{T}, k::Partition{T})
-    res=0
+    res = 0
     for i in p
       for j in k
-        if i>j
-          res+=j
+        if i > j
+          res += j
         else
-          res+=i
+          res += i
         end
       end
     end
     return res
   end
 
-  c=0
-  #n[mu]
-  for i=2:length(config[1])
-    c+=(i-1)*config[1][i]
+  #M(p) := M(p,p)
+  function M(p::Partition{T})
+    res = 0
+    for i = 1:length(p)
+      res+= p[i]*(2*i-1)
+    end
+    return res
   end
 
-  for k=2:length(config)
-    c+=M(config[k],config[k])-M(config[k],config[k-1])   #first call of M(c,c) could be improved/specialized
+  c = 0
+  #n[mu]
+  for i = 2:length(config[1])
+    c += (i-1)*config[1][i]
+  end
+
+  for k = 2:length(config)
+    c += M(config[k])-M(config[k],config[k-1])   #first call of M(c,c) could be improved/specialized
   end
   return c
 end
@@ -254,7 +268,10 @@ end
 """
     charge(Tab::Tableau)
 
-returns the charge of ``Tab``.
+returns the **charge** of a Tableau ```Tab``` which is defined by the charge of it´s **reading word**.
+```
+charge(Tab):=charge(reading_word(Tab))
+```
 """
 function charge(Tab::Tableau)
   return charge(reading_word(Tab))
@@ -264,7 +281,11 @@ end
 """
     charge(word::Array{Int,1},standard=false::Bool)
 
-returns the charge of the Tableau corresponding to the reading word ``word``
+This returns the **charge** of the Tableau corresponding to the reading word ```word```.
+
+We call a word **standard**, if each of its letters or numbers only appears once in it. If you are shure that your word is standard, you can set this argument to ``true``, to improve the efficiency.
+
+This Algorithm is based on the Algorithm following Example 7.3 in "[Hall-Littlewood Functions and Kostka-Foulkes Polynomials in Representation Theory](https://www.emis.de/journals/SLC/opapers/s32leclerc.pdf)", J. Désarménien, B. Leclerc and J.-Y. Thibon.
 """
 function charge(word::Array{Int,1},standard=false::Bool)
   c = 0
