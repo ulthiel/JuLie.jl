@@ -108,7 +108,7 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
 
 
   index_max = [length(parts[i]) for i=1:len_lam] #gives an upper bound to how big index can get
-  index = ones(Int, len_lam)  #will be our itterator with which we will look at all admissible configurations
+  index = ones(Int, len_lam)  #will be our iterator with which we will look at all admissible configurations
   empty_partition = Partition{T}([])  #this will act as a placeholder during the Algorithm
   pointer = 2  #this will index the part of the configuration we are currently looking at
   v = Array{Partition{T},1}([empty_partition for i=1:len_lam])

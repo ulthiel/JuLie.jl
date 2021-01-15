@@ -46,7 +46,7 @@ end
 """
 	quantum_number(n::Int)
 
-The quantum number ``[n]_q`` where q is the interdeterminate of the Laurent polynomial ring ``\\mathbb{Z}[q,q^{-1}]`` in one variable over the integers.
+The quantum number ``[n]_q`` where q is the indeterminate of the Laurent polynomial ring ``\\mathbb{Z}[q,q^{-1}]`` in one variable over the integers.
 """
 function quantum_number(n::Int)
 	R,q = LaurentPolynomialRing(ZZ, "q")

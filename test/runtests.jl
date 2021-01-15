@@ -55,7 +55,7 @@ end
 			check = false
 			break
 		end
-		# check that partititons are really partitions of n
+		# check that partitions are really partitions of n
 		for lambda in P
 			if sum(lambda) != n
 				check = false
@@ -82,7 +82,7 @@ end
 				check = false
 				break
 			end
-			# check that partititons are really partitions of n
+			# check that partitions are really partitions of n
 			for lambda in P
 				if sum(lambda) != n
 					check = false
@@ -117,7 +117,7 @@ end
 				check = false
 				break
 			end
-			# check that partititons are really partitions of n
+			# check that partitions are really partitions of n
 			for lambda in P
 				if sum(lambda) != n
 					check = false
@@ -155,7 +155,7 @@ end
 					check = false
 					break
 				end
-				# check that partititons are really partitions of n
+				# check that partitions are really partitions of n
 				for lambda in P
 					if sum(lambda) != n
 						check = false
