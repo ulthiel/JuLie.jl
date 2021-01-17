@@ -162,15 +162,20 @@ function CartanMatrix(type::Char, dim::Int, tilde=false::Bool)
             dim += 1
         end
         CM = diagonal_matrix(ZZ(2), dim)
-        CM[2,1] = -1
+        if dim > 1
+            CM[2,1] = -1
+            CM[dim-1,dim] = -1
+        end
         for j = 2:dim-1
             CM[j-1,j] = -1
             CM[j+1,j] = -1
         end
-        CM[dim-1,dim] = -1
         if tilde
-            CM[1,dim] = -1
-            CM[dim,1] = -1
+            if dim == 2  # A1~
+                CM[1,dim] = CM[dim,1] = -2
+            else
+                CM[1,dim] = CM[dim,1] = -1
+            end
         end
         return CartanMatrix(CM)
 
@@ -398,15 +403,20 @@ function CartanMatrix(types::Array{Char,1}, dims::Array{Int,1}, tildes::BitArray
             if tilde
                 dim += 1
             end
-            CM[2+c,1+c] = -1
+            if dim > 1
+                CM[2+c,1+c] = -1
+                CM[dim-1+c,dim+c] = -1
+            end
             for j = 2+c:dim-1+c
                 CM[j-1,j] = -1
                 CM[j+1,j] = -1
             end
-            CM[dim-1+c,dim+c] = -1
             if tilde
-                CM[1+c,dim+c] = -1
-                CM[dim+c,1+c] = -1
+                if dim == 2  # A1~
+                    CM[1+c,dim+c] = CM[dim+c,1+c] = -2
+                else
+                    CM[1+c,dim+c] = CM[dim+c,1+c] = -1
+                end
             end
 
         elseif type == 'B'
