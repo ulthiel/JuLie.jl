@@ -7,6 +7,7 @@
 #
 ################################################################################
 
+import AbstractAlgebra: base_ring, nrows, ncols
 import AbstractAlgebra: MatElem, MatrixAlgebra, diagonal_matrix, matrix, zero_matrix
 import Nemo: fmpz
 
@@ -41,8 +42,12 @@ If you would like to generate block diagonal matrices you can do so with
 CartanMatrix(["A3~","G2","B12"])    #calls essentially CartanMatrix(['A','G','B'],[3,2,12],[true,false,false])
 ```
 """
-struct CartanMatrix{T} <: MatElem{T}
-   cm::MatElem{T}
+struct CartanMatrix <: MatElem{fmpz}
+   cm::MatElem{fmpz}
+   function CartanMatrix(m::MatElem{fmpz})
+      is_cartan_matrix(m) || throw(DomainError(m, "`m` must be a (generalized) Cartan matrix"))
+      new(m)
+   end
 end
 
 
@@ -53,6 +58,10 @@ end
 function Base.size(CM::CartanMatrix)
   return size(CM.cm)
 end
+
+base_ring(CM::CartanMatrix) = base_ring(CM.cm)
+nrows(CM::CartanMatrix) = nrows(CM.cm)
+ncols(CM::CartanMatrix) = ncols(CM.cm)
 
 function Base.size(CM::CartanMatrix, d::Int)
   return size(CM.cm, d)
@@ -80,7 +89,7 @@ end
 
 returns true iff C is a *(generalized)* **Cartan matrix**.
 """
-function is_cartan_matrix(C::CartanMatrix)
+function is_cartan_matrix(C::MatElem)
     #is square
     if size(C,1) != size(C,2)
         return false
