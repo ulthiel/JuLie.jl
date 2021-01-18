@@ -168,7 +168,7 @@ generates the **Cartan block matrix** defined by ``types`` whose elements should
 
 for example you could call:
 ```
-CartanMatrix( [ "A12~" , "B7" , "C9~" ] )
+CartanMatrix( [ "A1~" , "B2" , "C3~" ] )
 ```
 """
 function CartanMatrix(types::Array{String,1})
@@ -200,12 +200,28 @@ end
 generates the **Cartan block matrix** ``types[1]_{dims[1]} ✖ ̃\\tilde{types[2]_{dims[2]}} …`` if for example ``tildes[1]=true, tildes[2]=false, …``
 
 for example you could call:
-```
-CartanMatrix( [('A', 12, true), ('B', 7, false), ('C', 9, true)] )
+```jldoctest
+julia> CartanMatrix( [('A', 1, true), ('B', 2, false), ('C', 3, true)] )
+[ 2  -2   0   0   0   0   0   0]
+[-2   2   0   0   0   0   0   0]
+[ 0   0   2  -1   0   0   0   0]
+[ 0   0  -2   2   0   0   0   0]
+[ 0   0   0   0   2  -1   0   0]
+[ 0   0   0   0  -2   2  -1   0]
+[ 0   0   0   0   0  -1   2  -2]
+[ 0   0   0   0   0   0  -1   2]
 ```
 which would return the same as
-```
-CartanMatrix( [ "A12~" , "B7" , "C9~" ] )
+```jldoctest
+julia> CartanMatrix( [ "A1~" , "B2" , "C3~" ] )
+[ 2  -2   0   0   0   0   0   0]
+[-2   2   0   0   0   0   0   0]
+[ 0   0   2  -1   0   0   0   0]
+[ 0   0  -2   2   0   0   0   0]
+[ 0   0   0   0   2  -1   0   0]
+[ 0   0   0   0  -2   2  -1   0]
+[ 0   0   0   0   0  -1   2  -2]
+[ 0   0   0   0   0   0  -1   2]
 ```
 """
 function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
@@ -241,7 +257,8 @@ function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
             if dim == 2
                 CM[2+c,1+c] = -2
                 CM[1+c,2+c] = -1
-                return CartanMatrix(CM)
+                c += dim
+                continue
             end
 
             if tilde
@@ -282,8 +299,6 @@ function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
                 CM[j+1,j] = -1
             end
             CM[dim-1+c,dim+c] = -2
-
-            return CartanMatrix(CM)
 
         elseif type == 'D'
             dim >= 4 || throw(ArgumentError("dim ≥ 4 required for type = D"*(tilde ? "~" : "")))
