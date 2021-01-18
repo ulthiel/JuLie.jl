@@ -61,7 +61,7 @@ function schur_polynomial(shp::Partition{T}, R::FmpzMPolyRing) where T<:Integer
 
     Tab[m][n] += 1
 
-    #minimize trailing elemnts
+    #minimize trailing elements
     if n < shp[m]
       i = m
       j = n + 1

@@ -336,7 +336,7 @@ end
 
 A list of all possible multiset_partitions of a Partition, by regrouping its parts into Partitions.
 
-The algorithm used is the algorithm M by , ["The Art of Computer Programming - Volume 4A, Combinatotial Algorithms, Part 1"](http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf) by Donald E. Knuth(2011), 429–430. De-gotoed, index-shifted and generalized.
+The algorithm used is the algorithm M by , ["The Art of Computer Programming - Volume 4A, Combinatorial Algorithms, Part 1"](http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf) by Donald E. Knuth(2011), 429–430. De-gotoed, index-shifted and generalized.
 """
 function multiset_partitions(p::Partition{T})  where T<:Integer
   if p == Partition(T[])
@@ -489,7 +489,7 @@ end
 
 A list of all possible ``r``-restricted multiset_partitions of a Partition, by regrouping its parts into Partitions.
 
-The algorithm used is a version of the algorithm M by , "The Art of Computer Programming - Volume 4A, Combinatotial Algorithms, Part 1" by Donald E. Knuth, 429–430 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
+The algorithm used is a version of the algorithm M by , "The Art of Computer Programming - Volume 4A, Combinatorial Algorithms, Part 1" by Donald E. Knuth, 429–430 http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf. De-gotoed, index-shifted and generalized.
 """
 function multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
   #The algorithm is almost the same as multiset_partitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multiset_partitions.

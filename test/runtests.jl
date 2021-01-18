@@ -66,7 +66,7 @@ end
 			check = false
 			break
 		end
-		# check that partititons are really partitions of n
+		# check that partitions are really partitions of n
 		for lambda in P
 			if sum(lambda) != n
 				check = false
@@ -93,7 +93,7 @@ end
 				check = false
 				break
 			end
-			# check that partititons are really partitions of n
+			# check that partitions are really partitions of n
 			for lambda in P
 				if sum(lambda) != n
 					check = false
@@ -128,7 +128,7 @@ end
 				check = false
 				break
 			end
-			# check that partititons are really partitions of n
+			# check that partitions are really partitions of n
 			for lambda in P
 				if sum(lambda) != n
 					check = false
@@ -259,7 +259,7 @@ end
 					check = false
 					break
 				end
-				# check that partititons are really partitions of n
+				# check that partitions are really partitions of n
 				for lambda in P
 					if sum(lambda) != n
 						check = false
@@ -735,3 +735,6 @@ end
 	@test schur_polynomial(Partition([3]), S) == x[1]*x[2]*x[3] + x[1]^2*x[2] + x[1]*x[2]^2 + x[1]^2*x[3] + x[1]*x[3]^2 + x[2]^2*x[3] + x[2]*x[3]^2 + x[1]^3 + x[2]^3 + x[3]^3
 
 end
+
+
+include("cartan_matrices.jl")

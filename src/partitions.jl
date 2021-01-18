@@ -409,7 +409,7 @@ end
 """
     partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
 
-All partitions of an integer m >= 0 into n >= 0 parts, where each part is an element in v and each v[i] occurse a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
+All partitions of an integer m >= 0 into n >= 0 parts, where each part is an element in v and each v[i] occurs a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
 
 The algorithm used is a de-gotoed version of "partb" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
 """

@@ -194,7 +194,7 @@ function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer)
 
     Tab[m][n] += 1
 
-    #minimize trailing elemnts
+    #minimize trailing elements
     if n < shape[m]
       i = m
       j = n + 1
