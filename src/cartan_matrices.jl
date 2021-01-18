@@ -155,183 +155,8 @@ CartanMatrix('A',12,true)
 CartanMatrix('C',7)
 ```
 """
-function CartanMatrix(type::Char, dim::Int, tilde=false::Bool)
-    if type == 'A'
-        dim >= 1 || throw(ArgumentError("dim ≥ 1 required for type = A"*(tilde ? "~" : "")))
-        if tilde
-            dim += 1
-        end
-        CM = diagonal_matrix(ZZ(2), dim)
-        if dim > 1
-            CM[2,1] = -1
-            CM[dim-1,dim] = -1
-        end
-        for j = 2:dim-1
-            CM[j-1,j] = -1
-            CM[j+1,j] = -1
-        end
-        if tilde
-            if dim == 2  # A1~
-                CM[1,dim] = CM[dim,1] = -2
-            else
-                CM[1,dim] = CM[dim,1] = -1
-            end
-        end
-        return CartanMatrix(CM)
-
-    elseif type == 'B'
-        dim >= 3 || !tilde || throw(ArgumentError("dim ≥ 3 required for type = B~"))
-        dim >=2 || throw(ArgumentError("dim ≥ 2 required for type = B"))
-
-        if dim == 2
-            CM = diagonal_matrix(ZZ(2), 2)
-            CM[2,1] = -2
-            CM[1,2] = -1
-            return CartanMatrix(CM)
-        end
-
-        if tilde
-            dim += 1
-        end
-        CM = diagonal_matrix(ZZ(2), dim)
-
-        if tilde
-            CM[3,1] = -1
-            CM[1,3] = -1
-        else
-            CM[2,1] = -1
-            CM[1,2] = -1
-        end
-
-        CM[3,2] = -1
-        for j = 3:dim-2
-            CM[j-1,j] = -1
-            CM[j+1,j] = -1
-        end
-        CM[dim-2,dim-1] = -1
-        CM[dim,dim-1] = -2
-        CM[dim-1,dim] = -1
-        return CartanMatrix(CM)
-
-    elseif type == 'C'
-        dim >= 2 || !tilde || throw(ArgumentError("dim ≥ 2 required for type = C~"))
-        dim >= 3 || tilde || throw(ArgumentError("dim ≥ 3 required for type = C"))
-        if tilde
-            dim += 1
-        end
-        CM = diagonal_matrix(ZZ(2), dim)
-
-        if tilde
-            CM[2,1] = -2
-        else
-            CM[2,1] = -1
-        end
-        for j = 2:dim-1
-            CM[j-1,j] = -1
-            CM[j+1,j] = -1
-        end
-        CM[dim-1,dim] = -2
-
-        return CartanMatrix(CM)
-
-    elseif type == 'D'
-        dim >= 4 || throw(ArgumentError("dim ≥ 4 required for type = D"*(tilde ? "~" : "")))
-
-        if tilde
-            dim += 1
-        end
-        CM = diagonal_matrix(ZZ(2), dim)
-
-        if tilde
-            CM[3,1] = -1
-            CM[1,3] = -1
-        else
-            CM[2,1] = -1
-            CM[1,2] = -1
-        end
-
-        CM[3,2] = -1
-        for j = 3:dim-2
-            CM[j-1,j] = -1
-            CM[j+1,j] = -1
-        end
-        CM[dim,dim-2] = -1
-        CM[dim-2,dim-1] = -1
-        CM[dim-2,dim] = -1
-        return CartanMatrix(CM)
-
-    elseif type == 'E'
-        dim>=6 && dim <=8 || throw(ArgumentError("6 ≤ dim ≤ 8 required for type = E"*(tilde ? "~" : "")))
-
-        if tilde
-            dim += 1
-        end
-        CM = diagonal_matrix(ZZ(2), dim)
-
-        if tilde && dim==7 #E~6
-            CM[5,1] = -1
-            CM[1,5] = -1
-        elseif tilde && dim==8 #E~7
-            CM[dim,1] = -1
-            CM[1,dim] = -1
-        else
-            CM[2,1] = -1
-            CM[1,2] = -1
-        end
-
-        CM[3,2] = -1
-        for j = 3:dim-3
-            CM[j-1,j] = -1
-            CM[j+1,j] = -1
-        end
-        CM[dim-1,dim-3] = -1
-        CM[dim-3,dim-2] = -1
-        CM[dim-3,dim-1] = -1
-        CM[dim,dim-1] = -1
-        CM[dim-1,dim] = -1
-        return CartanMatrix(CM)
-
-    elseif type == 'F'
-        dim == 4 || throw(ArgumentError(" dim=4  required for type = F"*(tilde ? "~" : "")))
-
-        if !tilde
-            CM = diagonal_matrix(ZZ(2), dim)
-            CM[2,1] = -1
-            CM[1,2] = -1
-            CM[3,2] = -2
-            CM[2,3] = -1
-            CM[4,3] = -1
-            CM[3,4] = -1
-        else
-            CM = diagonal_matrix(ZZ(2), dim+1)
-            CM[2,1] = -1
-            CM[1,2] = -1
-            CM[3,2] = -1
-            CM[2,3] = -1
-            CM[4,3] = -2
-            CM[3,4] = -1
-            CM[5,4] = -1
-            CM[4,5] = -1
-        end
-        return CartanMatrix(CM)
-
-    elseif type == 'G'
-        dim == 2 || throw(ArgumentError(" dim=2  required for type = G"*(tilde ? "~" : "")))
-
-        if tilde
-            CM = diagonal_matrix(ZZ(2), 3)
-            CM[2,1] = -1
-            CM[1,2] = -1
-            CM[3,2] = -3
-            CM[2,3] = -1
-        else
-            CM = diagonal_matrix(ZZ(2), 2)
-            CM[2,1] = -1
-            CM[1,2] = -3
-        end
-        return CartanMatrix(CM)
-    end
-    throw(ArgumentError("type has to be either \'A\', \'B\', \'C\', \'D\', \'E\', \'F\' or \'G\'"))
+function CartanMatrix(type::Char, dim::Int, tilde::Bool=false)
+    return CartanMatrix([(type, dim, tilde)])
 end
 
 
@@ -361,42 +186,32 @@ function CartanMatrix(types::Array{String,1})
         end
     end
 
-    L = Array{Char,1}(undef,length(types))  #the types 'A',...,'G'
-    N = zeros(Int, length(types))           #the dimensions _n
-    tilde = falses(length(types))
-    for i = 1:length(types)
-        L[i] = types[i][1]
-        tilde[i] = types[i][end]=='~'
-        N[i] = parse(Int, types[i][2:end-tilde[i]])
+    tmp = map(types) do typ
+        tilde = typ[end]=='~'
+        return (typ[1], parse(Int, typ[2:end-tilde]), tilde)
     end
-    return CartanMatrix(L,N,tilde)
+    return CartanMatrix(tmp)
 end
 
 
 """
-    CartanMatrix(types::Array{Char,1}, dims::Array{Int,1}, tildes::BitArray{1})
+    CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
 
 generates the **Cartan block matrix** ``types[1]_{dims[1]} ✖ ̃\\tilde{types[2]_{dims[2]}} …`` if for example ``tildes[1]=true, tildes[2]=false, …``
 
 for example you could call:
 ```
-CartanMatrix( ["A", "B", "C"], [12, 7, 9], [true, false, true] )
+CartanMatrix( [('A', 12, true), ('B', 7, false), ('C', 9, true)] )
 ```
 which would return the same as
 ```
 CartanMatrix( [ "A12~" , "B7" , "C9~" ] )
 ```
 """
-function CartanMatrix(types::Array{Char,1}, dims::Array{Int,1}, tildes::BitArray{1})
-    length(types)==length(dims) && length(dims)==length(tildes) || throw(ArgumentError("types, dims and tilde have to be of equal lengths"))
-
-    CM = diagonal_matrix(ZZ(2), sum(dims)+sum(tildes))
+function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
+    CM = diagonal_matrix(ZZ(2), sum(t -> t[2] + t[3], types))
     c = 0 # the offset
-    for k = 1:length(types)
-
-        type = types[k]
-        dim = dims[k]
-        tilde = tildes[k]
+    for (type, dim, tilde) in types
 
         if type == 'A'
             dim >= 1 || throw(ArgumentError("dim ≥ 1 required for type = A"*(tilde ? "~" : "")))
@@ -554,7 +369,7 @@ function CartanMatrix(types::Array{Char,1}, dims::Array{Int,1}, tildes::BitArray
         else
             throw(ArgumentError("type has to be either \'A\', \'B\', \'C\', \'D\', \'E\', \'F\' or \'G\'"))
         end
-        c += dims[k] + tilde
+        c += dim
     end
     return CartanMatrix(CM)
 end
