@@ -352,7 +352,7 @@ for performance, partitions with trailing zeroes will not be allowed.
 function partition_to_partcount(p::Partition{T})  where T<:Integer
 
   if isempty(p) || getindex(p,1) == 0
-    return []
+    return T[]
   end
 
   p[end]!=0 || throw(ArgumentError("p can't have any trailing zeroes"))
@@ -377,6 +377,10 @@ julia> partcount_to_partition([2,0,1])
 ```
 """
 function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+
+  if isempty(pc)
+    return Partition{T}(T[])
+  end
 
   l = sum(pc)       #length of resulting partition
   if l == 0

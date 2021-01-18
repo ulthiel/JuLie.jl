@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+JuLie = "0fac7475-a920-4e58-b2d0-2357b2a71519"

@@ -4,9 +4,9 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import AbstractAlgebra: LaurentPolynomialRing, RingElem
+import AbstractAlgebra: LaurentPolynomialRing, RingElem, divexact
 
-export quantum, quantum_number
+export quantum, quantum_number, gaussian_binomial
 
 
 
@@ -37,7 +37,8 @@ end
 """
 	quantum(n::Int, q::RingElem)
 
-This is a shortcut for ```quantum_number(n,q)```.
+Well This is a shortcut for ```quantum_number(n,q)```.
+
 """
 function quantum(n::Int, q::RingElem)
 	return quantum_number(n,q)
@@ -60,4 +61,33 @@ This is a shortcut for ```quantum_number(n)```.
 """
 function quantum(n::Int)
 	return quantum_number(n)
+end
+
+"""
+	gaussian_binomial(m::Int, r::Int, q::RingElem)
+
+The **Gaussian binomial coefficient** ``\\begin{bmatrix} m \\\\ r \\end{bmatrix}_q`` , also known as **q-binomial coefficient** is defined by:
+
+```math
+\\begin{bmatrix} m \\\\ r \\end{bmatrix}_q = \\begin{cases}{\\frac{(1-q^m)(1-q^{m-1})⋯(1-q^{m-r+1})}{(1-q)(1-q^2)⋯(1-q^r)}} & r≤m \\\\ 0 & r>m \\end{cases} \\;
+```
+"""
+function gaussian_binomial(m::Int, r::Int, q::RingElem)
+	m >= 0 || throw(ArgumentError("m ≥ 0 required"))
+	r >= 0 || throw(ArgumentError("r ≥ 0 required"))
+
+	R = parent(q)
+	if isone(q)
+		return R(binomial(m,r))
+	elseif  r>m
+		return R(0)
+	else
+		num = one(R) #the numerator
+		den = one(R) #the denominator
+		for i = 1:min(r,m-r)
+			mul!(num, num, one(R)-q^(m-i+1))
+			mul!(den, den, one(R)-q^i)
+		end
+		return divexact(num, den)
+	end
 end
