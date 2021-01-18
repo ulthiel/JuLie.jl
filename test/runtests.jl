@@ -630,3 +630,6 @@ end
 	@test schur_polynomial(Partition([3]), S) == x[1]*x[2]*x[3] + x[1]^2*x[2] + x[1]*x[2]^2 + x[1]^2*x[3] + x[1]*x[3]^2 + x[2]^2*x[3] + x[2]*x[3]^2 + x[1]^3 + x[2]^3 + x[3]^3
 
 end
+
+
+include("cartan_matrices.jl")
