@@ -54,12 +54,24 @@ function Base.setindex!(P::Partition, x::Integer, i::Int)
   return setindex!(P.p,x,i)
 end
 
+function Partition(parts::Integer...)
+  return Partition(collect(Int, parts))
+end
+
+function Partition{T}(parts::Integer...) where T<:Integer
+  return Partition(collect(T, parts))
+end
+
 # The empty array is of "Any" type, and this is stupid. We want it here
 # to get it into the default type Int64. This constructor is also called by
 # MultiPartition, and this casts the whole array into "Any" whenever there's
 # the empty partition inside.
 function Partition(p::Array{Any,1})
   return Partition(Array{Int64,1}(p))
+end
+
+function Base.copy(P::Partition{T}) where T<:Integer
+  return Partition{T}(copy(P.p))
 end
 
 """
