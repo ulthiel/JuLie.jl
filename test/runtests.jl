@@ -1,7 +1,7 @@
 using Test
-#using Combinatorics
+using JuLie
 import Nemo: ZZ, QQ
-import AbstractAlgebra: LaurentPolynomialRing
+import AbstractAlgebra: LaurentPolynomialRing, PolynomialRing
 
 @testset "Enumerative functions" begin
 
@@ -131,6 +131,99 @@ end
 	end
 	@test check==true
 
+	# k-restricted partitions with lower and upper bounds
+	check = true
+	N = 0:20
+	for n in N
+		for k = 0:n+1
+			for l1 = 0:n
+				for l2 = l1:n
+					P = partitions(n,k,l1,l2)
+					# check that partitions have k parts
+					if length(P) !=0 && unique([ length(p) for p in P ]) != [k]
+						check = false
+						break
+					end
+					# check that all partitions are distinct
+					if P != unique(P)
+						check = false
+						break
+					end
+					# check that partititons are really partitions of n
+					for lambda in P
+						if sum(lambda) != n
+							check = false
+							break
+						end
+					end
+					#check that all parts are inside the bounds
+					for lambda in P
+						for part in lambda
+							if part>l2 || part<l1
+								check = false
+								break
+							end
+						end
+					end
+				end
+			end
+		end
+		if check==false
+			break
+		end
+	end
+	@test check==true
+
+	# k-restricted partitions with lower and upper bounds and distinct parts
+	check = true
+	N = 0:20
+	for n in N
+		for k = 0:n+1
+			for l1 = 0:n
+				for l2 = l1:n
+					P = partitions(n,k,l1,l2,z=1)
+					# check that partitions have k parts
+					if length(P) !=0 && unique([ length(p) for p in P ]) != [k]
+						check = false
+						break
+					end
+					# check that all partitions are distinct
+					if P != unique(P)
+						check = false
+						break
+					end
+					# check that partititons are really partitions of n
+					for lambda in P
+						if sum(lambda) != n
+							check = false
+							break
+						end
+					end
+					#check that all parts are inside the bounds
+					for lambda in P
+						for part in lambda
+							if part>l2 || part<l1
+								check = false
+								break
+							end
+						end
+					end
+					#check that all parts are distinct
+					for lambda in P
+						if lambda != unique(lambda)
+							check = false
+							break
+						end
+					end
+				end
+			end
+		end
+		if check==false
+			break
+		end
+	end
+	@test check==true
+
 	#= v-mu-restricted partitions aren't yet functional in this package
 
 	# v-mu-restricted partitions
@@ -179,66 +272,100 @@ end
 
 	# Conjugate partition
 	@test conjugate(Partition([6,4,3,1])) == Partition([4, 3, 3, 2, 1, 1])
+	@test conjugate(Partition([5,4,1])) == Partition([3, 2, 2, 2, 1])
+	check = true
+	for p in partitions(10)
+		if conjugate(conjugate(p)) != p
+			check = false
+			break
+		end
+	end
+	@test check==true
+
+	# partcount_to_partition
+	@test partcount_to_partition([2,0,1]) == Partition([3,1,1])
+	@test partcount_to_partition(Int[]) == Partition([])
+	@test partcount_to_partition([3,2,1]) == Partition([3,2,2,1,1,1])
+
+	# partition_to_partcount
+	@test partition_to_partcount(Partition([5,3,3,3,2,1,1])) == [2,1,3,0,1]
+	@test partition_to_partcount(Partition([])) == []
+	@test partition_to_partcount(Partition([3,2,1])) == [1,1,1]
+
+	check = true
+	N = 0:20
+	for n in N
+		for λ in partitions(n)
+			if λ != partcount_to_partition(partition_to_partcount(λ))
+				check=false
+				break
+			end
+		end
+		if check==false
+			break
+		end
+	end
+	@test check==true
 
 end
 
 @testset "Multi-partitions" begin
 
-	# multi-set-partitions
-	check = true
-	N = 0:15
-	for n in N
-		MP = multisetpartitions(n)
-		# check that all multisetpartitions are distinct
-		if MP != unique(MP)
-			check = false
-			break
-		end
-		# check that multisetpartititons are really multisetpartitions of n
-		for mp in MP
-			lambda=0
-			for p in mp
-				lambda = lambda + sum(p)
-			end
-			if lambda != n
-				check = false
-				break
-			end
-		end
-	end
-	@test check==true
+	# # multi-set-partitions
+	# check = true
+	# N = 0:15
+	# for n in N
+	# 	MP = multisetpartitions(n)
+	# 	# check that all multisetpartitions are distinct
+	# 	if MP != unique(MP)
+	# 		check = false
+	# 		break
+	# 	end
+	# 	# check that multisetpartititons are really multisetpartitions of n
+	# 	for mp in MP
+	# 		lambda=0
+	# 		for p in mp
+	# 			lambda = lambda + sum(p)
+	# 		end
+	# 		if lambda != n
+	# 			check = false
+	# 			break
+	# 		end
+	# 	end
+	# end
+	# @test check==true
 
-	# k-restricted multisetpartitions
-	check = true
-	N = 0:15
-	K = 1:15
-	for n in N
-		for k in K
-			MP = multisetpartitions(n,k)
-			# check that all multisetpartitions are distinct
-			if MP != unique(MP)
-				check = false
-				break
-			end
-			# check that all multisetpartititons are really multisetpartitions of n
-			for mp in MP
-				lambda=0
-				for p in mp
-					lambda = lambda + sum(p)
-				end
-				if lambda != n
-					check = false
-					break
-				end
-			end
-			# check that all multisetpartitions have k parts
-			if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
-				check = false
-				break
-			end
-		end
-	end
-	@test check==true
+	# # k-restricted multisetpartitions
+	# check = true
+	# N = 0:15
+	# K = 1:15
+	# for n in N
+	# 	for k in K
+	# 		MP = multisetpartitions(n,k)
+	# 		# check that all multisetpartitions are distinct
+	# 		if MP != unique(MP)
+	# 			check = false
+	# 			break
+	# 		end
+	# 		# check that all multisetpartititons are really multisetpartitions of n
+	# 		for mp in MP
+	# 			lambda=0
+	# 			for p in mp
+	# 				lambda = lambda + sum(p)
+	# 			end
+	# 			if lambda != n
+	# 				check = false
+	# 				break
+	# 			end
+	# 		end
+	# 		# check that all multisetpartitions have k parts
+	# 		if length(MP) !=0 && unique([ length(mp) for mp in MP ]) != [k]
+	# 			check = false
+	# 			break
+	# 		end
+	# 	end
+	# end
+	# @test check==true
 
 	# multi-partitions
 	check = true
@@ -286,12 +413,49 @@ end
 	@test quantum(5) == q^-4 + q^-2 + 1 + q^2 + q^4
 	@test quantum(-5) == -quantum(5)
 	@test quantum(5, QQ(11)) == QQ(216145205//14641)
+
+	S,t = PolynomialRing(ZZ,"t")
+	@test gaussian_binomial(0,0,t) == 1
+	@test gaussian_binomial(1,0,t) == 1
+	@test gaussian_binomial(1,1,t) == 1
+	@test gaussian_binomial(2,1,t) == t + 1
+	@test gaussian_binomial(3,1,t) == t^2 + t + 1
+	@test gaussian_binomial(3,2,t) == t^2 + t + 1
+	@test gaussian_binomial(4,2,t) == t^4 + t^3 + 2*t^2 + t + 1
+	@test gaussian_binomial(0,1,t) == 0
+	@test gaussian_binomial(2,3,t) == 0
+
 end
 
 
 @testset "Tableaux" begin
+	# reading_word
+	@test reading_word(Tableau([ [1,2,5,7], [3,4], [6]])) == [6,3,4,1,2,5,7]
+	@test reading_word(Tableau([ [1], [2], [3]])) == [3,2,1]
+	@test reading_word(Tableau([[1,2,3]])) == [1,2,3]
+	@test reading_word(Tableau([[]])) == Int[]
 
-	@test reading_word(Tableau([ [1,2,5,7], [3,4] , [6]])) == [6,3,4,1,2,5,7]
+	# weight
+	@test weight(Tableau([[1,2,3],[1,2],[1]])) == [3,2,1]
+	@test weight(Tableau([[1,2,3,4,5]])) == [1,1,1,1,1]
+	@test weight(Tableau([[1],[1],[1]])) == [3]
+	@test weight(Tableau([[]])) == Int[]
+
+	# is_standard
+	@test is_standard(Tableau([[1,2,4,7,8],[3,5,6,9],[10]])) == true
+	@test is_standard(Tableau([[1,2],[3,4]])) == true
+	@test is_standard(Tableau([[1,3],[2,4]])) == true
+	@test is_standard(Tableau([[1,4],[2,4]])) == false
+	@test is_standard(Tableau([[1,2],[4]])) == false
+
+	# is_semistandard
+	@test is_semistandard(Tableau([[1,2,4,7,8],[3,5,6,9],[10]])) == true
+	@test is_semistandard(Tableau([[1,2],[3,4]])) == true
+	@test is_semistandard(Tableau([[1,3],[2,4]])) == true
+	@test is_semistandard(Tableau([[1,4],[2,4]])) == false
+	@test is_semistandard(Tableau([[1,2],[4]])) == true
+	@test is_semistandard(Tableau([[1,2,2],[3]])) == true
+	@test is_semistandard(Tableau([[1,2,3],[1,4]])) == false
 
 	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
 	check = true
@@ -317,7 +481,7 @@ end
 	# semistandard_tableaux(s::Array{T,1}, weight::Array{T,1})
 	check = true
 	shapes = [[5,3,1,1],[4,3,2,1],[2,2,2,2,2]]
-	weights = [[1,1,1,1,1,1,1,1,1,1],[3,0,2,0,0,5],[4,3,2,1,0]]
+	weights = [[1,1,1,1,1,1,1,1,1,1],[3,0,2,0,0,5],[4,3,2,1]]
 	for s in shapes
 		for w in weights
 			SST = semistandard_tableaux(s,w)
@@ -333,15 +497,28 @@ end
 					break
 				end
 			end
-			println(length(SST))
+			#check that all tableaux have the correct shape
+			for tab in SST
+				if shape(tab)!=s
+					check = false
+					break
+				end
+			end
+			#check that all tableaux have the correct weight
+			for tab in SST
+				if weight(tab)!=w
+					check = false
+					break
+				end
+			end
 		end
 	end
 	@test check==true
 
-
+	# num_standard_tableaux
 	# standard_tableaux(s::Partition)
 	check = true
-	for i=1:10
+	for i = 1:10
 		for s in partitions(i)
 			ST = standard_tableaux(s)
 			#check that all tableaux are distinct
@@ -357,11 +534,99 @@ end
 				end
 			end
 			#check that all tableaux where found
-			if length(ST)!=hook_length_formula(s)
+			if length(ST)!=num_standard_tableaux(s)
 				check = false
 				break
 			end
 		end
 	end
 	@test check==true
+
+
+	# hook_length
+	@test hook_length(Partition([1]),1,1) == 1
+	@test hook_length(Partition([4,3,1,1]),1,1) == 7
+
+	# hook_lengths
+	@test hook_lengths(Partition([4,3,1,1])) == Tableau([[7,4,3,1],[5,2,1],[2],[1]])
+	@test hook_lengths(Partition([1])) == Tableau([[1]])
+	@test hook_lengths(Partition([])) == Tableau([Int[]])
+
+	# schensted
+	@test schensted([6,2,7,3,5,4,1]) == (Tableau([[1,3,4],[2,7],[5],[6]]),Tableau([[1,3,5],[2,4],[6],[7]]))
+	@test schensted([5,2,7,1,3,8,6,4]) == (Tableau([[1,3,4],[2,6,8],[5,7]]),Tableau([[1,3,6],[2,5,7],[4,8]]))
+	@test schensted([1]) == (Tableau([[1]]),Tableau([[1]]))
+	@test schensted(Int[]) == (Tableau([[]]),Tableau([[]]))
+
+	# bump
+	tab = Tableau([[]])
+	for x in [1,2,1,1,3,4,1,1]
+		bump!(tab,x)
+	end
+	@test tab == Tableau([[1,1,1,1,1],[2,3,4]])
+
+end
+
+
+@testset "Kostka polynomials" begin
+	R,t = PolynomialRing(ZZ, "t")
+
+	# kostka polynomials
+	@test kostka_polynomial([4],[1,1,1,1]) == t^6
+	@test kostka_polynomial([4],[2,1,1]) == t^3
+	@test kostka_polynomial([4],[2,2]) == t^2
+	@test kostka_polynomial([4],[3,1]) == t
+	@test kostka_polynomial([4],[4]) == one(R)
+	@test kostka_polynomial([3,1],[1,1,1,1]) == t^5 + t^4 + t^3
+	@test kostka_polynomial([3,1],[2,1,1]) == t^2 + t
+	@test kostka_polynomial([3,1],[2,2]) == t
+	@test kostka_polynomial([3,1],[3,1]) == one(R)
+	@test kostka_polynomial([2,2],[1,1,1,1]) == t^4 + t^2
+	@test kostka_polynomial([2,2],[2,1,1]) == t
+	@test kostka_polynomial([2,2],[2,2]) == one(R)
+	@test kostka_polynomial([2,1,1],[1,1,1,1]) == t^3 + t^2 + t
+	@test kostka_polynomial([2,1,1],[2,1,1]) == one(R)
+	@test kostka_polynomial([1,1,1,1],[1,1,1,1]) == one(R)
+	@test kostka_polynomial([2,2],[3,1]) == zero(R)
+
+	check = true
+	for λ in partitions(5), μ in partitions(5)
+		kp = kostka_polynomial(λ,μ)
+		if kp(1) != length(semistandard_tableaux(λ,μ))
+			check = false
+			break
+		end
+	end
+	@test check == true
+
+	# charge
+	@test charge([2,1,1,2,3,5,4,3,4,1,1,2,2,3]) == 8
+	@test charge([2,5,4,1,3],true) == 3
+	@test charge([1,3,2],true) == 2
+	@test charge(Int[]) == 0
+
+	@test charge(Tableau([[1,1,1,4], [2,2], [3]])) == 1
+	@test charge(Tableau([[1,1,1,3], [2,2], [4]])) == 2
+	@test charge(Tableau([[1,1,1,2], [2,4], [3]])) == 2
+	@test charge(Tableau([[1,1,1,2], [2,3], [4]])) == 3
+	@test charge(Tableau([[]])) == 0
+
+	@test charge([Partition([2,2,2,2,2,2,2]),Partition([4,3,1,1]),Partition([3,2]),Partition([2])]) == 18
+	@test charge([Partition([6,4,3,2]),Partition([5,2]),Partition([2])]) == 3
+	@test charge([Partition([6,4,3,2]),Partition([4,3]),Partition([2])]) == 3
+
+end
+
+
+@testset "Schur polynomials" begin
+	x = [string("x",string(i)) for i=1:3]
+	S,x = PolynomialRing(ZZ, x)
+
+	@test schur_polynomial(Partition([1]), S) == x[1]
+	@test schur_polynomial(Partition([1,1]), S) == x[1]*x[2]
+	@test schur_polynomial(Partition([2]), S) == x[1]^2 + x[2]^2 + x[1]*x[2]
+	@test schur_polynomial(Partition([1,1,1]), S) == x[1]*x[2]*x[3]
+	@test schur_polynomial(Partition([2,1]), S) == 2*x[1]*x[2]*x[3] + x[1]^2*x[2] + x[1]*x[2]^2 + x[1]^2*x[3] + x[1]*x[3]^2 + x[2]^2*x[3] + x[2]*x[3]^2
+	@test schur_polynomial(Partition([3]), S) == x[1]*x[2]*x[3] + x[1]^2*x[2] + x[1]*x[2]^2 + x[1]^2*x[3] + x[1]*x[3]^2 + x[2]^2*x[3] + x[2]*x[3]^2 + x[1]^3 + x[2]^3 + x[3]^3
+
 end

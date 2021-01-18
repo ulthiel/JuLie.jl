@@ -68,10 +68,14 @@ end
 The **weight** of a tableau is the number of times each number appears in the tableau. The return value is an array whose i-th element gives the number of times the integer i appears in the tableau.
 """
 function weight(Tab::Tableau)
-  max=0
-  for i=1:length(Tab)
-    if max<Tab[i][end]
-      max=Tab[i][end]
+  if isempty(Tab[1])
+    return Int[]
+  end
+
+  max = 0
+  for i = 1:length(Tab)
+    if max < Tab[i][end]
+      max = Tab[i][end]
     end
   end
 
@@ -373,9 +377,13 @@ function is_standard(Tab::Tableau)
   end
 
   #contains all numbers from 1 to n
-  numbs = falses(sum(s))
+  n = sum(s)
+  numbs = falses(n)
   for i = 1:length(s)
     for j = 1:s[i]
+      if Tab[i][j]>n
+        return false
+      end
       numbs[Tab[i][j]] = true
     end
   end
@@ -521,6 +529,9 @@ end
 Returns the tableau of shape λ in which the entry at position (i,j) is equal to the hook length of the corresponding box.
 """
 function hook_lengths(lambda::Partition)
+  if isempty(lambda)
+    return Tableau([Int[]])
+  end
   Tab = [ [hook_length(lambda,i,j) for j in 1:lambda[i]] for i in 1:length(lambda) ]
   return Tableau(Tab)
 end
@@ -565,6 +576,9 @@ julia> schensted([3,1,6,2,5,4])
 ```
 """
 function schensted(sigma::Array{T,1}) where T<:Integer
+  if isempty(sigma)
+    return Tableau{T}([[]]),Tableau{T}([[]])
+  end
   P = Tableau{T}([[sigma[1]]])
   Q = Tableau{T}([[1]])
   for i = 2:length(sigma)
@@ -580,6 +594,11 @@ end
 Inserts the integer x into the tableau Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
 """
 function bump!(Tab::Tableau, x::Integer)
+  if isempty(Tab[1])
+    push!(Tab[1],x)
+    return Tab
+  end
+
   i = 1
   while i <= length(Tab)
     if Tab[i, length(Tab[i])] <= x
@@ -608,6 +627,11 @@ end
 Inserts x into Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion. Traces the change with Q by inserting y at the same Position in Q as x in Tab.
 """
 function bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
+  if isempty(Tab[1])
+    push!(Tab[1],x)
+    push!(Q[1],x)
+    return Tab,Q
+  end
   i = 1
   while i <= length(Tab)
     if Tab[i,length(Tab[i])] <= x

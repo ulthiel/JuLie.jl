@@ -5,7 +5,7 @@
 ################################################################################
 
 import AbstractAlgebra: PolynomialRing, push_term!, MPolyBuildCtx, finish
-import Nemo: ZZ, fmpz, fmpz_mpoly
+import Nemo: ZZ, fmpz, fmpz_mpoly, FmpzMPolyRing, gens
 
 export schur_polynomial
 
@@ -21,10 +21,10 @@ s_{shp}:=∑_{T} x_1^{m_1}…x_n^{m_n}
 
 where the sum is taken over all **semistandard tableaux** ``T`` of shape ``shp``, and ``m_i`` gives the weight of ``i`` in ``T``.
 """
-function schur_polynomial(shp::Partition{T}) where T<:Integer
+function schur_polynomial(shp::Partition{T}, R::FmpzMPolyRing) where T<:Integer
   num_boxes = sum(shp)
-  x = [string("x",string(i)) for i=1:num_boxes]
-  R,x = PolynomialRing(ZZ, x)
+  x = gens(R)
+  S = R.base_ring
 
   sf = MPolyBuildCtx(R)
 
@@ -34,7 +34,7 @@ function schur_polynomial(shp::Partition{T}) where T<:Integer
   m = len
   n = shp[m]
 
-  count = zeros(Int, num_boxes)
+  count = zeros(Int, length(x))
 
   while true
     count .= 0
@@ -43,7 +43,7 @@ function schur_polynomial(shp::Partition{T}) where T<:Integer
         count[Tab[i][j]] += 1
       end
     end
-    push_term!(sf, ZZ(1), count)
+    push_term!(sf, S(1), count)
 
     #raise one element by 1
     while !(Tab[m][n] < num_boxes &&
@@ -87,4 +87,10 @@ function schur_polynomial(shp::Partition{T}) where T<:Integer
     m = len
     n = shp[len]
   end #while
+end
+
+function schur_polynomial(shp::Partition{T}) where T<:Integer
+  x = [string("x",string(i)) for i=1:sum(shp)]
+  R,x = PolynomialRing(ZZ, x)
+  return schur_polynomial(shp, R)
 end

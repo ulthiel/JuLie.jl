@@ -1,5 +1,5 @@
 ################################################################################
-# Combinatorics.jl
+# JuLie.jl
 #
 #	A combinatorics package for Julia.
 #
