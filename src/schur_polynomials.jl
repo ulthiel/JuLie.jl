@@ -4,135 +4,43 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import AbstractAlgebra: PolynomialRing, push_term!, MPolyBuildCtx, finish, MatrixSpace
-import Nemo: ZZ, fmpz, fmpz_mpoly, FmpzMPolyRing, gens, divexact, mul!
+import AbstractAlgebra: PolynomialRing, push_term!, MPolyBuildCtx, finish
+import Nemo: ZZ, fmpz_mpoly, FmpzMPolyRing, gens, divexact, mul!
 
 export schur_polynomial
 
-
 """
-    schur_polynomial(λ::Partition)
-    schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing) where T<:Integer
-
-Returns the Schur polynomial ``s_λ`` in sum(λ) variables, as a Multivariate Polynomial:
-
-```math
-s_λ:=∑_T x₁^{m₁}…xₙ^{mₙ}
-```
-
-where the sum is taken over all semistandard [`tableaux`](@ref JuLie.Tableau) ``T`` of shape ``λ``, and ``mᵢ`` gives the weight of ``i`` in ``T``.
-"""
-function schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing) where T<:Integer
-  if isempty(λ)
-    return one(R)
-  end
-  num_boxes = sum(λ)
-  x = gens(R)
-  S = R.base_ring
-
-  sf = MPolyBuildCtx(R)
-
-  #version of the function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
-  len = length(λ)
-  Tab = [(fill(i,λ[i])) for i = 1:len]
-  m = len
-  n = λ[m]
-
-  count = zeros(Int, length(x))
-
-  while true
-    count .= 0
-    for i = 1:len
-      for j = 1:λ[i]
-        count[Tab[i][j]] += 1
-      end
-    end
-    push_term!(sf, S(1), count)
-    #raise one element by 1
-    while !(Tab[m][n] < num_boxes &&
-      (n==λ[m] || Tab[m][n]<Tab[m][n+1]) &&
-      (m==len || λ[m+1]<n || Tab[m][n]+1<Tab[m+1][n]))
-      if n > 1
-        n -= 1
-      elseif m > 1
-        m -= 1
-        n = λ[m]
-      else
-        return finish(sf)
-      end
-    end
-
-    Tab[m][n] += 1
-
-    #minimize trailing elements
-    if n < λ[m]
-      i = m
-      j = n + 1
-    else
-      i = m + 1
-      j = 1
-    end
-    while (i<=len && j<=λ[i])
-      if i == 1
-        Tab[1][j] = Tab[1][j-1]
-      elseif j == 1
-        Tab[i][1] = Tab[i-1][1] + 1
-      else
-        Tab[i][j] = max(Tab[i][j-1], Tab[i-1][j] + 1)
-      end
-      if j < λ[i]
-        j += 1
-      else
-        j = 1
-        i += 1
-      end
-    end
-    m = len
-    n = λ[len]
-  end #while
-end
-
-function schur_polynomial(λ::Partition{T}) where T<:Integer
-  if isempty(λ)
-    return ZZ(1)
-  end
-  x = [string("x",string(i)) for i=1:sum(λ)]
-  R,x = PolynomialRing(ZZ, x)
-  return schur_polynomial(λ, R)
-end
-
-
-"""
-    schur_polynomial(λ::Partition{T}, n::Integer) where T<:Integer
-
-Returns the Schur polynomial ``s_λ(x₁,x₂,...,xₙ)`` over `PolynomialRing(ZZ,["x1","x2",...,"xn"])`.
-
-If ``sum(λ) = n`` consider calling `schur_polynomial(λ)` instead; this tends to be much faster.
-"""
-function schur_polynomial(λ::Partition{T}, n::Integer) where T<:Integer
-  n>=0 || throw(ArgumentError("n≥0 required"))
-  x = [string("x",string(i)) for i=1:n]
-  R,x = PolynomialRing(ZZ, x)
-  return schur_polynomial(λ, x)
-end
-
-
-"""
+    schur_polynomial(λ::Partition{T}, n=sum(λ)::Int) where T<:Integer
+    schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing, n=sum(λ)::Int) where T<:Integer
     schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
 
-Returns the Schur polynomial of `λ` in the variables from `x`: ``s_λ(x[1],x[2],...,x[n])``.
+Returns the Schur polynomial ``s_λ(x₁,x₂,...,xₙ)`` in n variables, as a Multivariate Polynomial.
 
-If ``x`` are the generators of `R`, and ``sum(λ) = length(x)`` consider calling `schur_polynomial(λ, R)` instead; this tends to be much faster.
+If neither `R` nor `x` are given, the Schur polynomial will be over `PolynomialRing(ZZ,["x1","x2",...,"xn"])`.
 
 # Example
 ```julia-repl
-julia> schur_polynomial(Partition([3,2,1]),[x1,x2])
-x1^3*x2^2 + x1^2*x2^3
+julia> R,x = PolynomialRing(ZZ, ["a","b","c"])
+(Multivariate Polynomial Ring in a, b, c over Integer Ring, fmpz_mpoly[a, b, c])
+julia> schur_polynomial(Partition([2,1]),[x[1],x[2]])
+a^2*b + a*b^2
+julia> schur_polynomial(Partition([2,1]),R)
+a^2*b + a^2*c + a*b^2 + 2*a*b*c + a*c^2 + b^2*c + b*c^2
+julia> schur_polynomial(Partition([2]))
+x1^2 + x1*x2 + x2^2
 ```
 
 # Algorithm
-We use *Cauchy's bialternant formula* to compute the Schur polynomials in `x`:
+We use two different Algorithms, depending on the size of the input.
+The Combinatorial Algorithm is used for Partitions of small Integers, or if ``n ≥ 10``. In the other cases we use Cauchy's bialternant formula.
 
+**Combinatorial Algorithm**
+```math
+s_λ:=∑_T x₁^{m₁}…xₙ^{mₙ}
+```
+where the sum is taken over all semistandard [tableaux](@ref JuLie.Tableau) ``T`` of shape ``λ``, and ``mᵢ`` gives the weight of ``i`` in ``T``.
+
+**Cauchy's bialternant formula**
 ```math
 s_λ(x₁,…,xₙ) =  ∏_{1 ≤ i < j ≤ n} (x_i-x_j)^{-1} ⋅
 \\begin{vmatrix}
@@ -143,8 +51,67 @@ x_1^{λ_n} & x_2^{λ_n} & … & x_n^{λ_n}
 \\end{vmatrix}
 ```
 """
+function schur_polynomial(λ::Partition{T}, n=sum(λ)::Int) where T<:Integer
+  n>=0 || throw(ArgumentError("n≥0 required"))
+  x = [string("x",string(i)) for i=1:n]
+  R,x = PolynomialRing(ZZ, x)
+  return schur_polynomial(λ, R, n)
+end
+
+
+function schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing, n=sum(λ)::Int) where T<:Integer
+  n>=0 || throw(ArgumentError("n≥0 required"))
+  if n > R.nvars
+    n = R.nvars
+  end
+  x = gens(R)[1:n]
+  if n==0 || n < length(λ)
+    if isempty(λ)
+      return 1
+    else
+      return 0
+    end
+  end
+
+  if n>=10
+    return schur_polynomial_combinat(λ, R, n)
+  end
+  #decide which Algorithm to use if n<10
+  bo = sum(λ) <= [140,50,17,11,10,10,11,13,14][n]
+  if bo
+    return schur_polynomial_combinat(λ, R, n) #Combinatorial formula
+  else
+    return schur_polynomial_cbf(λ, x) #Cauchy's bialternant formula
+  end
+end
+
+
 function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
-#**Note** : This Algorithm could be improved for some cases, by calling schur_polynomial(λ) and then deleting the Terms that aren't over x.
+  n = length(x)
+
+  if n==0 || n < length(λ)
+    if isempty(λ)
+      return 1
+    else
+      return 0
+    end
+  end
+
+  if n>=10
+    return schur_polynomial_combinat(λ, R, n)
+  end
+  #decide which Algorithm to use if n<10
+  bo = sum(λ) <= [140,50,17,11,10,10,11,13,14][n]
+  if bo
+    R = x[1].parent
+    return schur_polynomial_combinat(λ, R, n) #Combinatorial formula
+  else
+    return schur_polynomial_cbf(λ, x) #Cauchy's bialternant formula
+  end
+end
+
+#returning the schur polynomial in the first k generators of R using Cauchy's bialternant formula.
+function schur_polynomial_cbf(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
   if isempty(x)
     if sum(λ)==0
       return 1
@@ -156,6 +123,10 @@ function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Int
   n = length(x)
   R = x[1].parent # Multi-polynomialring
   S = R.base_ring # Integer Ring
+
+  if n < length(λ)
+    return 0
+  end
 
   #=
   To calculate the determinant we use the Laplace expansion along the last row.
@@ -189,7 +160,7 @@ function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Int
         ntrues -= 1
         pointer += 1
       end
-      if pointer>n
+      if pointer > n
         break
       end
     end
@@ -235,4 +206,80 @@ function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Int
   end
 
   return sp
+end
+
+#returning the schur polynomial in the first k generators of R using the Combinatorial formula.
+function schur_polynomial_combinat(λ::Partition{T}, R::FmpzMPolyRing, k=sum(λ)::Int) where T<:Integer
+  if isempty(λ)
+    return one(R)
+  end
+
+  S = R.base_ring
+  sf = MPolyBuildCtx(R)
+
+  #version of the function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
+  len = length(λ)
+  Tab = [(fill(i,λ[i])) for i = 1:len]
+  m = len
+  n = λ[m]
+
+  count = zeros(Int, R.nvars)
+  valid = true
+  while true
+    count .= 0
+    for i = 1:len
+      for j = 1:λ[i]
+        if Tab[i][j] <= k
+          count[Tab[i][j]] += 1
+        else
+          valid = false
+          break
+        end
+      end
+    end
+    if valid
+      push_term!(sf, S(1), count)
+    end
+    #raise one element by 1
+    while !(Tab[m][n] < k &&
+      (n==λ[m] || Tab[m][n]<Tab[m][n+1]) &&
+      (m==len || λ[m+1]<n || Tab[m][n]+1<Tab[m+1][n]))
+      if n > 1
+        n -= 1
+      elseif m > 1
+        m -= 1
+        n = λ[m]
+      else
+        return finish(sf)
+      end
+    end
+
+    Tab[m][n] += 1
+
+    #minimize trailing elements
+    if n < λ[m]
+      i = m
+      j = n + 1
+    else
+      i = m + 1
+      j = 1
+    end
+    while (i<=len && j<=λ[i])
+      if i == 1
+        Tab[1][j] = Tab[1][j-1]
+      elseif j == 1
+        Tab[i][1] = Tab[i-1][1] + 1
+      else
+        Tab[i][j] = max(Tab[i][j-1], Tab[i-1][j] + 1)
+      end
+      if j < λ[i]
+        j += 1
+      else
+        j = 1
+        i += 1
+      end
+    end
+    m = len
+    n = λ[len]
+  end #while true
 end
