@@ -53,19 +53,11 @@ function num_partitions(n::fmpz, k::fmpz)
 
   # See https://oeis.org/A008284
   elseif n < 2*k
-    if n-k < 0
-      return ZZ(0)
-    else
-      return num_partitions(n-k)
-    end
+    return num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
 
   # See https://oeis.org/A008284
   elseif n <= 2+3*k
-    if n-k < 0
-      p = ZZ(0)
-    else
-      p = num_partitions(n-k)
-    end
+    p = num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
     for i=0:Int(n)-2*Int(k)-1
       p = p - num_partitions(ZZ(i))
     end
@@ -117,10 +109,8 @@ function catalan(n::fmpz; alg="binomial")
 
   n >= 0 || throw(ArgumentError("n >= 0 required"))
 
-  if n==0
+  if n<=1
     return ZZ(1)
-  elseif n==1
-    return ZZ(0)
   else
 
     if alg=="binomial"

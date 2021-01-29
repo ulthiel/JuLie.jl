@@ -658,7 +658,7 @@ function partcount_to_partition(pc::Array{T,1}) where T<:Integer
 
   l = sum(pc)       #length of resulting partition
   if l == 0
-    return Partition{T}([0])
+    return Partition{T}([])
   end
 
   p = zeros(T,l)

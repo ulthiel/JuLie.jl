@@ -98,6 +98,7 @@ function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Int
   end
 
   if n>=10
+    R = x[1].parent
     return schur_polynomial_combinat(λ, R, n)
   end
   #decide which Algorithm to use if n<10
@@ -112,21 +113,21 @@ end
 
 #returning the schur polynomial in the first k generators of R using Cauchy's bialternant formula.
 function schur_polynomial_cbf(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
-  if isempty(x)
-    if sum(λ)==0
-      return 1
-    else
-      return 0
-    end
-  end
+  #if isempty(x) #this event is handled in the calling methods
+  #  if sum(λ)==0
+  #    return 1
+  #  else
+  #    return 0
+  #  end
+  #end
 
   n = length(x)
   R = x[1].parent # Multi-polynomialring
   S = R.base_ring # Integer Ring
 
-  if n < length(λ)
-    return 0
-  end
+  #if n < length(λ)
+  #  return 0
+  #end
 
   #=
   To calculate the determinant we use the Laplace expansion along the last row.

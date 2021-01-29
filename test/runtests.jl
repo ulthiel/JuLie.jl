@@ -1,5 +1,6 @@
 using Test
 using JuLie
+using JuLie: schur_polynomial_cbf
 import Nemo: ZZ, QQ
 import AbstractAlgebra: LaurentPolynomialRing, PolynomialRing
 
@@ -23,16 +24,24 @@ import AbstractAlgebra: LaurentPolynomialRing, PolynomialRing
 	@test num_partitions(ZZ(1991),ZZ(1)) == ZZ(1)
 
 	# catalan
+	@test catalan(ZZ(0)) == ZZ(1)
+	@test catalan(ZZ(1)) == ZZ(1)
+	@test catalan(3) == ZZ(5)
+
+
 	@test catalan(ZZ(87)) == ZZ(16435314834665426797069144960762886143367590394940)
 	@test catalan(ZZ(87), alg="binomial") == ZZ(16435314834665426797069144960762886143367590394940)
 	@test catalan(ZZ(87), alg="iterative") == ZZ(16435314834665426797069144960762886143367590394940)
 
 	# stirling
 	@test stirling1(ZZ(119),ZZ(97)) == ZZ(231393604360614503792428283097412982860076938212225481588634166)
+	@test stirling1(1,1) == ZZ(1)
 	@test stirling2(ZZ(117),ZZ(101)) == ZZ(52573293149721609368885842841453741018410117476)
+	@test stirling2(3,2) == ZZ(3)
 
 	# lucas
 	@test lucas(ZZ(201)) == ZZ(1015116040150328233272520834523487973612876)
+	@test lucas(2) == ZZ(3)
 
 end
 
@@ -235,20 +244,17 @@ end
 	end
 	@test check==true
 
-	#= v-mu-restricted partitions aren't yet functional in this package
-
-	# v-mu-restricted partitions
+	#v-mu-restricted partitions
 	check = true
 	N = 0:20
 	for n in N
 		for k = 1:n+1
 			for i = 1:20
-				v=convert(Array{Integer,1},rand(1:20,i))
+				v = convert(Array{Integer,1}, rand(1:20,i))
 				unique!(v)
 				sort!(v)
-				mu=convert(Array{Integer,1},rand((0:k).+1,length(v)))
-				println(mu,n,v,k)
-				P = partitions(mu,n,v,k)
+				mu = convert(Array{Integer,1}, rand((0:k).+1, length(v)))
+				P = partitions(mu, n, v, k)
 				# check that partitions have k parts
 				if length(P) !=0 && unique([ length(p) for p in P ]) != [k]
 					check = false
@@ -260,10 +266,23 @@ end
 					break
 				end
 				# check that partitions are really partitions of n
-				for lambda in P
-					if sum(lambda) != n
+				for λ in P
+					if sum(λ) != n
 						check = false
 						break
+					end
+				end
+				# check that partitions are constrained by v and mu
+				for λ in P
+					partcount = partition_to_partcount(λ)
+					for j = 1:length(partcount)
+						if partcount[j] != 0
+							ind = findfirst(isequal(j),v)
+							if ind==nothing || mu[ind] < partcount[j]
+								check = false
+								break
+							end
+						end
 					end
 				end
 			end
@@ -273,17 +292,44 @@ end
 		end
 	end
 	@test check==true
-
-	=#
+	#check for a few examples if the correct v-mu-restricted Partitions are found
+	check = true
+	N = 1:20
+	K = 1:20
+	for n in N
+		for k in K
+			if partitions(n,k) != partitions(fill(n,n),n,collect(1:n),k)
+				check = false
+			end
+			if partitions(n, k, 1, n, z=1) != partitions(fill(1,n),n,collect(1:n),k)
+				check = false
+			end
+			for l1 = 1:n
+				for l2 = l1:n
+					if partitions(n, k, l1, l2, z=1) != partitions(fill(1,l2-l1+1),n,collect(l1:l2),k)
+						check = false
+					end
+					if partitions(n, k, l1, l2) != partitions(fill(n,l2-l1+1),n,collect(l1:l2),k)
+						check = false
+					end
+				end
+			end
+		end
+	end
+	@test_throws ArgumentError partitions([1,2], 5, [1,2,3], 2)
+	@test_throws ArgumentError partitions([1,2,3], -1, [1,2,3], 2)
+	@test_throws ArgumentError partitions([1,2,3], 5, [1,2], 0)
 
 	# Dominance order
 	@test dominates(Partition([4,2]), Partition([3,2,1])) == true
 	@test dominates(Partition([4,1,1]), Partition([3,3])) == false
 	@test dominates(Partition([3,3]), Partition([4,1,1])) == false
+	@test dominates(Partition([5]), Partition([2,2,2])) == false
 
 	# Conjugate partition
 	@test conjugate(Partition([6,4,3,1])) == Partition([4, 3, 3, 2, 1, 1])
 	@test conjugate(Partition([5,4,1])) == Partition([3, 2, 2, 2, 1])
+	@test conjugate(Partition([])) == Partition([])
 	check = true
 	for p in partitions(10)
 		if conjugate(conjugate(p)) != p
@@ -296,6 +342,7 @@ end
 	# partcount_to_partition
 	@test partcount_to_partition([2,0,1]) == Partition([3,1,1])
 	@test partcount_to_partition(Int[]) == Partition([])
+	@test partcount_to_partition([0]) == Partition([])
 	@test partcount_to_partition([3,2,1]) == Partition([3,2,2,1,1,1])
 
 	# partition_to_partcount
@@ -351,6 +398,16 @@ end
 	setindex!(msp,0,Partition([2]))
 	@test msp == Multiset_partition([1],[1])
 
+	# union
+	msp = Multiset_partition()
+	msp = union(msp,Partition([1]),Partition([2]),Partition([3]))
+	@test msp == Multiset_partition([1],[2],[3])
+	msp = union(msp,Partition([3]),Partition([3]))
+	@test msp == Multiset_partition([1],[2],[3],[3],[3])
+	union(msp,Partition([3]))
+	@test msp == Multiset_partition([1],[2],[3],[3],[3])
+
+
 	# union!
 	msp = Multiset_partition()
 	union!(msp,Partition([1]),Partition([2]),Partition([3]))
@@ -358,7 +415,7 @@ end
 	union!(msp,Partition([3]),Partition([3]))
 	@test msp == Multiset_partition([1],[2],[3],[3],[3])
 
-	# union!
+	# getindex
 	msp = Multiset_partition([3,2],[5],[2,1],[2,1])
 	@test getindex(msp,Partition([3,2])) == 1
 	@test getindex(msp,Partition([2,1])) == 2
@@ -385,6 +442,14 @@ end
 	@test length(Multiset_partition([2],[2],[8,7],[3,2,1])) == 4
 	@test length(Multiset_partition([2])) == 1
 	@test length(Multiset_partition()) == 0
+
+	#copy
+	msp = Multiset_partition([2],[2],[8,7,6])
+	mspc = copy(msp)
+	@test msp == mspc
+	push!(msp, Partition([2]))
+	@test msp != mspc
+
 
 	# multiset-partitions
 	check = true
@@ -471,6 +536,9 @@ end
 end
 
 @testset "Multi-partitions" begin
+	#constructors
+	@test Multipartition([[3,2],[1]]) == Multipartition([Partition([3,2]),Partition([1])])
+	@test Multipartition([[3,2],[]]) == Multipartition([Partition([3,2]),Partition([])])
 
 	# multi-partitions
 	check = true
@@ -486,11 +554,7 @@ end
 			end
 			# check that multipartititons are really multipartitions of n
 			for mp in MP
-				lambda=0
-				for p in mp
-					lambda = lambda + sum(p)
-				end
-				if lambda != n
+				if sum(mp) != n
 					check = false
 					break
 				end
@@ -518,6 +582,7 @@ end
 	@test quantum(5) == q^-4 + q^-2 + 1 + q^2 + q^4
 	@test quantum(-5) == -quantum(5)
 	@test quantum(5, QQ(11)) == QQ(216145205//14641)
+	@test quantum(6, one(QQ)) == QQ(6)
 
 	S,t = PolynomialRing(ZZ,"t")
 	@test gaussian_binomial(0,0,t) == 1
@@ -529,6 +594,7 @@ end
 	@test gaussian_binomial(4,2,t) == t^4 + t^3 + 2*t^2 + t + 1
 	@test gaussian_binomial(0,1,t) == 0
 	@test gaussian_binomial(2,3,t) == 0
+	@test gaussian_binomial(2,1,one(ZZ)) == 2
 
 end
 
@@ -538,13 +604,13 @@ end
 	@test reading_word(Tableau([ [1,2,5,7], [3,4], [6]])) == [6,3,4,1,2,5,7]
 	@test reading_word(Tableau([ [1], [2], [3]])) == [3,2,1]
 	@test reading_word(Tableau([[1,2,3]])) == [1,2,3]
-	@test reading_word(Tableau([[]])) == Int[]
+	@test reading_word(Tableau(Array{Int,1}[])) == Int[]
 
 	# weight
 	@test weight(Tableau([[1,2,3],[1,2],[1]])) == [3,2,1]
 	@test weight(Tableau([[1,2,3,4,5]])) == [1,1,1,1,1]
 	@test weight(Tableau([[1],[1],[1]])) == [3]
-	@test weight(Tableau([[]])) == Int[]
+	@test weight(Tableau(Array{Int,1}[])) == Int[]
 
 	# is_standard
 	@test is_standard(Tableau([[1,2,4,7,8],[3,5,6,9],[10]])) == true
@@ -552,6 +618,8 @@ end
 	@test is_standard(Tableau([[1,3],[2,4]])) == true
 	@test is_standard(Tableau([[1,4],[2,4]])) == false
 	@test is_standard(Tableau([[1,2],[4]])) == false
+	@test is_standard(Tableau([[1,3,2],[4]])) == false
+
 
 	# is_semistandard
 	@test is_semistandard(Tableau([[1,2,4,7,8],[3,5,6,9],[10]])) == true
@@ -561,6 +629,7 @@ end
 	@test is_semistandard(Tableau([[1,2],[4]])) == true
 	@test is_semistandard(Tableau([[1,2,2],[3]])) == true
 	@test is_semistandard(Tableau([[1,2,3],[1,4]])) == false
+	@test is_semistandard(Tableau([[1,2,1],[2,4]])) == false
 
 	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
 	check = true
@@ -581,7 +650,7 @@ end
 		end
 	end
 	@test check==true
-
+	@test isempty(semistandard_tableaux([3,2,1],2))
 
 	# semistandard_tableaux(s::Array{T,1}, weight::Array{T,1})
 	check = true
@@ -619,6 +688,46 @@ end
 		end
 	end
 	@test check==true
+	@test semistandard_tableaux(Int[], Int[]) == [Tableau(Array{Int,1}[])]
+
+	#semistandard_tableaux(box_num, max_val)
+	check = true
+	BoxNum = 0:5
+	MaxVal = 1:6
+	for box_num in BoxNum
+		for max_val in MaxVal
+			SST = semistandard_tableaux(box_num, max_val)
+			#check that all tableaux are distinct
+			if SST != unique(SST)
+				check = false
+				break
+			end
+			#check that all tableaux are semistandard_tableaux
+			for tab in SST
+				if !is_semistandard(tab)
+					check = false
+					break
+				end
+			end
+			#check that all tableaux have box_num boxes
+			for tab in SST
+				if sum(shape(tab)) != box_num
+					check = false
+					break
+				end
+			end
+			#check that all tableaux have values ≤ max_val
+			for tab in SST
+				for i in 1:length(tab)
+					if tab[i][end] > max_val
+						check = false
+						break
+					end
+				end
+			end
+		end
+	end
+	@test check==true
 
 	# num_standard_tableaux
 	# standard_tableaux(s::Partition)
@@ -646,29 +755,61 @@ end
 		end
 	end
 	@test check==true
+	@test standard_tableaux(Partition(Int[])) == [Tableau(Array{Int,1}[])]
+	@test standard_tableaux([3,2,1]) == standard_tableaux(Partition([3,2,1]))
 
+	# standard_tableaux(n::Integer)
+	check = true
+	for n = 0:10
+		ST = standard_tableaux(n)
+		#check that all tableaux are distinct
+		if ST != unique(ST)
+			check = false
+			break
+		end
+		#check that all tableaux are standard_tableaux
+		for tab in ST
+			if !is_standard(tab)
+				check = false
+				break
+			end
+		end
+		#check that all tableaux have n boxes
+		for tab in ST
+			if sum(shape(tab))!=n
+				check = false
+				break
+			end
+		end
+	end
+	@test check==true
 
 	# hook_length
 	@test hook_length(Partition([1]),1,1) == 1
 	@test hook_length(Partition([4,3,1,1]),1,1) == 7
+	@test hook_length(Tableau([[1,2,3,4],[5,6,7],[8],[9]]),1,1) == 7
 
 	# hook_lengths
 	@test hook_lengths(Partition([4,3,1,1])) == Tableau([[7,4,3,1],[5,2,1],[2],[1]])
 	@test hook_lengths(Partition([1])) == Tableau([[1]])
-	@test hook_lengths(Partition([])) == Tableau([Int[]])
+	@test hook_lengths(Partition([])) == Tableau(Array{Int,1}[])
 
 	# schensted
 	@test schensted([6,2,7,3,5,4,1]) == (Tableau([[1,3,4],[2,7],[5],[6]]),Tableau([[1,3,5],[2,4],[6],[7]]))
 	@test schensted([5,2,7,1,3,8,6,4]) == (Tableau([[1,3,4],[2,6,8],[5,7]]),Tableau([[1,3,6],[2,5,7],[4,8]]))
 	@test schensted([1]) == (Tableau([[1]]),Tableau([[1]]))
-	@test schensted(Int[]) == (Tableau([[]]),Tableau([[]]))
+	@test schensted(Int[]) == (Tableau(Array{Int,1}[]),Tableau(Array{Int,1}[]))
 
-	# bump
-	tab = Tableau([[]])
+	# bump!
+	tab = Tableau(Array{Int,1}[])
+	tab2 = Tableau(Array{Int,1}[])
+	Q = Tableau(Array{Int,1}[])
 	for x in [1,2,1,1,3,4,1,1]
 		bump!(tab,x)
+		bump!(tab2, x, Q, x)
 	end
 	@test tab == Tableau([[1,1,1,1,1],[2,3,4]])
+	@test tab2 == Tableau([[1,1,1,1,1],[2,3,4]])
 
 end
 
@@ -706,6 +847,8 @@ end
 
 	# charge
 	@test charge([2,1,1,2,3,5,4,3,4,1,1,2,2,3]) == 8
+	@test charge([3,2]) == 0
+	@test charge([3,1],true) == 0
 	@test charge([2,5,4,1,3],true) == 3
 	@test charge([1,3,2],true) == 2
 	@test charge(Int[]) == 0
@@ -714,7 +857,7 @@ end
 	@test charge(Tableau([[1,1,1,3], [2,2], [4]])) == 2
 	@test charge(Tableau([[1,1,1,2], [2,4], [3]])) == 2
 	@test charge(Tableau([[1,1,1,2], [2,3], [4]])) == 3
-	@test charge(Tableau([[]])) == 0
+	@test charge(Tableau(Array{Int,1}[])) == 0
 
 	@test charge([Partition([2,2,2,2,2,2,2]),Partition([4,3,1,1]),Partition([3,2]),Partition([2])]) == 18
 	@test charge([Partition([6,4,3,2]),Partition([5,2]),Partition([2])]) == 3
@@ -741,7 +884,9 @@ end
 	@test schur_polynomial(Partition([1,1]), S, 3) == x[1]*x[2] + x[1]*x[3] + x[2]*x[3]
 	@test schur_polynomial(Partition([2]), S, 3) == x[1]^2 + x[2]^2 + x[1]*x[2] + x[1]*x[3] + x[2]*x[3] + x[3]^2
 	@test schur_polynomial(Partition([1,1,1]), S, 3) == x[1]*x[2]*x[3]
+	@test schur_polynomial(Partition([1,1,1]), S, 4) == x[1]*x[2]*x[3]
 	@test schur_polynomial(Partition([2,1]), S, 1) == 0
+	@test schur_polynomial(Partition([3,1]), S, 2) == x[1]^3*x[2] + x[1]^2*x[2]^2 + x[1]*x[2]^3
 	@test schur_polynomial(Partition([3]), S, 2) == x[1]^2*x[2] + x[1]*x[2]^2 + x[1]^3 + x[2]^3
 
 	@test schur_polynomial(Partition([141]), S, 1) == x[1]^141 #this calls Cauchy's algorithm
@@ -758,6 +903,8 @@ end
 	@test schur_polynomial(Partition([1]), x[1:0]) == 0
 	@test schur_polynomial(Partition([141]), [x[1]]) == x[1]^141 #this calls Cauchy's algorithm
 	@test schur_polynomial(Partition([200]), [x[2]]) == x[2]^200 #this calls Cauchy's algorithm
+	@test schur_polynomial(Partition([1]), PolynomialRing(ZZ, [string("x",string(i)) for i=1:10])[2])(1,1,1,1,1,1,1,1,1,1) == 10 #this calls Cauchy's algorithm
+	@test schur_polynomial_cbf(Partition([3,2,1]), [x[1],x[2],x[3]]) == schur_polynomial(Partition([3,2,1]), [x[1],x[2],x[3]])
 
 	check = true
 	for n = 1:5
@@ -779,6 +926,7 @@ end
 	@test schur_polynomial(Partition([]), 1) == 1
 	@test schur_polynomial(Partition([]), 0) == 1
 	@test schur_polynomial(Partition([3,2,1]), 0) == 0
+	@test schur_polynomial(Partition([1]), 10)(1,1,1,1,1,1,1,1,1,1) == 10
 	@test_throws ArgumentError schur_polynomial(Partition([3,2,1]), -1)
 
 end
