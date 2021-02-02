@@ -119,4 +119,5 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ## Contributors
 
+* Max Horn (TU Kaiserslautern, 2021–)
 * Tom Schmit (TU Kaiserslautern, 2020–)
