@@ -28,7 +28,13 @@ julia> ?partitions
 
 ## Motivation
 
-Especially for combinatorics there's a lot already in other computer algebra systems. So, why another package? First, I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project. What convinced me of Julia as programming language is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Pyhton). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems.
+Especially for combinatorics there's a lot already in other computer algebra systems and this justifies the question: why another package? I will give 3 (interwoven) reasons:
+
+1. I want to create a package that covers the mathematics that I care about in a way that I think about it. One distant goal is to have all the material available from my book [Introduction to Soergel bimodules](https://www.springer.com/gp/book/9783030488253) with Elias, Makisumi, and Williamson. It will take a lot of time and I don't know if I succeed but it's one motivation.
+
+2. I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project.
+
+3. What really convinced me of Julia as programming language—and thus of all the whole enterprise—is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Pyhton). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems.
 
 In **[Sage](https://www.sagemath.org)** (v9.1):
 
@@ -76,6 +82,8 @@ The [Nemo](http://nemocas.github.io/Nemo.jl/latest/) package (part of OSCAR) pro
 
 ## Developing
 
+Contributions are necessary and very much welcome. Here are some guidelines.
+
 ### Setting up the repository
 
 Clone this repository to somewhere on your computer:
@@ -110,9 +118,9 @@ Now, changes you make in the code are immediately available in the Julia session
 ### Programming guidelines
 
 1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
-2. Check out the Julia [Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
-3. Everything has to be well-documented, algorithms and papers have to be properly referenced.
-4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try.)
+2. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+3. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```. 
+4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
 5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. You can run the complete unit test with ```Pkg.test("JuLie")```.
 6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
 
