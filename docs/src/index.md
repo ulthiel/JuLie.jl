@@ -119,7 +119,7 @@ Now, changes you make in the code are immediately available in the Julia session
 
 1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
 2. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
-3. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```. 
+3. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```.
 4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
 5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. You can run the complete unit test with ```Pkg.test("JuLie")```.
 6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
@@ -127,5 +127,5 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ## Contributors
 
-* Max Horn (TU Kaiserslautern, 2021–)
+* [Max Horn](https://www.quendi.de/en/math) (TU Kaiserslautern, 2021–)
 * Tom Schmit (TU Kaiserslautern, 2020–)

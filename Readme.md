@@ -11,4 +11,4 @@ JuLie.jl is an early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.
 
 By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and [contributors](https://ulthiel.github.io/JuLie.jl/stable/index.html#contributors).
 
-Please check out the [*documentation*](https://ulthiel.github.io/JuLie.jl/stable) for all information.
+Please check out the [**documentation**](https://ulthiel.github.io/JuLie.jl/stable) for all information.
