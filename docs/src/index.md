@@ -57,7 +57,7 @@ In **[Magma](http://magma.maths.usyd.edu.au/magma/)** (v2.25-5):
 ```
 > time X:=Partitions(90);
 Time: 32.990
-//Uses 15.688 GiB mem, Magma UNUSABLE from now on!!
+//Uses 15.688 GiB mem, Magma unusable from now on
 ```
 
 And now, in **[Julia](https://julialang.org)** (v1.5.2, my implementation):
