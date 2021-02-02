@@ -11,8 +11,8 @@ export kostka_polynomial, charge
 
 
 """
-    kostka_polynomial(lambda::Partition{T}, mu::Partition{T})
-    kostka_polynomial(lambda::Array{Int,1}, mu::Array{Int,1})
+    kostka_polynomial(λ::Partition{T}, μ::Partition{T})
+    kostka_polynomial(λ::Array{Int,1}, μ::Array{Int,1})
 
 The (one-variable) **Kostka polymial** ``K_{λμ}(t)`` associated to partitions λ and μ can be defined as
 
@@ -62,58 +62,58 @@ v^{(0)}=μ \\text{ ,\\hspace{2mm} } |v^{(K)}|=∑_{j≥K+1}λ_j \\text{\\hspace{
 
 Here, ``\\left[\\genfrac{[}{]}{0pt}{0}{m}{n} \\right]_t`` is the [Gaussian binomial coefficient](https://en.wikipedia.org/wiki/Gaussian_binomial_coefficient).
 """
-function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Integer
-  sum(lambda) == sum(mu) || throw(ArgumentError("lambda and mu have to be Partitions of the same Integer"))
+function kostka_polynomial(λ::Partition{T}, μ::Partition{T}) where T<:Integer
+  sum(λ) == sum(μ) || throw(ArgumentError("λ and μ have to be Partitions of the same Integer"))
 
   R,t = PolynomialRing(ZZ, "t")
   kos_poly = R()
 
-  if length(lambda)==0 || !dominates(lambda,mu)
+  if length(λ)==0 || !dominates(λ,μ)
     return R()
   end
 
   #Here we apply fact 2.12 from https://arxiv.org/pdf/1608.01775.pdf  (AN ITERATIVE FORMULA FOR THE KOSTKA-FOULKES POLYNOMIALS - TIMOTHEE W. BRYAN AND NAIHUAN JING)
   copied = false
   i = 1
-  while i<=length(lambda) && i<=length(mu) && lambda[i]==mu[i]
+  while i<=length(λ) && i<=length(μ) && λ[i]==μ[i]
     i += 1
   end
   if i != 1
-    if lambda == mu
+    if λ == μ
       return R(1)
     end
-    lambda_copy = copy(lambda)
-    mu_copy = copy(mu)
-    lambda = Partition{T}(lambda[i:end])
-    mu = Partition{T}(mu[i:end])
+    λ_copy = λ
+    μ_copy = μ
+    λ = Partition{T}(λ[i:end])
+    μ = Partition{T}(μ[i:end])
     copied = true
   end
 
-  len_lam = length(lambda) #note that length(v)=Length(lambda)
-  len_mu = length(mu)
+  len_λ = length(λ) #note that length(v)=Length(λ)
+  len_μ = length(μ)
 
   #calculate the sizes of the partitions from the admissible configurations
-  size_v = Partition{T}(zeros(T,len_lam))
-  for k = 1:len_lam
-    for j = k:len_lam
-      size_v[k] += lambda[j]
+  size_v = Partition{T}(zeros(T,len_λ))
+  for k = 1:len_λ
+    for j = k:len_λ
+      size_v[k] += λ[j]
     end
   end
 
   #compute the Arrays of available Partitions
-  parts = Array{Array{Partition{T},1},1}([[] for i = 1:len_lam])
-  for i = 2:len_lam
+  parts = Array{Array{Partition{T},1},1}([[] for i = 1:len_λ])
+  for i = 2:len_λ
     parts[i] = partitions(size_v[i])
   end
-  parts[1] = [mu]
+  parts[1] = [μ]
 
 
-  index_max = [length(parts[i]) for i=1:len_lam] #gives an upper bound to how big index can get
-  index = ones(Int, len_lam)  #will be our iterator with which we will look at all admissible configurations
+  index_max = [length(parts[i]) for i=1:len_λ] #gives an upper bound to how big index can get
+  index = ones(Int, len_λ)  #will be our iterator with which we will look at all admissible configurations
   empty_partition = Partition{T}([])  #this will act as a placeholder during the Algorithm
   pointer = 2  #this will index the part of the configuration we are currently looking at
-  v = Array{Partition{T},1}([empty_partition for i=1:len_lam])
-  v[1] = mu
+  v = Array{Partition{T},1}([empty_partition for i=1:len_λ])
+  v[1] = μ
 
   #returns P_n^(k)
   function vacancy(n,k)
@@ -123,7 +123,7 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
       res += min(n,vj)
     end
 
-    if k < len_lam
+    if k < len_λ
       for vj in v[k+1]
         res += min(n,vj)
       end
@@ -139,10 +139,10 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
   #Here the actual Algorithm begins
   while pointer > 1
 
-    if pointer == len_lam + 1
+    if pointer == len_λ + 1
       summand = t^charge(v)
       divisor = one(R)
-      for k = 2:len_lam
+      for k = 2:len_λ
         m = partition_to_partcount(v[k])
         for n = 1:length(m)
           if m[n] > 0
@@ -182,9 +182,6 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
               break
             else
               v[pointer] = parts[pointer][index[pointer]]
-              if max_n < v[pointer][1]
-                max_n = v[pointer][1]
-              end
             end
             n = 0
           end
@@ -192,7 +189,7 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
         end
         if n == max_n + 1
           pointer += 1
-          if pointer <= len_lam
+          if pointer <= len_λ
             index[pointer] = 1
           end
         end
@@ -201,16 +198,16 @@ function kostka_polynomial(lambda::Partition{T}, mu::Partition{T}) where T<:Inte
   end
 
   if copied
-    lambda = lambda_copy
-    mu = mu_copy
+    λ = λ_copy
+    μ = μ_copy
   end
 
   return kos_poly
 end
 
 
-function kostka_polynomial(lambda::Array{Int,1}, mu::Array{Int,1})
-   return kostka_polynomial(Partition(lambda), Partition(mu))
+function kostka_polynomial(λ::Array{Int,1}, μ::Array{Int,1})
+   return kostka_polynomial(Partition(λ), Partition(μ))
 end
 
 
@@ -252,7 +249,7 @@ function charge(config::Array{Partition{T},1}) where T<:Integer
   end
 
   c = 0
-  #n[mu]
+  #n[μ]
   for i = 2:length(config[1])
     c += (i-1)*config[1][i]
   end

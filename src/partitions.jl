@@ -54,12 +54,24 @@ function Base.setindex!(P::Partition, x::Integer, i::Int)
   return setindex!(P.p,x,i)
 end
 
+function Partition(parts::Integer...)
+  return Partition(collect(Int, parts))
+end
+
+function Partition{T}(parts::Integer...) where T<:Integer
+  return Partition(collect(T, parts))
+end
+
 # The empty array is of "Any" type, and this is stupid. We want it here
 # to get it into the default type Int64. This constructor is also called by
 # MultiPartition, and this casts the whole array into "Any" whenever there's
 # the empty partition inside.
 function Partition(p::Array{Any,1})
   return Partition(Array{Int64,1}(p))
+end
+
+function Base.copy(P::Partition{T}) where T<:Integer
+  return Partition{T}(copy(P.p))
 end
 
 """
@@ -393,24 +405,32 @@ end
 
 # The code below still has to be fixed, I forgot what the problem was.
 # This is the (de-gotoed version of) algorithm partb by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
-#=
+
 """
     partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
 
-All partitions of an integer m >= 0 into n >= 0 parts, where each part is an element in v and each v[i] occurs a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
+All partitions of an integer m >= 0 into n >= 1 parts, where each part is an element in v and each v[i] occurs a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
 
 The algorithm used is a de-gotoed version of "partb" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
 """
-function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::Integer)
+function partitions(mu::Array{S,1}, m::Integer, v::Array{S,1}, n::Integer) where S<:Integer
+  length(mu)==length(v) || throw(ArgumentError("mu and v should have the same length"))
+  m>=0 || throw(ArgumentError("m ≥ 0 required"))
+  n>=1 || throw(ArgumentError("n ≥ 1 required"))
+
+  T = typeof(m)
+  if isempty(mu)
+    return Partition{T}[]
+  end
+
   r = length(v)
   j = 1
   k = mu[1]
   ll = v[1]
-  x = zeros(Int8, n)
-  y = zeros(Int8, n)
+  x = zeros(Int8, n+1)
+  y = zeros(Int8, n+1)
   ii = zeros(Int8, n)
   i_1 = 0
-  T=typeof(m)
   P = Partition{T}[]
 
   num = 0
@@ -454,7 +474,7 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
           gotob2 = true
           break
         end
-        x[i]=lr
+        x[i] = lr
         ii[i] = r - 1
         i = i + 1
         m = m - lr + y[i]
@@ -468,16 +488,27 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
     end #if
 
     if gotob2
-      while v[r] > m
+      while r>0 && v[r] > m
         r = r - 1
+      end
+
+      if r == 0
+        break
       end
 
       lr = v[r]
       if m == lr
         x[i] = lr
-        push!(P,Partition{T}(x[1:n]))
+        if i<=n
+          push!(P, Partition{T}(x[1:n]))
+        else
+          break
+        end
 
         r = r - 1
+        if r==0
+          break
+        end
         lr = v[r]
       end #if
 
@@ -489,7 +520,7 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
         x[i] = k
       end #if
       i_1 = i - 1
-      for i_0=i_1:-1:1
+      for i_0 = i_1:-1:1
         i = i_0
         r = ii[i]
         lr = v[r]
@@ -510,29 +541,28 @@ function partitions(mu::Array{Integer,1}, m::Integer, v::Array{Integer,1}, n::In
   return P
 end
 
-=#
 
 
 """
-    dominates(lambda::Partition, mu::Partition)
+    dominates(λ::Partition, μ::Partition)
 
 The **dominance order** on partitions is the partial order ⊵ defined by λ ⊵ μ if and only if λ₁ + … + λᵢ ≥ μ₁ + … + μᵢ for all i. This function returns true if λ ⊵ μ.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Dominance_order).
 """
-function dominates(lambda::Partition, mu::Partition)
+function dominates(λ::Partition, μ::Partition)
   dif = 0
   i = 1
-  while i <= min(length(lambda), length(mu))
-    dif += lambda[i] - mu[i]
+  while i <= min(length(λ), length(μ))
+    dif += λ[i] - μ[i]
     i += 1
     if dif < 0
       return false
     end
   end
-  if length(lambda) < length(mu)
-    while i <= length(mu)
-      dif -= mu[i]
+  if length(λ) < length(μ)
+    while i <= length(μ)
+      dif -= μ[i]
       i += 1
     end
     if dif < 0
@@ -544,24 +574,24 @@ end
 
 
 """
-    conjugate(P::Partition{T}) where T<:Integer
+    conjugate(λ::Partition{T}) where T<:Integer
 
 The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableau](@ref)) and then flipping it along its main diagonal.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions).
 """
-function conjugate(P::Partition{T}) where T<:Integer
-  if isempty(P)
-    return copy(P)
+function conjugate(λ::Partition{T}) where T<:Integer
+  if isempty(λ)
+    return copy(λ)
   end
 
-  Q = zeros(T, P[1])
+  μ = zeros(T, λ[1])
 
-  for i = 1:length(P)
-    for j = 1:P[i]
-      Q[j] += 1
+  for i = 1:length(λ)
+    for j = 1:λ[i]
+      μ[j] += 1
     end
   end
 
-  return Partition(Q)
+  return Partition(μ)
 end

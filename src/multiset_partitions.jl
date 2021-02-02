@@ -1,33 +1,304 @@
 ################################################################################
-# Multipartitions.
+# Multiset_partitions.
 #
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export multiset_partitions, partition_to_partcount, partcount_to_partition
+export Multiset_partition, multiset_partitions, partition_to_partcount, partcount_to_partition
+#export union, union!
+
+"""
+    Multiset_partition{T}
+
+Multiset-partitions are generalizations of partitions. An r-component **multiset-partition** of an integer ``n`` is a multiset(a set where each element can be contained multiple times) of partitions ``λ¹, λ², …, λʳ`` where each ``λⁱ`` is a partition of some integer ``nᵢ ≥ 1`` and the ``nᵢ`` sum to ``n``. As for partitions, we have implemented an own type `Multiset_partition{T}`. As with partitions, you can can use smaller integer types to increase performance.
+
+# Example
+```julia-repl
+julia> P = Multiset_partition( [2,1], [4], [3,2,1] )
+{[2, 1], [4], [3, 2, 1]}
+julia> sum(P)
+13
+julia> Multiset_partition( Array{Int8,1}[[2,1], [4], [3,2,1]] ) #Using 8-bit integers
+{Int8[2, 1], Int8[4], Int8[3, 2, 1]}
+```
+
+Since Multiset-partitions are unordered sets, you can't call an explicit element, however, you can iterate over a Multiset\\_partition.
+# Example
+```julia-repl
+julia> MSP = Multiset_partition( [2,1], [4], [3,2,1] )
+{[2, 1], [4], [3, 2, 1]}
+julia> for p in MSP println(p) end
+[2, 1]
+[4]
+[3, 2, 1]
+```
+
+"""
+struct Multiset_partition{T}
+  msp::Dict{Partition{T},Int}
+end
+
+"""
+    Multiset_partition()
+    Multiset_partition{T}() where T<:Integer
+
+Returns an empty **Multiset_partition**.
+"""
+Multiset_partition() = Multiset_partition{Int}(Dict{Partition{Int},Int}())
+Multiset_partition{T}() where T<:Integer = Multiset_partition{T}(Dict{Partition{T},Int}())
+
+"""
+    Multiset_partition(msp::Array{Partition{T},1}) where T<:Integer
+    Multiset_partition(msp::Array{Array{T,1},1}) where T<:Integer
+    Multiset_partition(p::Partition{T}...) where T<:Integer
+    Multiset_partition(p::Array{T,1}...) where T<:Integer
+
+Generates a **Multiset_partition** containing the Partitions `p` or the Partitions from `msp` respectively.
+"""
+function Multiset_partition(msp::Array{Partition{T},1}) where T<:Integer
+  m = Dict{Partition{T}, Int}(p => 0 for p in msp)
+  for p in msp
+    m[p] = m[p] + 1
+  end
+  return Multiset_partition{T}(m)
+end
+
+# More convenient constructors
+function Multiset_partition(msp::Array{Array{T,1},1}) where T<:Integer
+   return Multiset_partition(Partition{T}[Partition(p) for p in msp])
+end
+
+function Multiset_partition(p::Partition{T}...) where T<:Integer
+  m = Dict{Partition{T}, Int}(part => 0 for part in p)
+  for part in p
+    m[part] = m[part] + 1
+  end
+  return Multiset_partition{T}(m)
+end
+
+# More convenient constructors
+function Multiset_partition(p::Array{T,1}...) where T<:Integer
+   return Multiset_partition([Partition(part) for part in p])
+end
 
 
-# struct Multipartition{T} <: AbstractArray{Partition{T},1}
-#    mp::Array{Partition{T},1}
-# end
-#
-#
-#
-# function Base.show(io::IO, ::MIME"text/plain", MP::Multipartition)
-#   print(io, MP.mp)
-# end
-#
-# function Base.size(MP::Multipartition)
-#   return size(MP.mp)
-# end
-#
-# function Base.length(MP::Multipartition)
-#   return length(MP.mp)
-# end
-#
-# function Base.getindex(MP::Multipartition, i::Int)
-#   return getindex(MP.mp,i)
-# end
+function Base.show(io::IO, ::MIME"text/plain", MSP::Multiset_partition)
+  print(io, "{")
+  first = true
+  for p in keys(MSP.msp)
+    for i = 1:MSP[p]
+      if first
+        first = false
+      else
+        print(io, ", ")
+      end
+      print(io, p)
+    end
+  end
+  print(io, "}")
+end
+
+
+"""
+    push!(MSP::Multiset_partition, p::Partition, incr::Int = 1)
+
+Adds the Partition `p` to the Multiset-partition `MSP`.
+`incr` defines how often p should be added to `MSP`
+# Example
+```julia-repl
+julia> MSP = Multiset_partition( [4], [3,1] )
+{[4], [3, 1]}
+julia> push!(MSP, Partition([5,2]))
+{[4], [5, 2], [3, 1]}
+julia> push!(MSP, Partition([7]), 3)
+{[4], [5, 2], [3, 1], [7], [7], [7]}
+```
+"""
+function Base.push!(MSP::Multiset_partition, p::Partition, incr::Int = 1)
+  incr > 0 || throw(ArgumentError("incr > 0 required"))
+  if haskey(MSP.msp, p)
+    MSP.msp[p] += incr
+  else
+    MSP.msp[p] = incr
+  end
+  return MSP
+end
+
+
+"""
+    setindex!(MSP::Multiset_partition, x::Integer, p::Partition)
+
+Sets the multiplicity of the Partition `p` to `x`.
+# Example
+```julia-repl
+julia> MSP = Multiset_partition( [4], [3,1] )
+{[4], [3, 1]}
+julia> setindex!(MSP, 3, Partition([4]))
+{[4], [4], [4], [3, 1]}
+julia> setindex!(MSP, 0, Partition([3, 1]))
+{[4], [4], [4]}
+```
+"""
+function Base.setindex!(MSP::Multiset_partition, x::Integer, p::Partition)
+  if x==0 && haskey(MSP.msp, p)
+    delete!(MSP.msp, p)
+  elseif x!=0
+    MSP.msp[p] = x
+  end
+  return MSP
+end
+
+"""
+    union(MSP::Multiset_partition, partitions::Partition ...)
+
+Returns a new Multiset_partition, containing the Partitions from `MSP` and `partitions`.
+"""
+function Base.union(MSP::Multiset_partition, partitions::Partition ...)
+  MSPc = Multiset_partition(Base.copy(MSP.msp))
+  for p in partitions
+    push!(MSPc,p)
+  end
+  return MSPc
+end
+
+"""
+    union!(MSP::Multiset_partition, partitions::Partition ...)
+
+Adds the Partitions `partitions` to `MSP` and returns it.
+"""
+function Base.union!(MSP::Multiset_partition, partitions::Partition ...)
+  for p in partitions
+    push!(MSP,p)
+  end
+  return MSP
+end
+
+"""
+    getindex(MSP::Multiset_partition, p::Partition)
+
+Returns the multiplicity of the Partition `p` in `MSP`.
+# Example
+```julia-repl
+julia> MSP = Multiset_partition( [4], [4], [3,1] )
+{[4], [4], [3, 1]}
+julia> getindex(MSP, Partition([4]))
+2
+julia> getindex(MSP, Partition([2,2]))
+0
+```
+"""
+function Base.getindex(MSP::Multiset_partition, p::Partition)
+  if haskey(MSP.msp, p)
+    return MSP.msp[p]
+  else
+    return 0
+  end
+end
+
+"""
+    collect(MSP::Multiset_partition{T}) where T<:Integer
+
+Returns an Array{T,1} of all Partitions in `MSP`.
+# Example
+```julia-repl
+julia> MSP = Multiset_partition( [4], [4], [3,1] )
+{[4], [4], [3, 1]}
+julia> collect(MSP)
+3-element Array{Partition{Int64},1}:
+ [4]
+ [4]
+ [3, 1]
+```
+"""
+function Base.collect(MSP::Multiset_partition{T}) where T<:Integer
+  P = Array{Partition{T},1}(undef, length(MSP))
+  k = 1
+  for p in keys(MSP.msp)
+    for i = 1:MSP[p]
+      P[k] = copy(p)
+      k += 1
+    end
+  end
+  return P
+end
+
+function Base.copy(MSP::Multiset_partition)
+  return Multiset_partition(copy(MSP.msp))
+end
+
+function Base.:(==)(MSP1::Multiset_partition, MSP2::Multiset_partition)
+  if keys(MSP1.msp)!=keys(MSP2.msp)
+    return false
+  else
+    for p in keys(MSP1.msp)
+      if MSP1[p]!=MSP2[p]
+        return false
+      end
+    end
+  end
+  return true
+end
+
+"""
+    isempty(MSP::Multiset_partition)
+
+Returns `true` if the Multiset-partition `MSP` is empty.
+"""
+function Base.isempty(MSP::Multiset_partition)
+  return isempty(MSP.msp)
+end
+
+function Base.iterate(MSP::Multiset_partition)
+  Keys = Base.collect(keys(MSP.msp))
+  if !isempty(MSP)
+    return Keys[1], (1, 1, Keys)
+  else
+    return
+  end
+end
+
+function Base.iterate(MSP::Multiset_partition{T}, state) where T<:Integer #state = (1,0,collect(keys(MSP.msp)))
+  i,j,Keys = state
+  j += 1
+  if j<=MSP[Keys[i]]
+    return Keys[i], (i, j, Keys)
+  else
+    i += 1
+    j = 1
+    if i<=length(Keys)
+      return Keys[i], (i, j, Keys)
+    else
+      return
+    end
+  end
+end
+
+"""
+    sum(MSP::Multiset_partition{T}) where T<:Integer
+
+If `MSP` is a multiset-partition of the integer ``n``, this function returns ``n``.
+"""
+function Base.sum(MSP::Multiset_partition{T}) where T<:Integer
+  s = zero(T)
+  for p in keys(MSP.msp)
+    s += MSP[p]*sum(p)
+  end
+  return s
+end
+
+
+"""
+    length(MSP::Multiset_partition{T}) where T<:Integer
+
+Returns the amount of Partitions in `MSP`.
+"""
+function Base.length(MSP::Multiset_partition{T}) where T<:Integer
+  s = zero(T)
+  for p in keys(MSP.msp)
+    s += MSP[p]
+  end
+  return s
+end
 
 """
     multiset_partitions(n::T) where T<:Integer
@@ -46,17 +317,17 @@ function multiset_partitions(n::T) where T<:Integer
 
     # Some trivial cases
     if n == 0
-        return Multipartition{T}[Multipartition{T}([Partition{T}([])])]
+        return Multiset_partition{T}[Multiset_partition{T}()]
     elseif n == 1
-        return Multipartition{T}[Multipartition{T}([Partition([1])])]
+        return Multiset_partition{T}[Multiset_partition([Partition(T[1])])]
     end
 
     # Now, the algorithm starts
-    MP = Multipartition{T}[]
+    MSPs = Multiset_partition{T}[]
     for p in partitions(n)
-        append!(MP, multiset_partitions(p))
+        append!(MSPs, multiset_partitions(p))
     end
-    return MP
+    return MSPs
 end
 
 
@@ -68,7 +339,10 @@ A list of all possible multiset_partitions of a Partition, by regrouping its par
 The algorithm used is the algorithm M by , ["The Art of Computer Programming - Volume 4A, Combinatorial Algorithms, Part 1"](http://www.cs.utsa.edu/~wagner/knuth/fasc3b.pdf) by Donald E. Knuth(2011), 429–430. De-gotoed, index-shifted and generalized.
 """
 function multiset_partitions(p::Partition{T})  where T<:Integer
-  MP = Multipartition{T}[]
+  if p == Partition(T[])
+    return Multiset_partition{T}[Multiset_partition{T}()]
+  end
+  MSPs = Multiset_partition{T}[]
 
   partcount = partition_to_partcount(p)
   n::T = sum(partcount)
@@ -139,17 +413,17 @@ function multiset_partitions(p::Partition{T})  where T<:Integer
       end
 
       # M4 : Visit a partition
-      mp = Vector{Partition{T}}(undef, l)
+      msp = Multiset_partition{T}()
       i_f = 1
       while i_f <= l
         partcount = zeros(T,p[1])
         for ii = f[i_f]:f[i_f+1]-1
           partcount[c[ii]] = v[ii]
         end
-        mp[i_f] = partcount_to_partition(partcount)
-        i_f = i_f + 1
+        push!(msp, partcount_to_partition(partcount))
+        i_f += 1
       end
-      push!(MP, Multipartition{T}(mp))
+      push!(MSPs, msp)
 
     end #if gotoM2
 
@@ -169,7 +443,7 @@ function multiset_partitions(p::Partition{T})  where T<:Integer
 
     # M6 : Backtrack
     if l == 1
-      return MP
+      return MSPs
     end
     l -= 1
     b = a
@@ -193,19 +467,19 @@ function multiset_partitions(n::T, r::Integer) where T<:Integer
 
   # Some trivial cases
   if n < r
-    return Multipartition{T}[]
+    return Multiset_partition{T}[]
   elseif n == r
-    return Multipartition{T}[Multipartition{T}(fill(Partition{T}([T(1)]),r))]
+    return Multiset_partition{T}[setindex!(Multiset_partition{T}(), r, Partition{T}([1]))]
   end
 
   # Now, the algorithm starts
-  MP = Multipartition{T}[]
+  MSPs = Multiset_partition{T}[]
   for p in partitions(n)
     if length(p) >= r
-      append!(MP,multiset_partitions(p,r))
+      append!(MSPs, multiset_partitions(p,r))
     end
   end
-  return MP
+  return MSPs
 end
 
 
@@ -220,7 +494,7 @@ The algorithm used is a version of the algorithm M by , "The Art of Computer Pro
 function multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
   #The algorithm is almost the same as multiset_partitions(p::Partition), only part M4 of the algorithm was altered. The algorithm does the same computation but outputs only r-restricted multiset_partitions.
 
-  MP = Multipartition{T}[]
+  MSPs = Multiset_partition{T}[]
 
   partcount = partition_to_partcount(p)
   n::T = sum(partcount)
@@ -292,17 +566,17 @@ function multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
 
       # M4 : Visit a partition
       if l==r
-        mp = Vector{Partition{T}}(undef, l)
+        msp = Multiset_partition{T}()
         i_f = 1
         while i_f <= l
           partcount = zeros(T,p[1])
           for ii = f[i_f]:f[i_f+1]-1
             partcount[c[ii]] = v[ii]
           end
-          mp[i_f] = partcount_to_partition(partcount)
-          i_f = i_f + 1
+          push!(msp, partcount_to_partition(partcount))
+          i_f += 1
         end
-      push!(MP, Multipartition{T}(mp))
+        push!(MSPs, msp)
       end
     end #if gotoM2
 
@@ -322,7 +596,7 @@ function multiset_partitions(p::Partition{T}, r::Integer) where T<:Integer
 
     # M6 : Backtrack
     if l == 1
-      return MP
+      return MSPs
     end
     l -= 1
     b = a
@@ -384,7 +658,7 @@ function partcount_to_partition(pc::Array{T,1}) where T<:Integer
 
   l = sum(pc)       #length of resulting partition
   if l == 0
-    return Partition{T}([0])
+    return Partition{T}([])
   end
 
   p = zeros(T,l)

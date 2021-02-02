@@ -68,7 +68,7 @@ end
 The **weight** of a tableau is the number of times each number appears in the tableau. The return value is an array whose i-th element gives the number of times the integer i appears in the tableau.
 """
 function weight(Tab::Tableau)
-  if isempty(Tab[1])
+  if isempty(Tab)
     return Int[]
   end
 
@@ -107,8 +107,8 @@ julia> reading_word(Tableau([ [1,2,3] , [4,5] , [6] ]))
 ```
 """
 function reading_word(Tab::Tableau)
-  w=zeros(Int,sum(shape(Tab)))
-  k=0
+  w = zeros(Int,sum(shape(Tab)))
+  k = 0
   for i = length(Tab):-1:1
     for j = 1:length(Tab[i])
       k += 1
@@ -125,8 +125,12 @@ end
 A tableau is called **semistandard** if the entries weakly increase along each row and strictly increase down each column.
 """
 function is_semistandard(Tab::Tableau)
-  #correct shape
   s = shape(Tab)
+  if isempty(s)
+    return true
+  end
+
+  #correct shape
   for i = 1:length(s)-1
     if s[i] < s[i+1]
       return false
@@ -134,8 +138,8 @@ function is_semistandard(Tab::Tableau)
   end
 
   #increasing first row
-  for j = 2:length(s[1])
-    if Tab[i][j] < Tab[i][j-1]
+  for j = 2:s[1]
+    if Tab[1][j] < Tab[1][j-1]
       return false
     end
   end
@@ -149,7 +153,7 @@ function is_semistandard(Tab::Tableau)
 
   #increasing rows and columns
   for i = 2:length(Tab)
-    for j = 2:length(Tab[i])
+    for j = 2:s[i]
       if Tab[i][j] < Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
         return false
       end
@@ -169,7 +173,10 @@ function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer)
   SST = Array{Tableau{T},1}()
   len = length(shape)
   if max_val < len
-    return ST
+    return SST
+  elseif len==0
+    push!(SST, Tableau(Array{T,1}[]))
+    return SST
   end
   Tab = [Array{T}(fill(i,shape[i])) for i = 1:len]
   m = len
@@ -237,7 +244,11 @@ end
 Returns a list of all semistandard tableaux consisting of `box_num` boxes and filling elements bounded by `max_val`.
 """
 function semistandard_tableaux(box_num::T, max_val=box_num::T) where T<:Integer
+  box_num>=0 || throw(ArgumentError("box_num ≥ 0 required"))
   SST = Array{Tableau{T},1}()
+  if max_val<=0
+    return SST
+  end
   shapes = partitions(box_num)
 
   for s in shapes
@@ -262,7 +273,7 @@ function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integ
 
   Tabs = Array{Tableau,1}()
   if isempty(s)
-    push!(Tabs, Tableau([[]]))
+    push!(Tabs, Tableau(Array{Int,1}[]))
     return Tabs
   end
   ls = length(s)
@@ -368,8 +379,12 @@ end
 A tableau is called **standard** if it is semistandard and the entries are in bijection with 1,…n, where n is the number of boxes.
 """
 function is_standard(Tab::Tableau)
-  #correct shape
   s = shape(Tab)
+  if isempty(s)
+    return true
+  end
+
+  #correct shape
   for i = 1:length(s)-1
     if s[i] < s[i+1]
       return false
@@ -392,7 +407,7 @@ function is_standard(Tab::Tableau)
   end
 
   #increasing first row
-  for j = 2:length(s[1])
+  for j = 2:s[1]
     if Tab[1][j] <= Tab[1][j-1]
       return false
     end
@@ -406,8 +421,8 @@ function is_standard(Tab::Tableau)
   end
 
   #increasing rows and columns
-  for i = 2:length(Tab)
-    for j = 2:length(Tab[i])
+  for i = 2:length(s)
+    for j = 2:s[i]
       if Tab[i][j] <= Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
         return false
       end
@@ -425,7 +440,7 @@ Returns a list of all standard tableaux of a given shape.
 function standard_tableaux(s::Partition)
   Tabs = Array{Tableau,1}()
   if isempty(s)
-    push!(Tabs, Tableau([[]]))
+    push!(Tabs, Tableau(Array{Int,1}[]))
     return Tabs
   end
   n_max = sum(s)
@@ -489,6 +504,7 @@ end
 Returns a list of all standard tableaux with n boxes.
 """
 function standard_tableaux(n::Integer)
+  n>=0 || throw(ArgumentError("n ≥ 0 required"))
   ST = Array{Tableau,1}()
   for s in partitions(n)
     append!(ST, standard_tableaux(s))
@@ -530,7 +546,7 @@ Returns the tableau of shape λ in which the entry at position (i,j) is equal to
 """
 function hook_lengths(lambda::Partition)
   if isempty(lambda)
-    return Tableau([Int[]])
+    return Tableau(Array{Int,1}[])
   end
   Tab = [ [hook_length(lambda,i,j) for j in 1:lambda[i]] for i in 1:length(lambda) ]
   return Tableau(Tab)
@@ -577,7 +593,7 @@ julia> schensted([3,1,6,2,5,4])
 """
 function schensted(sigma::Array{T,1}) where T<:Integer
   if isempty(sigma)
-    return Tableau{T}([[]]),Tableau{T}([[]])
+    return Tableau(Array{T,1}[]),Tableau(Array{T,1}[])
   end
   P = Tableau{T}([[sigma[1]]])
   Q = Tableau{T}([[1]])
@@ -594,8 +610,8 @@ end
 Inserts the integer x into the tableau Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
 """
 function bump!(Tab::Tableau, x::Integer)
-  if isempty(Tab[1])
-    push!(Tab[1],x)
+  if isempty(Tab)
+    push!(Tab.t,[x])
     return Tab
   end
 
@@ -627,9 +643,9 @@ end
 Inserts x into Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion. Traces the change with Q by inserting y at the same Position in Q as x in Tab.
 """
 function bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
-  if isempty(Tab[1])
-    push!(Tab[1],x)
-    push!(Q[1],x)
+  if isempty(Tab)
+    push!(Tab.t,[x])
+    push!(Q.t,[x])
     return Tab,Q
   end
   i = 1
