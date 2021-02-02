@@ -2,6 +2,8 @@ using Documenter, JuLie
 
 #makedocs(sitename = "JuLie Documentation", modules = [JuLie])
 
+DocMeta.setdocmeta!(JuLie, :DocTestSetup, :(using JuLie); recursive = true)
+
 makedocs(
     modules = [JuLie],
 #    format = Documenter.HTML(
