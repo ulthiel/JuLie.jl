@@ -576,7 +576,7 @@ end
 """
     conjugate(λ::Partition{T}) where T<:Integer
 
-The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableaux](@ref)) and then flipping it along its main diagonal.
+The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableau](@ref)) and then flipping it along its main diagonal.
 
 For more information see [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions).
 """
