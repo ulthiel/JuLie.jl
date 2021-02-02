@@ -61,4 +61,8 @@
 	@test schur_polynomial(Partition([1]), 10)(1,1,1,1,1,1,1,1,1,1) == 10
 	@test_throws ArgumentError schur_polynomial(Partition([3,2,1]), -1)
 
+	#Two examples from Wikipedia
+	schur_polynomial(Partition([2,1,1]), [x[1],x[2],x[3]]) == x[1]*x[2]*x[3]*(x[1]+x[2]+x[3])
+	schur_polynomial(Partition([2,2]), [x[1],x[2],x[3]]) == x[1]^2*x[2]^2 + x[1]^2*x[3]^2 + x[2]^2*x[3]^2 + x[1]^2*x[2]*x[3] + x[1]*x[2]^2*x[3] + x[1]*x[2]*x[3]^2
+
 end

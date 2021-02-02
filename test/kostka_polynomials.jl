@@ -18,6 +18,8 @@
 	@test kostka_polynomial([2,1,1],[2,1,1]) == one(R)
 	@test kostka_polynomial([1,1,1,1],[1,1,1,1]) == one(R)
 	@test kostka_polynomial([2,2],[3,1]) == zero(R)
+
+	# An example from https://www2.math.upenn.edu/~peal/polynomials/kostkaFoulkes.htm
 	@test kostka_polynomial([4,2,1],[3,2,1,1]) == t^3 + 2*t^2 + t
 
 	check = true
