@@ -1,5 +1,14 @@
 # Combinatorics
 
+## Enumerative functions
+```@docs
+catalan
+num_partitions
+lucas
+stirling1
+stirling2
+```
+
 ## Partitions
 ```@docs
 Partition
@@ -14,6 +23,7 @@ ascending_partitions
 ```@docs
 Multipartition
 multipartitions
+sum(P::Multipartition{T}) where T<:Integer
 ```
 
 ## Multiset partitions
