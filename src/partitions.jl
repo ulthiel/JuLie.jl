@@ -412,6 +412,7 @@ end
 All partitions of an integer m >= 0 into n >= 1 parts, where each part is an element in v and each v[i] occurs a maximum of mu[i] times. The partitions are produced in  *decreasing* order.
 
 The algorithm used is a de-gotoed version of "partb" by W. Riha and K. R. James, "Algorithm 29. Efficient Algorithms for Doubly and Multiply Restricted Partitions" (1976).
+**Note:** The original Algorithm lead to BoundsErrors, since r could get smaller than 1. Furthermore x and y are handled as Arrays with an infinite length. After finding all valid partitions, the algorithm will continue searching for partitions of length n+1. We thus had to add a few additional checks and interruptions.
 """
 function partitions(mu::Array{S,1}, m::Integer, v::Array{S,1}, n::Integer) where S<:Integer
   length(mu)==length(v) || throw(ArgumentError("mu and v should have the same length"))
