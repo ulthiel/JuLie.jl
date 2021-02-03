@@ -202,8 +202,6 @@ function lucas(n::Integer)
 end
 
 
-
-
 #
 # """
 #     euler(n::fmpz)

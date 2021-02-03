@@ -30,7 +30,7 @@ julia> ?partitions
 
 Especially for combinatorics there's a lot already in other computer algebra systems and this justifies the question: why another package? I will give 3 (interwoven) reasons:
 
-1. I want to create a package that covers the mathematics that I especially care about in a way that I think about it. One distant goal is to have all the material available from my book [Introduction to Soergel bimodules](https://www.springer.com/gp/book/9783030488253) with Elias, Makisumi, and Williamson. It will take a lot of time and I don't know if I succeed but it's one motivation.
+1. I want to create a package that covers the mathematics that I especially care about in a way that I think about it. One distant goal is to have all the material available from the book [Introduction to Soergel bimodules](https://www.springer.com/gp/book/9783030488253) with Elias, Makisumi, and Williamson. It will take a lot of time and I don't know if I succeed but it's one motivation.
 
 2. I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project.
 

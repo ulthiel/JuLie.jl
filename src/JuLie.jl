@@ -24,5 +24,6 @@ include("nemo_export.jl")
 
 include("quantum_numbers.jl")
 
+include("crg_imprim.jl")
 
 end # module
