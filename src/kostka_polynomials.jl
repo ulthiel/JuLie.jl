@@ -306,7 +306,8 @@ function charge(word::Array{Int,1},standard=false::Bool)
         end
       end
       sort!(indices)
-      w = splice!(baseword,indices)
+      w = baseword[indices]       #splice!(baseword,indices)
+      deleteat!(baseword,indices) #
       c += charge(w,true)
     end
   else
