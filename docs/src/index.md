@@ -119,6 +119,7 @@ Now, changes you make in the code are immediately available in the Julia session
 
 1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
 2. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+2. You can use unicode characters in the code—I find it cleaner to write λ instead of "lambda". I recommend using the [Atom](https://atom.io) editor. Here, you can enter "\lambda", then hit Tab, and you'll get a λ. However, we do not want user input in unicode (e.g. a ⊕ for a direct sum) as this may be a pain for the user.
 3. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```.
 4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
 5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. Try to find computed examples in publications or which follow from general theory etc. You can run the complete unit test with ```Pkg.test("JuLie")```.
@@ -127,5 +128,5 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ## Contributors
 
-* [Max Horn](https://www.quendi.de/en/math) (TU Kaiserslautern, 2021–)
+* [Max Horn](https://www.quendi.de/en/math) (TU Kaiserslautern, 2020–)
 * Tom Schmit (TU Kaiserslautern, 2020–)
