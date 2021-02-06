@@ -10,6 +10,7 @@ module JuLie
 
 include("enum_func.jl")
 
+include("compositions.jl")
 include("partitions.jl")
 include("multipartitions.jl")
 include("multiset_partitions.jl")

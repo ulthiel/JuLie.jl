@@ -6,6 +6,7 @@ import AbstractAlgebra: LaurentPolynomialRing, PolynomialRing
 
 
 include("enum_func.jl")
+include("compositions.jl")
 include("partitions.jl")
 include("tableaux.jl")
 include("multipartitions.jl")

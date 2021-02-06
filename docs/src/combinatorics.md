@@ -9,6 +9,13 @@ stirling1
 stirling2
 ```
 
+## Compositions
+```@docs
+Composition
+compositions
+num_compositions
+```
+
 ## Partitions
 ```@docs
 Partition

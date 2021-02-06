@@ -4,7 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-export Multipartition, multipartitions
+export Multipartition, multipartitions, num_multipartitions
 
 """
     Multipartition{T} <: AbstractArray{Partition{T},1}
@@ -115,4 +115,18 @@ function multipartitions(n::T, r::Integer) where T<:Integer
 
   recP!(zeros(T,r), T(1), n)
   return MP
+end
+
+function num_multipartitions(n::Int, k::Int)
+
+  z = ZZ(0)
+  for λ in partitions(n,k)
+    w = ZZ(1)
+    for i=1:k
+      w *= num_partitions(λ[i])
+    end
+    z += w
+  end
+
+
 end
