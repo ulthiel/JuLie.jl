@@ -3,7 +3,6 @@
 ## Enumerative functions
 ```@docs
 catalan
-num_partitions
 lucas
 stirling1
 stirling2
@@ -20,6 +19,7 @@ num_compositions
 ```@docs
 Partition
 partitions
+num_partitions
 dominates
 conjugate
 getelement
@@ -30,6 +30,7 @@ ascending_partitions
 ```@docs
 Multipartition
 multipartitions
+num_multipartitions
 sum(P::Multipartition{T}) where T<:Integer
 ```
 
