@@ -117,15 +117,29 @@ function multipartitions(n::T, r::Integer) where T<:Integer
 	return MP
 end
 
+
+"""
+	num_multipartitions(n::Int, k::Int)
+
+The number of multipartitions of n into k parts. There's a straightforward way to count them, see D. Craven, [The Number of t-Cores of Size n](http://web.mat.bham.ac.uk/D.A.Craven/docs/papers/tcores0608.pdf) (2006), Proof of Lemma 2.4.
+"""
 function num_multipartitions(n::Int, k::Int)
 
-	# z = ZZ(0)
-	# for a=1:k
-	#	 w = ZZ(0)
-	#	 for λ in compositions(n,a)
-	#		 w +=
+	z = ZZ(0)
 
+	# Special cases
+	if n==0
+		return ZZ(k)
+	end
 
-	return 0
+	for a=1:k
+		w = ZZ(0)
+		for λ in compositions(n,a)
+		 w += prod([num_partitions(λ[i]) for i=1:length(λ)])
+		end
+		z += binomial(k,a)*w
+	end
+
+	return z
 
 end

@@ -30,4 +30,12 @@
 		end
 	end
 	@test check==true
+
+	#counting
+	for n=0:5
+		for k=1:n+1
+			@test length(multipartitions(n,k)) == num_multipartitions(n,k)
+		end
+	end
+
 end
