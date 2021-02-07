@@ -1,14 +1,19 @@
 @testset "Compositions" begin
 
-	C = compositions(5)
-	@test length(C) == num_compositions(5)
-	check = true
-	for c in C
-		if sum(c) != 5
-			check = false
-			break
+	for n=0:6
+		C = compositions(n)
+		@test length(C) == num_compositions(n)
+		check = true
+		for c in C
+			if sum(c) != n
+				check = false
+				break
+			end
 		end
+		if C != unique(C)
+			check = false
+		end
+		@test check
 	end
-	@test check
 
 end

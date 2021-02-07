@@ -52,11 +52,11 @@ end
 """
 	num_compositions(n::Integer)
 
-The number of compositons of an integer n is equal to ``2^{n-1}``.
+The number of compositons of an integer n>0 is equal to ``2^{n-1}``. For n=0 there is 1 composition (the empty one) by convention. See [OEIS](https://oeis.org/A011782) for more information.
 """
 function num_compositions(n::Integer)
 	if n==0
-		return ZZ(0)
+		return ZZ(1)
 	else
 		return ZZ(2)^(n-1)
 	end
@@ -80,7 +80,12 @@ function compositions(n::Integer, k::Integer)
 	# This will be the array of compositions
 	C = Composition{T}[]
 
-	if k == 0 || k > n
+	# Special cases
+	if k > n
+		return C
+	elseif n == 0
+		c = Composition{T}([])
+		push!(C,copy(c))
 		return C
 	end
 
@@ -137,7 +142,7 @@ end
 """
 	compositions(n::Integer)
 
-Returns an array of all compositions of an integer n.
+Returns an array of all compositions of an integer n. This iterates over compositions of n into k parts for 1 ≤ k ≤ n.
 """
 function compositions(n::Integer)
 
@@ -149,6 +154,13 @@ function compositions(n::Integer)
 
 	# This will be the array of compositions
 	C = Composition{T}[]
+
+	# Special case
+	if n == 0
+		c = Composition{T}([])
+		push!(C,copy(c))
+		return C
+	end
 
 	for k=1:n
 		append!(C,compositions(n,k))
