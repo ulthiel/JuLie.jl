@@ -19,7 +19,8 @@ include("kostka_polynomials.jl")
 include("schur_polynomials.jl")
 
 include("cartan_matrices.jl")
-include("realizations.jl")
+
+#include("realizations.jl")
 
 include("nemo_export.jl")
 
