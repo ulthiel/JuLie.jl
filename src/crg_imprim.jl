@@ -4,15 +4,15 @@
 # Copyright (C) 2021 Ulrich Thiel, ulthiel.com/math
 #
 ################################################################################
-export ImprimitiveComplexReflectionGroup, order, rank, ngens, is_wellgenerated, degrees, exponents, codegrees, coexponents, num_reflections, num_classes_reflections, num_hyperplanes, coxeter_number
+export ImprimitiveComplexReflectionGroup, order, rank, ngens, is_wellgenerated, degrees, exponents, codegrees, coexponents, num_reflections, num_classes_reflections, num_hyperplanes, coxeter_number, num_classes
 
-import Nemo: ZZ, euler_phi
+import Nemo: ZZ, moebius_mu
 
 
 """
     ImprimitiveComplexReflectionGroup
 
-In the Shephard–Todd classification of irreducible complex reflection groups, the imprimitive ones are of the form G(m,p,n) for positive integers m,p,n satisfying the following conditions:
+In the Shephard–Todd classification [1] of irreducible complex reflection groups, the imprimitive ones are of the form G(m,p,n) for positive integers m,p,n satisfying the following conditions:
 * p divides m
 * n > 1 (otherwise not primitive)
 * (m,p,n) ≠ (1,1,n) (otherwise not irreducible)
@@ -26,6 +26,9 @@ julia> W=ImprimitiveComplexReflectionGroup(2,1,4) #The Weyl group B4
 julia> order(W)
 384
 ```
+
+# References
+1. G. Shephard and J. Todd: *Finite unitary reflection groups*, Canad. J. Math. 6 (1954), 274–304.
 """
 struct ImprimitiveComplexReflectionGroup
 	type::Tuple{T,T,T} where T<:Integer
@@ -55,10 +58,10 @@ end
 """
 	order(W::ImprimitiveComplexReflectionGroup)
 
-The order of the group W. For W=G(m,p,n) this is equal to (mⁿn!)/p.
+The order of the group W. For W=G(m,p,n) this is equal to (mⁿn!)/p, see [1, p274].
 
 # References
-G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009), p274.
+1. G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009).
 """
 function order(W::ImprimitiveComplexReflectionGroup)
 	m = W.type[1]
@@ -85,12 +88,12 @@ end
 """
 	ngens(W::ImprimitiveComplexReflectionGroup)
 
-The cardinality of one (any) minimal generating set of W consisting of reflections of W. For W=G(m,p,n) this number is:
+The cardinality of one (any) minimal generating set of W consisting of reflections of W. For W=G(m,p,n) this number is by [1, p35] equal to:
 * n if p=1 or p=m
 * n+1 otherwise.
 
 # References
-G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009), p35.
+1. G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009).
 """
 function ngens(W::ImprimitiveComplexReflectionGroup)
 	m = W.type[1]
@@ -126,10 +129,10 @@ end
 """
 	degrees(W::ImprimitiveComplexReflectionGroup)
 
-The **degrees** of W are the degrees of one (any) system of fundamental invariants of the invariant ring ℂ[V]ᵂ, where V is one (any) irreducible reflection representation of W and ℂ[V] is the symmetric algebra of the dual of V. We sort the degrees increasingly. For W=G(m,p,n) they are m, 2m, …, (n-1)m, and nm/p. We sort them increasingly.
+The **degrees** of W are the degrees of one (any) system of fundamental invariants of the invariant ring ℂ[V]ᵂ, where V is one (any) irreducible reflection representation of W and ℂ[V] is the symmetric algebra of the dual of V. We sort the degrees increasingly. For W=G(m,p,n) they are m, 2m, …, (n-1)m, and nm/p, see [1, p274]. We sort them increasingly.
 
 # References
-G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009), p274.
+1. G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009).
 """
 function degrees(W::ImprimitiveComplexReflectionGroup)
 	m = W.type[1]
@@ -147,7 +150,7 @@ end
 """
 	exponents(W::ImprimitiveComplexReflectionGroup)
 
-The **exponents** of W are the integers mᵢ ≔ dᵢ-1, where the dᵢ are the degrees of W.
+The **exponents** of W are by definition the integers mᵢ ≔ dᵢ-1, where the dᵢ are the degrees of W.
 """
 function exponents(W::ImprimitiveComplexReflectionGroup)
 	return [d-1 for d in degrees(W)]
@@ -157,12 +160,12 @@ end
 """
 	codegrees(W::ImprimitiveComplexReflectionGroup)
 
-The codegrees of W, sorted *decreasingly*. For W=G(m,p,n) they are:
+The codegrees of W, sorted *decreasingly*. For W=G(m,p,n) they are by [1, p274] given by:
 * 0, m, 2m, …, (n-1)m if p ≠ m;
 * 0, m, 2m, …, (n-2)m, (n-1)m - n if p=m.
 
 # References
-G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009), p274.
+1. G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009).
 """
 function codegrees(W::ImprimitiveComplexReflectionGroup)
 	m = W.type[1]
@@ -194,30 +197,31 @@ end
 """
 	num_reflections(W::ImprimitiveComplexReflectionGroup)
 
-The number of (complex) reflections in W. This is equal to the sum over the exponents of W.
+The number of (complex) reflections in W. For W=G(m,p,n) this is equal to ``\\frac{1}{2}m(n^2-n)+n\\left(\\frac{m}{p}-1 \\right)``, see [1, Lemma 15.25].
 
 # References
-G. Lehrer and D. Taylor, *Unitary reflection groups*, Australian Mathematical Society Lecture Series, Vol 20, Cambridge University Press (2009), Theorem 4.14.
+1. U. Thiel, *On restricted rational Cherednik algebras* (2014).
 """
 function num_reflections(W::ImprimitiveComplexReflectionGroup)
-	m = W.type[1]
-	p = W.type[2]
-	n = W.type[3]
+	m = ZZ(W.type[1])
+	p = ZZ(W.type[2])
+	n = ZZ(W.type[3])
 
 	#The following formula is true for any complex reflection group
-	return sum([m for m in exponents(W)])
+	#return sum([m for m in exponents(W)])
+	return div(m*(n^2-n),2) + n*(div(m,p)-1)
 end
 
 
 """
 	num_classes_reflections(W::ImprimitiveComplexReflectionGroup)
 
-The number of conjugacy classes of (complex) reflections in W. For W=G(m,p,n) this is equal to:
+The number of conjugacy classes of (complex) reflections in W. For W=G(m,p,n) this is by [1, Theorem 15.27] equal to:
 * m/p if n>2, or n=2 and p is odd;
 * m/p + 1 if n=2 and p is even.
 
 # References
-U. Thiel, *On restricted rational Cherednik algebras* (2014), Theorem 15.27.
+1. U. Thiel, *On restricted rational Cherednik algebras* (2014).
 """
 function num_classes_reflections(W::ImprimitiveComplexReflectionGroup)
 	m = W.type[1]
@@ -237,6 +241,8 @@ end
 	num_hyperplanes(W::ImprimitiveComplexReflectionGroup)
 
 The number of reflecting hyperplanes (fixed spaces of complex reflections) of W. This is equal to the sum over the coexponents.
+
+**Remar.** What is actually a reference for this? There should be a closed formula as well.
 """
 function num_hyperplanes(W::ImprimitiveComplexReflectionGroup)
 
@@ -256,4 +262,20 @@ where ``N`` is the number of reflections, ``N^*`` is the number of reflecting hy
 """
 function coxeter_number(W::ImprimitiveComplexReflectionGroup)
 	return div(num_reflections(W)+num_hyperplanes(W),ZZ(rank(W)))
+end
+
+
+"""
+	num_classes(W::ImprimitiveComplexReflectionGroup)
+
+The number of conjugacy classes of W.
+"""
+function num_classes(W::ImprimitiveComplexReflectionGroup)
+
+	m = W.type[1]
+	p = W.type[2]
+	n = W.type[3]
+
+
+
 end
