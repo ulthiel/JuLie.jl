@@ -24,7 +24,7 @@ A (generalized) **Cartan matrix** ``C`` is a square matrix over the integers, sa
 
 & C_{i,j} ≤ 0 \\quad \\text{ for } \\quad i≠j \\\\
 
-& C_{i,j} = 0 \\quad \\Leftrightarrow \\quad  C_{j,i} = 0``
+& C_{i,j} = 0 \\quad \\Leftrightarrow \\quad  C_{j,i} = 0
 \\end{aligned}
 ```
 

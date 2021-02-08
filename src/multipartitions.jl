@@ -7,7 +7,7 @@
 export Multipartition, multipartitions, num_multipartitions
 
 """
-		Multipartition{T} <: AbstractArray{Partition{T},1}
+	Multipartition{T} <: AbstractArray{Partition{T},1}
 
 Multipartitions are generalizations of partitions. An r-component **multipartition** of an integer n is an r-tuple of partitions λ¹, λ², …, λʳ where each λⁱ is a partition of some integer nᵢ ≥ 0 and the nᵢ sum to n. As for partitions, we have implemented an own type ```Multipartition{T}``` which is a subtype of ```AbstractArray{Partition{T},1}```. As with partitions, you can can use smaller integer types to increase performance.
 
@@ -55,7 +55,7 @@ end
 
 
 """
-		sum(P::Multipartition{T}) where T<:Integer
+	sum(P::Multipartition{T}) where T<:Integer
 
 If P is a multipartition of the integer n, this function returns n.
 """
@@ -69,7 +69,7 @@ end
 
 
 """
-		multipartitions(n::T, r::Integer) where T<:Integer
+	multipartitions(n::T, r::Integer) where T<:Integer
 
 A list of all r-component multipartitions of n.
 

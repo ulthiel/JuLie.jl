@@ -34,7 +34,7 @@ Especially for combinatorics there's a lot already in other computer algebra sys
 
 2. I hope this package will eventually form one pillar of the [OSCAR](https://oscar.computeralgebra.de) project.
 
-3. What really convinced me of Julia as programming language—and thus of the whole enterprise—is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Python). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems.
+3. What really convinced me of Julia as programming language—and thus of the whole enterprise—is its straightforward high-level syntax (like Python) paired with incredible performance (unlike Python). Have a look at the following examples creating the list (not an iterator) of all [partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)) of the integer 90 (there are ~56.6 million) in different computer algebra systems. More timings can be found in [Benchmarks](@ref Benchmarks).
 
 In **[Sage](https://www.sagemath.org)** (v9.1):
 
@@ -68,7 +68,7 @@ julia> @time partitions(Int8(90));
 #No problem afterwards
 ```
 
-I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still more efficient:
+I'm cheating here a bit because I'm using 8-bit integers (thus saving memory). But we can also use bigger integers and the Julia implementation is still faster:
 
 ```
 julia> @time partitions(Int64(90)); #this time with 64-bit integers

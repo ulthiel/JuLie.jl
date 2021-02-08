@@ -16,7 +16,9 @@ makedocs(
     pages = [
         "About" => "index.md",
         "Combinatorics" => "combinatorics.md",
-        "Lie theory" => "lie-theory.md"
+        "Lie theory" => "lie-theory.md",
+        "Benchmarks" => "benchmarks.md",
+        "Index" => "julie-index.md"
     ]
 )
 

@@ -10,7 +10,7 @@ export Composition, num_compositions, compositions
 """
 	Composition{T} <: AbstractArray{T,1}
 
-A **composition** of an integer n is a sequence λ₁,…,λᵣ of positive integers whose sum is equal to n. We have implemented an own type ```Composition``` as subtype of ```AbstractArray{T,1}```.
+A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λᵣ) of positive integers whose sum is equal to n. We have implemented an own type ```Composition``` as subtype of ```AbstractArray{T,1}```.
 
 # Example
 ```julia-repl
@@ -66,7 +66,12 @@ end
 """
 	compositions(n::Integer, k::Integer)
 
-Returns an array of all compositions of n into k parts. The algorithm used in Algorithm 72 "Composition Generator" by L. Hellerman and S. Ogden, Communications of the ACM, 1961. There may be faster algorithms—I don't know—but we're at least way faster than Sage. De-gotoed by Elisa (as usual).
+Returns an array of all compositions of n into k parts. The algorithm used is Algorithm 72 "Composition Generator" by L. Hellerman and S. Ogden, Communications of the ACM, 1961 (which refers to John Riordan, An Introduction to Combinatorial Analysis, 1958, Chapter 6). There may be faster algorithms—I don't know—but we're at least way faster than Sage (and also GAP4). De-gotoed by Elisa (as usual).
+
+```julia-repl
+julia> @time X=compositions(26);
+  5.189374 seconds (33.56 M allocations: 6.863 GiB, 20.09% gc time)
+```
 """
 function compositions(n::Integer, k::Integer)
 

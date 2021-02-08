@@ -37,7 +37,7 @@ end
 """
 	quantum(n::Int, q::RingElem)
 
-Well This is a shortcut for ```quantum_number(n,q)```.
+This is a shortcut for ```quantum_number(n,q)```.
 
 """
 function quantum(n::Int, q::RingElem)
