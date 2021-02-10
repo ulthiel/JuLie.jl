@@ -4,7 +4,7 @@
 # Copyright (C) 2021 Ulrich Thiel, ulthiel.com/math
 #
 ################################################################################
-export ImprimitiveComplexReflectionGroup, order, rank, ngens, is_wellgenerated, degrees, exponents, codegrees, coexponents, num_reflections, num_classes_reflections, num_hyperplanes, coxeter_number
+export ImprimitiveComplexReflectionGroup, order, rank, ngens, is_wellgenerated, degrees, exponents, codegrees, coexponents, num_reflections, num_classes_reflections, num_hyperplanes, coxeter_number, num_conjugacy_classes
 
 import Nemo: ZZ, euler_phi
 
@@ -256,4 +256,44 @@ where ``N`` is the number of reflections, ``N^*`` is the number of reflecting hy
 """
 function coxeter_number(W::ImprimitiveComplexReflectionGroup)
 	return div(num_reflections(W)+num_hyperplanes(W),ZZ(rank(W)))
+end
+
+
+"""
+	num_conjugacy_classes(W::ImprimitiveComplexReflectionGroup)
+
+The number of conjugacy classes of an Imprimitive Complex Reflection Group ``W`` is equal to the number of multipartitions if ``p=1``, otherwise do a weighted sum of the number of ``k``-stuttering ``m``-multipartitions of ``n`` with ``k \\mid gcd(n,p)``. A ``k``-stuttering multipartition ``\\lambda=(\\lambda^{(0)}, ..., \\lambda^{(m-1)})`` has the property ``\\lambda^{(i)} = \\lambda^{(i+k)}`` where the indexing is modulo ``m``.
+Since this is also the number of irreducible complex representations of ``W``, one can refer to J. Stembridge [On the Eigenvalues of Representations of Reflection Groups and Wreath Products](https://msp.org/pjm/1989/140-2/pjm-v140-n2-p06-p.pdf), section 6.
+"""
+
+function num_conjugacy_classes(W::ImprimitiveComplexReflectionGroup)
+	m = W.type[1]
+	p = W.type[2]
+	n = W.type[3]
+
+	if p==1
+		return num_multipartitions(n,m)
+	end
+
+	t=gcd(n,p)
+	a=[]
+	for k in 1:t
+		if floor(t/k)!=t/k
+			append!(a, 0)
+		else
+			append!(a, convert(Int64,num_multipartitions(n÷k,m÷k))) #implementation uses ::Nemo.fmpz, we convert back
+		end
+	end
+	#now we have an array of all the number of k-stuttering multipartitions
+	#before we count them up, we have to remove duplicates
+	for k in 0:t-1
+		if a[t-k] != 0
+			for j in 2:t÷(t-k)
+				a[t-k] = a[t-k] - a[j*(t-k)]
+			end
+		end
+	end
+	#now we have to weigh the summands by multiplying with the size of the stabilizer of the respective stuttering (which is i) and divide by the orbit size under C_p (which is p/i)
+	res = sum([a[i]*i^2÷p for i in 1:t])
+	return res
 end
