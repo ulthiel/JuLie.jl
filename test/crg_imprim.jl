@@ -184,4 +184,41 @@
 	@test num_hyperplanes(ImprimitiveComplexReflectionGroup(5,1,5)) == 55
 	@test num_hyperplanes(ImprimitiveComplexReflectionGroup(5,5,5)) == 50
 
+	#num_conjugacy_classes
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,1,2)) == 5
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,1,2)) == 9
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,1,2)) == 14
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,1,2)) == 20
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,2,2)) == 10
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,3,2)) == 3
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,4,2)) == 5
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,5,2)) == 4
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,1,3)) == 10
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,1,3)) == 22
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,1,3)) == 40
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,1,3)) == 65
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,2,3)) == 5
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,2,3)) == 20
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,3,3)) == 10
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,4,3)) == 10
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,5,3)) == 13
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,1,4)) == 20
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,1,4)) == 51
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,1,4)) == 105
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,1,4)) == 190
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,2,4)) == 13
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,2,4)) == 60
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,3,4)) == 17
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,4,4)) == 33
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,5,4)) == 38
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,1,5)) == 36
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,1,5)) == 108
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,1,5)) == 252
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,1,5)) == 506
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(2,2,5)) == 18
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,2,5)) == 126
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(3,3,5)) == 36
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(4,4,5)) == 63
+	@test num_conjugacy_classes(ImprimitiveComplexReflectionGroup(5,5,5)) == 106
+
 end
