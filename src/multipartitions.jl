@@ -22,7 +22,7 @@ julia> Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] ) #Using 8-bit integers
 ```
 """
 struct Multipartition{T} <: AbstractArray{Partition{T},1}
-	 mp::Array{Partition{T},1}
+	mp::Array{Partition{T},1}
 end
 
 
@@ -44,13 +44,13 @@ end
 
 # More convenient constructors
 function Multipartition(mp::Array{Array{T,1},1}) where T<:Integer
-	 return Multipartition([Partition(p) for p in mp])
+	return Multipartition([Partition(p) for p in mp])
 end
 
 # This is only called when the empty array is part of mp (because then it's
 # "Any" type and not of Integer type).
 function Multipartition(mp::Array{Array{Any,1},1})
-	 return Multipartition([Partition(p) for p in mp])
+	return Multipartition([Partition(p) for p in mp])
 end
 
 
@@ -121,7 +121,10 @@ end
 """
 	num_multipartitions(n::Int, k::Int)
 
-The number of multipartitions of n into k parts. There's a straightforward way to count them, see D. Craven, [The Number of t-Cores of Size n](http://web.mat.bham.ac.uk/D.A.Craven/docs/papers/tcores0608.pdf) (2006), Proof of Lemma 2.4.
+The number of multipartitions of n into k parts. There's a straightforward way to count them, see [1, Proof of Lemma 2.4].
+
+# References
+1. D. Craven, [The Number of t-Cores of Size n](http://web.mat.bham.ac.uk/D.A.Craven/docs/papers/tcores0608.pdf) (2006).
 """
 function num_multipartitions(n::Int, k::Int)
 

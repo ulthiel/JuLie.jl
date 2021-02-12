@@ -26,6 +26,8 @@ include("nemo_export.jl")
 
 include("quantum_numbers.jl")
 
+include("crg.jl")
 include("crg_imprim.jl")
+#include("hecke_parameters.jl")
 
 end # module

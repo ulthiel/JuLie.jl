@@ -10,25 +10,42 @@ import Nemo: ZZ, moebius_mu
 
 
 """
-    ImprimitiveComplexReflectionGroup
+	ImprimitiveComplexReflectionGroup
 
-In the Shephard–Todd classification [1] of irreducible complex reflection groups, the imprimitive ones are of the form G(m,p,n) for positive integers m,p,n satisfying the following conditions:
+In the Shephard–Todd classification [1] of irreducible complex reflection groups, the *imprimitive* ones are of the form G(m,p,n) for positive integers m,p,n satisfying the following conditions:
 * p divides m
 * n > 1 (otherwise not primitive)
 * (m,p,n) ≠ (1,1,n) (otherwise not irreducible)
 * (m,p,n) ≠ (2,2,2) (otherwise not irreducible)
 
+The definition of G(m,p,n) is as follows. Let ``C_m`` be the cyclic group of order ``m`` (written multiplicatively) and define
+```math
+A(m,p,n) := \\{ (\\theta_1,\\ldots,\\theta_n) \\in C_m^n \\mid (\\theta_1 \\cdots \\theta_n)^{m/p} = 1 \\} \\subseteq C_m^n \\;.
+```
+The symmetric group ``S_n`` acts on ``A(m,p,n)`` by coordinate permutations and we can thus form the semidirect product
+```math
+G(m,p,n) := A(m,p,n) \\rtimes S_n \\;.
+```
+The group G(m,p,n) is thus a normal subgroup of
+```math
+G(m,1,n) = A(m,1,n) \\rtimes S_n \\simeq C_m \\wr S_n
+```
+of index p.
+
+There are two classes of Weyl groups among them, namely G(2,1,n) is the group ``B_n`` and G(2,2,n) is the group ``D_n``. In addition, the groups G(m,m,2) is the dihedral group of order 2m, i.e. the Coxeter group I₂(m), with G(6,6,2) being the Weyl group G₂.
+
 So far, these groups are not implemented as groups but just as a structure carrying the integers m,p,n. This will be upgraded to an actual group once OSCAR has decided how to do that formally and I know what's the best way to do this. Nonetheless, we can deduce useful information from just the integers.
 
 # Example
 ```julia-repl
-julia> W=ImprimitiveComplexReflectionGroup(2,1,4) #The Weyl group B4
+julia> W=ImprimitiveComplexReflectionGroup(2,1,12) #The Weyl group B12
 julia> order(W)
-384
+1961990553600
 ```
 
 # References
 1. G. Shephard and J. Todd: *Finite unitary reflection groups*, Canad. J. Math. 6 (1954), 274–304.
+2. Wikipedia, [Complex reflection groups](https://en.wikipedia.org/wiki/Complex_reflection_group).
 """
 struct ImprimitiveComplexReflectionGroup
 	type::Tuple{T,T,T} where T<:Integer
@@ -197,7 +214,7 @@ end
 """
 	num_reflections(W::ImprimitiveComplexReflectionGroup)
 
-The number of (complex) reflections in W. For W=G(m,p,n) this is equal to ``\\frac{1}{2}m(n^2-n)+n\\left(\\frac{m}{p}-1 \\right)``, see [1, Lemma 15.25].
+The number of (complex) reflections in W. For W=G(m,p,n) this is equal to ``\\frac{1}{2}m(n^2-n)+n\\left(\\frac{m}{p}-1 \\right)``, see [1, Lemma 15.25]. This is also (in general) equal to the sum over the exponents.
 
 # References
 1. U. Thiel, *On restricted rational Cherednik algebras* (2014).
@@ -268,7 +285,15 @@ end
 """
 	num_classes(W::ImprimitiveComplexReflectionGroup)
 
-The number of conjugacy classes of W.
+The number of conjugacy classes of W. For W=G(m,p,n) this number is as follows:
+* If p=1, then G(m,p,n) is the wreath product ``C_m \\wr S_n``. The number of conjugacy classes is thus equal to the number of m-multipartitions of n by [1, Lemma 4.2.9].
+* If n > 2 and m,p are arbitrary, there is a formula in [2, Section 5]. This paper concerns the Hecke algebra but as this is a deformation of the group algebra, so for generic parameters in coprime characteristis, the number of simple modules will be the same (the operations in Theorem 5.1 on parameters preserve generic parameters).
+* It remains to deal with n=2 and p > 1.
+
+# References
+1. J. Kerber, *The representation theory of the symmetric group*, Mathematics and its Applications, 16, Addison-Wesley, 1981.
+2. J. Hu, *The number of simple modules for the Hecke algebras of type G(r,p,n)*, J. Alg, 2008.
+
 """
 function num_classes(W::ImprimitiveComplexReflectionGroup)
 
@@ -276,6 +301,11 @@ function num_classes(W::ImprimitiveComplexReflectionGroup)
 	p = W.type[2]
 	n = W.type[3]
 
+	if p == 1
+		return num_multipartitions(n, m)
+	else
 
+		throw("Not implemented yet")
+	end
 
 end

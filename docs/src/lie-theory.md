@@ -6,7 +6,7 @@ CartanMatrix
 is_cartan_matrix
 ```
 
-## Complex reflection groups
+## Imprimitive complex reflection groups
 ```@docs
 ImprimitiveComplexReflectionGroup
 order
