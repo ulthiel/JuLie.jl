@@ -202,26 +202,26 @@ generates the **Cartan block matrix** ``types[1]_{dims[1]} ✖ ̃\\tilde{types[2
 for example you could call:
 ```jldoctest; setup = :(using JuLie)
 julia> CartanMatrix( [('A', 1, true), ('B', 2, false), ('C', 3, true)] )
-[ 2	-2	 0	 0	 0	 0	 0	 0]
-[-2	 2	 0	 0	 0	 0	 0	 0]
-[ 0	 0	 2	-1	 0	 0	 0	 0]
-[ 0	 0	-2	 2	 0	 0	 0	 0]
-[ 0	 0	 0	 0	 2	-1	 0	 0]
-[ 0	 0	 0	 0	-2	 2	-1	 0]
-[ 0	 0	 0	 0	 0	-1	 2	-2]
-[ 0	 0	 0	 0	 0	 0	-1	 2]
+[ 2  -2   0   0   0   0   0   0]
+[-2   2   0   0   0   0   0   0]
+[ 0   0   2  -1   0   0   0   0]
+[ 0   0  -2   2   0   0   0   0]
+[ 0   0   0   0   2  -1   0   0]
+[ 0   0   0   0  -2   2  -1   0]
+[ 0   0   0   0   0  -1   2  -2]
+[ 0   0   0   0   0   0  -1   2]
 ```
 which would return the same as
 ```jldoctest; setup = :(using JuLie)
 julia> CartanMatrix( [ "A1~" , "B2" , "C3~" ] )
-[ 2	-2	 0	 0	 0	 0	 0	 0]
-[-2	 2	 0	 0	 0	 0	 0	 0]
-[ 0	 0	 2	-1	 0	 0	 0	 0]
-[ 0	 0	-2	 2	 0	 0	 0	 0]
-[ 0	 0	 0	 0	 2	-1	 0	 0]
-[ 0	 0	 0	 0	-2	 2	-1	 0]
-[ 0	 0	 0	 0	 0	-1	 2	-2]
-[ 0	 0	 0	 0	 0	 0	-1	 2]
+[ 2  -2   0   0   0   0   0   0]
+[-2   2   0   0   0   0   0   0]
+[ 0   0   2  -1   0   0   0   0]
+[ 0   0  -2   2   0   0   0   0]
+[ 0   0   0   0   2  -1   0   0]
+[ 0   0   0   0  -2   2  -1   0]
+[ 0   0   0   0   0  -1   2  -2]
+[ 0   0   0   0   0   0  -1   2]
 ```
 """
 function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})

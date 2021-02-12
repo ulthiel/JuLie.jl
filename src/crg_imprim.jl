@@ -266,32 +266,3 @@ function num_hyperplanes(W::ImprimitiveComplexReflectionGroup)
 	return sum(coexponents(W))
 
 end
-
-
-"""
-	num_classes(W::ImprimitiveComplexReflectionGroup)
-
-The number of conjugacy classes of W. For W=G(m,p,n) this number is as follows:
-* If p=1, then G(m,p,n) is the wreath product ``C_m \\wr S_n``. The number of conjugacy classes is thus equal to the number of m-multipartitions of n by [1, Lemma 4.2.9].
-* If n > 2 and m,p are arbitrary, there is a formula in [2, Section 5]. This paper concerns the Hecke algebra but as this is a deformation of the group algebra, so for generic parameters in coprime characteristis, the number of simple modules will be the same (the operations in Theorem 5.1 on parameters preserve generic parameters).
-* It remains to deal with n=2 and p > 1.
-
-# References
-1. J. Kerber, *The representation theory of the symmetric group*, Mathematics and its Applications, 16, Addison-Wesley, 1981.
-2. J. Hu, *The number of simple modules for the Hecke algebras of type G(r,p,n)*, J. Alg, 2008.
-
-"""
-function num_classes(W::ImprimitiveComplexReflectionGroup)
-
-	m = W.type[1]
-	p = W.type[2]
-	n = W.type[3]
-
-	if p == 1
-		return num_multipartitions(n, m)
-	else
-
-		throw("Not implemented yet")
-	end
-
-end
