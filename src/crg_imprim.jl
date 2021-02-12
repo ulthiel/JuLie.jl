@@ -269,20 +269,6 @@ end
 
 
 """
-	coxeter_number(W::ImprimitiveComplexReflectionGroup)
-
-The Coxeter number ``h`` of ``W`` is defined as
-```math
-h := \\frac{N+N^*}{n} \\;,
-```
-where ``N`` is the number of reflections, ``N^*`` is the number of reflecting hyperplanes, and ``n`` is the rank of ``W``.
-"""
-function coxeter_number(W::ImprimitiveComplexReflectionGroup)
-	return div(num_reflections(W)+num_hyperplanes(W),ZZ(rank(W)))
-end
-
-
-"""
 	num_classes(W::ImprimitiveComplexReflectionGroup)
 
 The number of conjugacy classes of W. For W=G(m,p,n) this number is as follows:

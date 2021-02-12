@@ -6,7 +6,14 @@ CartanMatrix
 is_cartan_matrix
 ```
 
-## Imprimitive complex reflection groups
+## Complex reflection groups
+<!-- ```@docs
+ComplexReflectionGroup
+IrreducibleComplexReflectionGroup
+coxeter_number
+``` -->
+
+### Imprimitive complex reflection groups
 ```@docs
 ImprimitiveComplexReflectionGroup
 order
@@ -20,5 +27,4 @@ coexponents
 num_reflections
 num_classes_reflections
 num_hyperplanes
-coxeter_number
 ```
