@@ -5,7 +5,7 @@
 ################################################################################
 
 #import AbstractAlgebra: PolynomialRing
-import Nemo: ZZ, fmpz, fmpz_poly, addeq!, mul!, divexact , libflint
+import Nemo: addeq!, mul!, divexact
 
 export kostka_polynomial, charge
 

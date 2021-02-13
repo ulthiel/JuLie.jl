@@ -4,8 +4,6 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import AbstractAlgebra: LaurentPolynomialRing, RingElem, divexact
-
 export quantum, quantum_number, gaussian_binomial
 
 

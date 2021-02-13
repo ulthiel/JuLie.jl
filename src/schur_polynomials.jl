@@ -4,8 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import AbstractAlgebra: PolynomialRing, push_term!, MPolyBuildCtx, finish
-import Nemo: ZZ, fmpz_mpoly, FmpzMPolyRing, gens, divexact, mul!
+import AbstractAlgebra: push_term!, MPolyBuildCtx, finish
 
 export schur_polynomial
 

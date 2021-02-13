@@ -4,7 +4,7 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import Nemo: ZZ, QQ, fmpz, fmpq, div, libflint, UInt
+import Nemo: libflint
 
 export num_partitions, catalan, stirling1, stirling2, lucas
 

@@ -1,3 +1,5 @@
+using JuLie: schur_polynomial_cbf
+
 @testset "Schur polynomials" begin
 	x = [string("x",string(i)) for i=1:3]
 	S,x = PolynomialRing(ZZ, x)

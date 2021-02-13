@@ -7,10 +7,6 @@
 #
 ################################################################################
 
-import AbstractAlgebra: base_ring, nrows, ncols
-import AbstractAlgebra: MatElem, MatrixAlgebra, diagonal_matrix, matrix, zero_matrix
-import Nemo: fmpz
-
 export is_cartan_matrix, CartanMatrix
 
 """
