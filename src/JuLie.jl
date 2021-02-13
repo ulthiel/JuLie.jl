@@ -8,6 +8,8 @@
 
 module JuLie
 
+include("export.jl")
+
 include("enum_func.jl")
 
 include("compositions.jl")
@@ -22,7 +24,7 @@ include("cartan_matrices.jl")
 
 #include("realizations.jl")
 
-include("nemo_export.jl")
+
 
 include("quantum_numbers.jl")
 
