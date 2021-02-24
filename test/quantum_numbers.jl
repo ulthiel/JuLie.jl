@@ -1,3 +1,5 @@
+import AbstractAlgebra: PolynomialRing, LaurentPolynomialRing
+
 @testset "Quantum numbers" begin
 	R,q = LaurentPolynomialRing(ZZ, "q")
 	@test quantum(0) == 0

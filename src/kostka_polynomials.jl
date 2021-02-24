@@ -4,9 +4,6 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-#import AbstractAlgebra: PolynomialRing
-import Nemo: addeq!, mul!, divexact
-
 export kostka_polynomial, charge
 
 

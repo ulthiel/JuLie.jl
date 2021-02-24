@@ -6,8 +6,6 @@
 
 export quantum, quantum_number, gaussian_binomial
 
-
-
 """
 	quantum_number(n::Int, q::RingElem)
 

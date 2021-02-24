@@ -4,8 +4,6 @@
 # Copyright (C) 2020 Ulrich Thiel, ulthiel.com/math
 ################################################################################
 
-import AbstractAlgebra: push_term!, MPolyBuildCtx, finish
-
 export schur_polynomial
 
 """

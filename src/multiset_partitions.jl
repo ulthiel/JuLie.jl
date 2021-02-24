@@ -5,7 +5,6 @@
 ################################################################################
 
 export Multiset_partition, multiset_partitions, partition_to_partcount, partcount_to_partition
-#export union, union!
 
 """
 	Multiset_partition{T}

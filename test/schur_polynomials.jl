@@ -1,4 +1,4 @@
-using JuLie: schur_polynomial_cbf
+import JuLie: schur_polynomial_cbf
 
 @testset "Schur polynomials" begin
 	x = [string("x",string(i)) for i=1:3]
