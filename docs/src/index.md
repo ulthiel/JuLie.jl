@@ -121,7 +121,7 @@ Now, changes you make in the code are immediately available in the Julia session
 1. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
 1. You can use unicode characters in the code—I find it cleaner to write λ instead of "lambda". The [LaTex-like abbreveations](https://docs.julialang.org/en/v1/manual/unicode-input/) can be used in e.g. the [Atom](https://atom.io) editor.
 1. We use *one hard* Tab for indentation.
-1. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```.
+1. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```docs```.
 1. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
 1. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. Try to find computed examples in publications or which follow from general theory etc. You can run the complete unit test with ```Pkg.test("JuLie")```.
 1. I am collecting all the global imports from other packages in the main file ```JuLie.jl```. If you need more imports, then first put them not here but in the file you are working on. When you're finished we can move the imports you need to the main file.
