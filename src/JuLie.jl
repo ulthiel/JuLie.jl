@@ -29,25 +29,35 @@ import AbstractAlgebra:
 	addeq!, mul!, divexact,
 
 	# Polynomial rings
-	LaurentPolynomialRing, MPolyBuildCtx, PolynomialRing,
-	nvars,
+	MPolyBuildCtx, PolynomialRing, nvars,
+
+	# Laurent polynomial ring
+	LaurentPolynomialRing,
 
 	# Constructing polynomials
 	finish, push_term!,
 
 	# Matrices
 	MatElem, MatrixAlgebra,
-	diagonal_matrix, identity_matrix, matrix, ncols, nrows, zero_matrix
+	diagonal_matrix, identity_matrix, matrix, ncols, nrows, zero_matrix,
 
+	# Vector spaces
+	VectorSpace, FreeModule
 
 # Nemo
 import Nemo:
 
-	# Number types
-	fmpz, fmpq, ZZ, QQ,
+	# Basic rings
+	fmpz, ZZ, fmpq, QQ, FiniteField,
 
-	# Polynomials
-	FmpzMPolyRing, fmpz_mpoly,
+	# Univariate polynomials
+	fmpz_poly, FmpzPolyRing, fmpq_poly, FmpqPolyRing,
+
+	# Multivariate polynomials
+	fmpz_mpoly, FmpzMPolyRing, fmpq_mpoly, FmpqMPolyRing,
+
+	# Matrices
+	fmpz_mat, FmpzMatSpace, fmpq_mat, FmpqMatSpace,
 
 	# Libs
 	libflint,
@@ -61,7 +71,7 @@ import Nemo:
 ################################################################################
 export
 	# Rings from Nemo
-	QQ, ZZ,
+	QQ, ZZ, FiniteField,
 
 	# General stuff from AbstractAlgebra
 	base_ring, gen, gens, parent_type,
@@ -77,7 +87,10 @@ export
 	matrix, identity_matrix, ncols, nrows, zero_matrix,
 
 	# Combinatorial functions from Nemo
-	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
+	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial,
+
+	# Vector spaces from AbstractAlgebra
+	VectorSpace, FreeModule
 
 
 ################################################################################
