@@ -118,16 +118,18 @@ Now, changes you make in the code are immediately available in the Julia session
 ### Programming guidelines
 
 1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
-2. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
-2. You can use unicode characters in the code—I find it cleaner to write λ instead of "lambda". The [LaTex-like abbreveations](https://docs.julialang.org/en/v1/manual/unicode-input/) can be used in e.g. the [Atom](https://atom.io) editor. 
-2. We use *one hard* Tab for indentation.
-3. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```.
-4. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
-5. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. Try to find computed examples in publications or which follow from general theory etc. You can run the complete unit test with ```Pkg.test("JuLie")```.
-6. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, Laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
+1. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+1. You can use unicode characters in the code—I find it cleaner to write λ instead of "lambda". The [LaTex-like abbreveations](https://docs.julialang.org/en/v1/manual/unicode-input/) can be used in e.g. the [Atom](https://atom.io) editor.
+1. We use *one hard* Tab for indentation.
+1. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```doc```.
+1. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
+1. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. Try to find computed examples in publications or which follow from general theory etc. You can run the complete unit test with ```Pkg.test("JuLie")```.
+1. I am collecting all the global imports from other packages in the main file ```JuLie.jl```. If you need more imports, then first put them not here but in the file you are working on. When you're finished we can move the imports you need to the main file.
+1. For large number arithmetic we use [Nemo](https://github.com/Nemocas/Nemo.jl) (type fmpz with constructor ZZ for integers, type fmpq with constructor QQ for rationals, etc.). See the file ```src/enum_func.jl``` for examples. For more general rings (polynomial rings, Laurent polynomial rings, etc.) we use [AbstractAlgebra](https://github.com/Nemocas/AbstractAlgebra.jl), see ```src/quantum_numbers.jl``` for examples. This is all part of the [OSCAR](https://oscar.computeralgebra.de) system.
+
 
 
 ## Contributors
 
 * [Max Horn](https://www.quendi.de/en/math) (TU Kaiserslautern, 2020–)
-* Tom Schmit (TU Kaiserslautern, 2020–)
+* Tom Schmit (TU Kaiserslautern, 2020–2021)

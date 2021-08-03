@@ -9,26 +9,36 @@
 module JuLie
 
 ################################################################################
-# Import/export for JuLie environment
+# Import
 ################################################################################
 
 # AbstractAlgebra
 import AbstractAlgebra:
 
 	# General stuff
-	base_ring, gens, parent_type,
+	base_ring, gen, gens, parent_type,
+
+	# Groups
+	Group, SymmetricGroup, Perm,
+
+	# Group element operations
+	order,
 
 	# Ring element operations
 	RingElem,
 	addeq!, mul!, divexact,
 
-	# Polynomials
+	# Polynomial rings
 	LaurentPolynomialRing, MPolyBuildCtx, PolynomialRing,
+	nvars,
+
+	# Constructing polynomials
 	finish, push_term!,
 
 	# Matrices
 	MatElem, MatrixAlgebra,
 	diagonal_matrix, identity_matrix, matrix, ncols, nrows, zero_matrix
+
 
 # Nemo
 import Nemo:
@@ -45,19 +55,29 @@ import Nemo:
 	# Combinatorial functions
 	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
 
-# Export
+
+################################################################################
+# Export (more exports are in the various source files)
+################################################################################
 export
 	# Rings from Nemo
 	QQ, ZZ,
 
+	# General stuff from AbstractAlgebra
+	base_ring, gen, gens, parent_type,
+
+	# Groups from AbstractAlgebra
+	SymmetricGroup, Perm,
+
 	# Rings from AbstractAlgebra
 	LaurentPolynomialRing, PolynomialRing,
+	nvars,
 
 	# Matrices from AbstractAlgebra
 	matrix, identity_matrix, ncols, nrows, zero_matrix,
 
 	# Combinatorial functions from Nemo
-	bell, bernoulli, binomial, factorial, fmpq, fmpz, fibonacci, harmonic, rising_factorial
+	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
 
 
 ################################################################################
@@ -74,10 +94,9 @@ include("schur_polynomials.jl")
 include("cartan_matrices.jl")
 include("quantum_numbers.jl")
 
-#
-# #include("crg.jl")
-# include("crg_imprim.jl")
-# #include("hecke_parameters.jl")
+#include("crg.jl")
+#include("crg_imprim.jl")
+
 
 
 end # module

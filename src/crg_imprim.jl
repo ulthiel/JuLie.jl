@@ -4,10 +4,39 @@
 # Copyright (C) 2021 Ulrich Thiel, ulthiel.com/math
 #
 ################################################################################
-export ImprimitiveComplexReflectionGroup, order, rank, ngens, is_wellgenerated, degrees, exponents, codegrees, coexponents, num_reflections, num_classes_reflections, num_hyperplanes, coxeter_number, num_classes
 
+export complex_reflection_group
+
+# Abstract type for imprimitive (irreducible) complex reflection groups
+abstract type ImprimitiveComplexReflectionGroup <: IrreducibleComplexReflectionGroup end
+
+# Type for standard model of imprimitive complex reflection group
+struct ImprimitiveComplexReflectionGroupStd <: ImprimitiveComplexReflectionGroup
+	m::Int
+	p::Int
+	n::Int
+	data::Dict{String,Any}
+end
+
+function Base.show(io::IO, ::MIME"text/plain", W::ImprimitiveComplexReflectionGroupStd)
+	print(io, "Standard model of imprimitive complex reflection group G()")
+end
+
+# Type for element of above
+struct ImprimitiveComplexReflectionGroupStdElem
+	parent::ImprimitiveComplexReflectionGroupStd
+	#matrix::MatElem
+	label::String
+end
+
+function complex_reflection_group(m::Int, p::Int, n::Int)
+	W = ImprimitiveComplexReflectionGroupStd(m,p,n,Dict{String,Any}())
+	return W
+end
+
+#=
 """
-	ImprimitiveComplexReflectionGroup
+	ImprimitiveComplexReflectionGroupType <: IrreducibleComplexReflectionGroupType
 
 In the Shephard–Todd classification [1] of irreducible complex reflection groups, the *imprimitive* ones are of the form G(m,p,n) for positive integers m,p,n satisfying the following conditions:
 * p divides m
@@ -44,30 +73,21 @@ julia> order(W)
 1. G. Shephard and J. Todd: *Finite unitary reflection groups*, Canad. J. Math. 6 (1954), 274–304.
 2. Wikipedia, [Complex reflection groups](https://en.wikipedia.org/wiki/Complex_reflection_group).
 """
-struct ImprimitiveComplexReflectionGroup
-	type::Tuple{T,T,T} where T<:Integer
+struct ImprimitiveComplexReflectionGroupType <: IrreducibleComplexReflectionGroupType
+	m::Int
+	p::Int
+	n::Int
 
-	function ImprimitiveComplexReflectionGroup(type)
-		m = type[1]
-		p = type[2]
-		n = type[3]
-
+	function ImprimitiveComplexReflectionGroupType(m,p,n)
 		# Argument checking to ensure group is irreducible and imprimitive
 		m>0 || throw(ArgumentError("m>0 required"))
 		p>0 || throw(ArgumentError("p>0 required"))
 		n>1 || throw(ArgumentError("n>0 required"))
 		m % p == 0 || throw(ArgumentError("m must divide p"))
-		type != (1,1,n) || throw(ArgumentError("(m,p,n) ≠ (1,1,n) required"))
-		type != (2,2,2) || throw(ArgumentError("(m,p,n) ≠ (2,2,2) required"))
-
-		return new(type)
+		(m,p,n) != (1,1,n) || throw(ArgumentError("(m,p,n) ≠ (1,1,n) required"))
+		(m,p,n) != (2,2,2) || throw(ArgumentError("(m,p,n) ≠ (2,2,2) required"))
 	end
 end
-
-function ImprimitiveComplexReflectionGroup(m::Integer, p::Integer, n::Integer)
-	ImprimitiveComplexReflectionGroup((m,p,n))
-end
-
 
 """
 	order(W::ImprimitiveComplexReflectionGroup)
@@ -263,3 +283,4 @@ function num_hyperplanes(W::ImprimitiveComplexReflectionGroup)
 	return sum(coexponents(W))
 
 end
+=#
