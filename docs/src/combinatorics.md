@@ -67,9 +67,10 @@ charge
 ```@docs
 schur_polynomial
 ```
-## Quantum numbers
+
+## Quantum analogs
 ```@docs
-quantum_number
-quantum
-gaussian_binomial
+quantum_integer
+quantum_factorial
+quantum_binomial
 ```

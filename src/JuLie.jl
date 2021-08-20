@@ -48,7 +48,7 @@ import AbstractAlgebra:
 import Nemo:
 
 	# Basic rings
-	fmpz, ZZ, fmpq, QQ, FiniteField,
+	fmpz, ZZ, fmpq, QQ, FiniteField, CyclotomicField, nf_elem,
 
 	# Univariate polynomials
 	fmpz_poly, FmpzPolyRing, fmpq_poly, FmpqPolyRing,
@@ -71,7 +71,7 @@ import Nemo:
 ################################################################################
 export
 	# Rings from Nemo
-	QQ, ZZ, FiniteField,
+	QQ, ZZ, FiniteField, CyclotomicField,
 
 	# General stuff from AbstractAlgebra
 	base_ring, gen, gens, parent_type,
@@ -105,7 +105,7 @@ include("tableaux.jl")
 include("kostka_polynomials.jl")
 include("schur_polynomials.jl")
 include("cartan_matrices.jl")
-include("quantum_numbers.jl")
+include("quantum_analogs.jl")
 
 #include("crg.jl")
 #include("crg_imprim.jl")

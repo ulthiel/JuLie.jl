@@ -118,6 +118,7 @@ Basic algebraic structures are provided by the [AbstractAlgebra](https://nemocas
 * Big [integers](https://nemocas.github.io/Nemo.jl/stable/integer/) of type ```fmpz``` (with shortcut constructor ```ZZ```) from Nemo. We prefer this to ```BigInt``` because it is what is used in Nemo and is faster.
 * Big exact [rationals](https://nemocas.github.io/Nemo.jl/stable/rational/) of type ```fmpq``` (with shortcut ```QQ```) from Nemo.
 * [Finite fields](https://nemocas.github.io/Nemo.jl/stable/finitefield/) from Nemo, e.g. ```R, x = FiniteField(7, 3, "x")``` creates the field of characteristic 7 and of degree 3 over the prime field (i.e. having 7³=343 elements) and with primitive element ```x```.
+* [Cyclotomic fields](https://nemocas.github.io/Nemo.jl/stable/numberfield/#Nemo.CyclotomicField-Tuple{Int64,%20String}) from Nemo, e.g. ```K,z = CyclotomicField(3, "z")```. 
 * [Univariant polynomial rings](https://nemocas.github.io/Nemo.jl/dev/polynomial/), e.g. ```R, x = PolynomialRing(ZZ, "x")``` creates the  univariate polynomial ring over the integers with indeterminate ```x```. This is implemented generically in AbstractAlgebra but there are special types for rings optimized in Nemo.
 * [Multivariate polynomial rings](https://nemocas.github.io/Nemo.jl/dev/mpolynomial/), e.g. ```R, (x, y) = PolynomialRing(ZZ, ["x", "y"])``` creates the multivariate polynomial ring over the integers with indeterminates ```x``` and ```y```. Again, there are special types for rings optimized in Nemo.
 * [Univariate Laurent polynomial rings](https://nemocas.github.io/AbstractAlgebra.jl/stable/laurent_polynomial/), e.g. ```R, x = LaurentPolynomialRing(ZZ, "x")```.
@@ -164,15 +165,15 @@ Now, changes you make in the code are immediately available in the Julia session
 
 ### Programming guidelines
 
-1. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+1. Have a look at the file ```src/quantum_numbers.jl``` to see how the stuff works and how I want code to look like.
 1. Check out the section on basic algebraic structures above. In particular, we use ```fmpz``` for big integers and whatever we can use from AbstractAlgebra and Nemo.
 1. I am collecting all the global imports from other packages in the main file ```JuLie.jl```. If you need more imports, then first put them *not* here but in the file you are working on. When you're finished we can move the imports you need to the main file.
-1. Have a look at the file ```src/partitions.jl``` to see how the stuff works and how I want code to look like.
-1. You can use unicode characters in the code—I find it cleaner to write λ instead of "lambda". The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) can be used in, e.g., the [Atom](https://atom.io) editor.
 1. We use *one hard* Tab for indentation.
 1. Everything has to be well-documented, algorithms and papers have to be properly referenced. You can build the documentation locally with ```julia make.jl local``` in the directory ```docs```.
-1. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
+1. To express mathematics, we use unicode characters in the documentation. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor. For more complicated mathematics, we use LaTeX (but even in LaTeX environments we use unicode characters wherever possible to increase readability in the terminal).
 1. For every function you implement, there has to be a reasonable test in ```test/runtests.jl```. Try to find computed examples in publications or which follow from general theory etc. You can run the complete unit test with ```Pkg.test("JuLie")```.
+1. Check out the [Julia Documentation](https://docs.julialang.org/en/v1/), especially the [Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/) and the [Performance Guide](https://docs.julialang.org/en/v1/manual/performance-tips/).
+1. If your implementation is not more efficient than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all.)
 
 ## Acknowledgments
 
