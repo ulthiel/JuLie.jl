@@ -38,7 +38,7 @@ The source files are located in the [src](https://github.com/ulthiel/JuLie.jl/tr
 
 To ensure proper functionality of JuLie we use [unit testing](https://docs.julialang.org/en/v1/stdlib/Test/). The directory [test](https://github.com/ulthiel/JuLie.jl/tree/master/test) contains various test sets, and these are combined in the file [runtests.jl](https://github.com/ulthiel/JuLie.jl/blob/master/test/runtests.jl). You can run the complete unit test with ```Pkg.test("JuLie")```.
 
-The documentation is automatically built on GitHub using the package [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl) from the comments in the source files together with the Markdown files in the [docs/src](https://github.com/ulthiel/JuLie.jl/tree/master/docs) directory. The file [docs/make.jl](https://github.com/ulthiel/JuLie.jl/blob/master/docs/make.jl) defines the structure of the navigation panel. You can build the documentation locally by running ```julia make.jl local``` in the directory ```docs```; the result is then located in ```doc/build```.
+The documentation is automatically built on GitHub using the package [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl) from the comments in the source files together with the Markdown files in the [docs/src](https://github.com/ulthiel/JuLie.jl/tree/master/docs) directory. The file [docs/make.jl](https://github.com/ulthiel/JuLie.jl/blob/master/docs/make.jl) defines the structure of the navigation panel. You can build the documentation locally by running ```julia make.jl local```; the result is then in the build directory.
 
 ## Programming
 

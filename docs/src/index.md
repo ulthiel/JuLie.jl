@@ -31,12 +31,6 @@ julia> @time partitions(Int8(90)); #One goal of JuLie is being fast :-)
   5.844981 seconds (56.63 M allocations: 6.239 GiB, 19.75% gc time)
 ```
 
-You can get help for a function by putting a question mark in front, e.g.
-
-```julia-repl
-julia> ?partitions
-```
-
 ## Motivation
 
 Especially for combinatorics there's a lot already in other computer algebra systems and this justifies the question: why another package? I have two reasons: 1) Julia has a straightforward high-level syntax (like Python) paired with incredible performance (unlike Python), see my [benchmarks](@ref Benchmarks); 2) Julia with its [type system](https://docs.julialang.org/en/v1/manual/types/) and [multiple dispatch](https://docs.julialang.org/en/v1/manual/methods/) is ideal to model mathematics closely to how you think abstractly. Because of the [OSCAR](https://oscar.computeralgebra.de) project (see also my summary [here](@ref basic-alg-struct)), we do not need to start from scratch. One of my distant goals is to have "all" the material available from (and as in) the book [Introduction to Soergel bimodules](https://www.springer.com/gp/book/9783030488253) with B. Elias, S. Makisumi, and G. Williamson.

@@ -7,7 +7,7 @@
 
 ## About
 
-JuLie.jl is an early-stage [Julia](https://julialang.org)/[OSCAR](https://oscar.computeralgebra.de) package with the goal to provide structures and fast algorithms for things around [algebraic Lie theory](https://en.wikipedia.org/wiki/Lie_theory), [representation theory](https://en.wikipedia.org/wiki/Representation_theory), and relevant [combinatorics](https://en.wikipedia.org/wiki/Combinatorics). These fields are huge and this package is still small—I hope it will grow with time. Contributions are necessary and very much welcome!
+JuLie is an early-stage package for the programming language [Julia](https://julialang.org) with the goal of providing mathematically sound structures and fast algorithms for things around representation theory, especially algebraic Lie theory and accompanying combinatorics. These fields are huge and this package is still small—I hope it will grow with time. [Contributions](https://ulthiel.github.io/JuLie.jl/dev/contributing/) are necessary and very much welcome!
 
 By Ulrich Thiel ([ulthiel.com/math](https://ulthiel.com/math)) and [contributors](https://ulthiel.github.io/JuLie.jl/stable/index.html#Contributors).
 
