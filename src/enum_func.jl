@@ -6,18 +6,17 @@
 
 export catalan, stirling1, stirling2, lucas, euler
 
-"""
+@doc raw"""
 	catalan(n::fmpz)
 	catalan(n::Integer)
 
-The n-th Catalan number ``C_n``. The computation simply uses the formula
+The ``n``-th Catalan number ``C_n``. The computation simply uses the formula
 ```math
-C_n = \\frac{1}{n+1}{ 2n \\choose n} \\;.
+C_n = \frac{1}{n+1}{ 2n \choose n} \;.
 ```
-
 # Refences
-1. [OEIS](https://oeis.org/A000108)
-2. [Wikipedia](https://en.wikipedia.org/wiki/Catalan_number)
+1. Wikipedia, [Catalan number](https://en.wikipedia.org/wiki/Catalan_number)
+1. The On-Line Encyclopedia of Integer Sequences, [A000108](https://oeis.org/A000108)
 """
 function catalan(n::fmpz)
 
@@ -36,6 +35,12 @@ function catalan(n::Integer)
 	return z
 end
 
+# julia> @time f=catalan(2^20)
+# 0.021279 seconds (431 allocations: 6.780 MiB)
+#
+# sage: time f=catalan_number(2^20)
+# CPU times: user 22.2 s, sys: 30.2 ms, total: 22.3 s
+# Wall time: 22.3 s
 
 
 """

@@ -1,6 +1,36 @@
 # Benchmarks
 
-All benchmarks were performed on an Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz, all timings are in seconds. The commands are given as footnotes. If you find a mistake, please send me a message.
+This is a logbook to keep track of the performance of JuLie compared to other computer algebra systems. It's not meant to belittle anyone—but as one of the goals of JuLie is to be fast, we need to verify that we're on the right track. In each section there's a description of a test (including a collapsible "Code" section containing the code used for the test) and a list of timings (on the same machine). If you find a mistake, please message me.
+
+## Partitions
+
+We create the full list (not an iterator) of the partitions of the integer 90 (there are about 56.6 million). It's a good test for "combinatorial speed" and memory efficiency. We cheat a little because we use 8-bit integers in Julia which saves memory—but since this is a feature of Julia, why not use it?
+
+| JuLie | Sage | GAP  | Magma |
+| ----- | ---- | ---- | ----- |
+| 5.45  | 185  | 52.0 | 33.0  |
+
+```@raw html
+<details><summary>Code</summary>
+<pre>
+JuLie:
+julia> @time L=partitions(Int8(90));
+
+Sage:
+sage: time L=Partitions(90).list()
+
+GAP:
+gap> L:=Partitions(90);; time/1000.0;
+
+Magma:
+> time L:=Partitions(90);
+</pre>
+</details>
+```
+
+## Compositions
+
+
 
 | Function               | JuLie      | Sage     | GAP | Magma |
 |:---------------------- | ---------- | -------- | ----- | ----- |

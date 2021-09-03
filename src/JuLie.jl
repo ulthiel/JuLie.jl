@@ -1,7 +1,7 @@
 ################################################################################
 # JuLie.jl
 #
-#	A combinatorics package for Julia.
+# A combinatorics package for Julia.
 #
 # Copyright (C) 2020-2021 Ulrich Thiel, ulthiel.com/math
 ################################################################################
@@ -65,6 +65,10 @@ import Nemo:
 	# Combinatorial functions
 	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
 
+# LightGraphs
+import LightGraphs:
+
+	SimpleGraph, add_edge!, connected_components, vertices, edges
 
 ################################################################################
 # Export (more exports are in the various source files)
@@ -90,25 +94,35 @@ export
 	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial,
 
 	# Vector spaces from AbstractAlgebra
-	VectorSpace, FreeModule
+	VectorSpace, FreeModule,
+
+	# LightGraphs
+	SimpleGraph, add_edge!, connected_components, vertices, edges
 
 
 ################################################################################
-# Include source files
+# JuLie source files
 ################################################################################
 include("enum_func.jl")
-include("compositions.jl")
 include("partitions.jl")
+include("compositions.jl")
 include("multipartitions.jl")
 include("multiset_partitions.jl")
+include("quantum_analogs.jl")
 include("tableaux.jl")
 include("kostka_polynomials.jl")
 include("schur_polynomials.jl")
+#include("block_matrices.jl")
 include("cartan_matrices.jl")
-include("quantum_analogs.jl")
 
-#include("crg.jl")
-#include("crg_imprim.jl")
+
+
+
+
+
+
+
+
 
 
 

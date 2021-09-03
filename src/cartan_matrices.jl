@@ -7,24 +7,23 @@
 #
 ################################################################################
 
-export is_cartan_matrix, CartanMatrix
+export is_cartan_matrix, CartanMatrix, is_square, adjacency_graph, permute, block_decomposition, is_indecomposable
 
-"""
-	struct CartanMatrix{T} <: MatElem{T}
+@doc raw"""
+	struct CartanMatrix <: MatElem{fmpz}
 
-A (generalized) **Cartan matrix** ``C`` is a square matrix over the integers, satisfying the following rules:
+A (generalized) **Cartan matrix** is a square matrix ``C`` over the integers satisfying the following conditions:
 
 ```math
-\\begin{aligned}
-& C_{i,i} = 2 & \\\\
+\begin{aligned}
+& C_{i,i} = 2 & \\
 
-& C_{i,j} ≤ 0 \\quad \\text{ for } \\quad i≠j \\\\
+& C_{i,j} ≤ 0 \quad \text{ for } \quad i≠j \\
 
-& C_{i,j} = 0 \\quad \\Leftrightarrow \\quad	C_{j,i} = 0
-\\end{aligned}
+& C_{i,j} = 0 \quad \Leftrightarrow \quad C_{j,i} = 0 \;.
+\end{aligned}
 ```
-
-We implement them as ```MatElem``` from *AbstractAlgebra.jl* over ```fmpz```.
+This definition is as in Carter (2005). Note that in Kac (1990) more generally matrices over the *complex* numbers are considered—but most of the literature just focuses on the integral case.
 
 You can create a CartanMatrix with
 ```
@@ -37,6 +36,11 @@ If you would like to generate block diagonal matrices you can do so with
 ```
 CartanMatrix(["A3~","G2","B12"])	#calls essentially CartanMatrix(['A','G','B'],[3,2,12],[true,false,false])
 ```
+
+# References
+1. Carter, R. (2005). *Lie Algebras of Finite and Affine Type*. Cambridge University Press, Cambridge.
+1. Kac, V. G. (1990). *Infinite dimensional Lie algebras* (Third edition). Cambridge University Press, Cambridge. (First edition published 1982)
+
 """
 struct CartanMatrix <: MatElem{fmpz}
 	 cm::MatElem{fmpz}
@@ -83,7 +87,7 @@ end
 """
 	is_cartan_matrix(C::CartanMatrix)
 
-returns true iff C is a *(generalized)* **Cartan matrix**.
+Returns true iff ``C`` is a (generalized) Cartan matrix.
 """
 function is_cartan_matrix(C::MatElem)
 	#is square
@@ -383,4 +387,101 @@ function CartanMatrix(types::Vector{Tuple{Char,Int,Bool}})
 		c += dim
 	end
 	return CartanMatrix(CM)
+end
+
+
+
+
+@doc raw"""
+	is_square(M::MatElem)
+
+Returns true iff ``M`` is a square matrix, i.e. the number of rows is equal to the number of columns. If true, the dimension is returned as well.
+"""
+function is_square(M::MatElem)
+	n = nrows(M)
+	m = ncols(M)
+	if n == m
+		return true, n
+	else
+		return false, nothing
+	end
+end
+
+@doc raw"""
+	adjacency_graph(M::MatElem)
+
+The **adjacency graph** of an ``(n × n)``-matrix ``M`` is the undirected graph with vertices ``1,…,n`` and an edge from ``i`` to ``j`` if and only if ``i \ne j`` and ``M_{ij} ≠ 0``. The adjacency graph is returned as a ```SimpleGraph``` fom the [LightGraphs](https://github.com/JuliaGraphs/LightGraphs.jl) package.
+"""
+function adjacency_graph(M::MatElem)
+	b, n = is_square(M)
+	b || throw(ArgumentError("The matrix has to be a square matrix"))
+
+	G = SimpleGraph(n);
+	for i=1:n
+		for j=i+1:n
+			if M[i,j] != 0
+				add_edge!(G, i, j);
+			end
+		end
+	end
+	return G
+end
+
+@doc raw"""
+	permute(M::MatElem, σ::Perm)
+
+Given an ``(n × n)``-matrix ``M`` and a permutation ``σ ∈ S_n``, this function returns the matrix ``M^\sigma`` with ``(M^\sigma)_{ij} ≔ M_{\sigma(i) \sigma(j)}``, i.e. the rows and columns are permuted by ``σ``.
+"""
+function permute(M::MatElem, σ::Perm)
+	b, n = is_square(M)
+	b || throw(ArgumentError("The matrix has to be a square matrix"))
+
+	Mσ = zero_matrix(base_ring(M), n, n)
+	for i=1:n
+		for j=1:n
+			Mσ[i,j] = M[σ[i],σ[j]]
+		end
+	end
+	return Mσ
+end
+
+@doc raw"""
+	block_decomposition(M::MatElem)
+
+Let ``M`` be an ``(n × n)``-matrix. A **block decomposition** of ``M`` is a collection of square matrices ``B_1,\ldots,B_r`` together with a permutation ``σ ∈ S_n`` such that the matrix ``M^\sigma`` obtained by applying the permutation ``\sigma`` to the rows and columns of ``M`` is the block diagonal sum of the ``B_i``. Up to reordering of the ``B_i`` and up to simulatenous row and column permutation of each ``B_i``, a block decomposition is unique and corresponds to the connected components of the adjacency graph of ``M``.
+"""
+function block_decomposition(M::MatElem)
+	b,n = is_square(M)
+	b || throw(ArgumentError("The matrix has to be a square matrix"))
+
+	G = adjacency_graph(M)
+	cpts = connected_components(G)
+	S = SymmetricGroup(n)
+	σ = S(collect(Iterators.flatten(cpts)))
+	blocks = typeof(M)[]
+	R = base_ring(M)
+	k = 0
+	for c in cpts
+		l = length(c)
+		B = zero_matrix(R, l, l)
+		for i=1:l
+			for j=1:l
+				B[i,j] = M[σ[i+k],σ[j+k]]
+			end
+		end
+		push!(blocks, B)
+		k += l
+	end
+	return blocks, σ
+end
+
+@doc raw"""
+	is_indecomposable(C::MatElem)
+
+A square matrix ``M`` is **indecomposable** if it has no non-trivial block decomposition, i.e. the adjacency graph of ``M`` is connected.
+"""
+function is_indecomposable(C::MatElem)
+	G = adjacency_graph(C)
+	n = length(connected_components(G))
+	return n == 1
 end
