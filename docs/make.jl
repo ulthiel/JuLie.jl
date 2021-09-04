@@ -22,11 +22,9 @@ makedocs(
 		"Basic algebraic structures" => "basic-algebraic-structures.md",
 
 		"Combinatorics" => 	[
-			"combinatorics.md",
-			"partitions.md"
+			"partitions.md",
+			"combinatorics.md"
 			],
-
-		"Lie theory" => "lie-theory.md",
 
 		"Index" => "julie-index.md"
 	]

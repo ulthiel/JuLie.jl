@@ -1,12 +1,5 @@
 # Partitions and the like
 
-## Compositions
-```@docs
-Composition
-compositions
-num_compositions
-```
-
 ## Partitions
 ```@docs
 Partition
@@ -26,12 +19,6 @@ num_multipartitions
 sum(P::Multipartition{T}) where T<:Integer
 ```
 
-## Multiset partitions
-```@docs
-Multiset_partition
-multiset_partitions
-```
-
 ## Tableaux
 ```@docs
 Tableau
@@ -47,4 +34,18 @@ hook_lengths
 num_standard_tableaux
 schensted
 bump!
+```
+
+## Compositions
+```@docs
+Composition
+compositions
+num_compositions
+```
+
+
+## Multiset partitions
+```@docs
+Multiset_partition
+multiset_partitions
 ```

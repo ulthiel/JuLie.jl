@@ -9,11 +9,9 @@ export Partition, partitions, ascending_partitions, dominates, conjugate, getele
 """
 	Partition{T} <: AbstractArray{T,1}
 
-A **partition** of an integer n ≥ 0 is a decreasing sequence λ=(λ₁,…,λᵣ) of positive integers λᵢ whose sum is equal to n. The λᵢ are called the **parts** of the partition. We encode a partition as an array with elements λᵢ. To be able to conceptually work with partitions we have implemented an own type ```Partition{T}``` as subtype of ```AbstractArray{T,1}```. All functions for arrays then also work for partitions. You may increase performance by using smaller integer types, see the example below. For efficiency, the ```Partition``` constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence.
+A **partition** of an integer n ≥ 0 is a decreasing sequence λ=(λ₁,…,λᵣ) of positive integers λᵢ whose sum is equal to n. The λᵢ are called the **parts** of the partition. We encode a partition as an array with elements λᵢ. To be able to conceptually work with partitions we have implemented an own type ```Partition{T}``` as subtype of ```AbstractArray{T,1}```. All functions for arrays then also work for partitions. You may increase performance by using smaller integer types, see the examples below. For efficiency, the ```Partition``` constructor does not check whether the given array is in fact a partition, i.e. a decreasing sequence.
 
-For more general information on partitions, check out [Wikipedia](https://en.wikipedia.org/wiki/Partition_(number_theory)).
-
-# Example
+# Examples
 ```julia-repl
 julia> P=Partition([3,2,1]) #The partition 3+2+1 of 6
 julia> sum(P) #The sum of the parts.
@@ -27,7 +25,10 @@ julia> P=Partition(Int8[3,2,1]) #Same partition but using 8 bit integers
 
 * Usually, |λ| ≔ n is called the **size** of λ. In Julia, the function ```size``` for arrays already exists and returns the dimension of an array. Instead, you can use ```sum``` to get the sum of the parts.
 
-* There is no performance impact by using an own type for partitions rather than simply using arrays—I've tested this. Julia is great. The implementation of a subtype of AbstractArray is explained in the [Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
+* There is no performance impact by using an own type for partitions rather than simply using arrays. The implementation of a subtype of AbstractArray is explained in the [Julia documentation](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-array).
+
+# References
+1. Wikipedia, [Partition (number theory)](https://en.wikipedia.org/wiki/Partition_(number_theory))
 """
 struct Partition{T} <: AbstractArray{T,1}
 	 p::Array{T,1}
@@ -75,15 +76,15 @@ function Base.copy(P::Partition{T}) where T<:Integer
 end
 
 """
-	getelement(P::Partition, i::Int)
+	getindex_safe(P::Partition, i::Int)
 
-Sometimes in algorithms for partitions it is convenient to be able to access parts beyond the length of the partition, and then you want to get zero instead of an error. This function is a shortcut for
+In algorithms involving partitions it is sometimes convenient to be able to access parts beyond the length of the partition, and then you want to get zero instead of an error. This function is a shortcut for
 ```
 return (i>length(P.p) ? 0 : getindex(P.p,i))
 ```
 If you are sure that ```P[i]``` exists, use **getindex** because this will be faster.
 """
-function getelement(P::Partition, i::Int)
+function getindex_safe(P::Partition, i::Int)
 	return (i>length(P.p) ? 0 : getindex(P.p,i))
 end
 

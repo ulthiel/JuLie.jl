@@ -136,7 +136,7 @@ function schur_polynomial_cbf(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<
 	=#
 
 	#initializing a few helpful Variables
-	exponents = Int[getelement(λ,i)+n-i for i=1:n] #the exponents from the Matrix read from top to bottom
+	exponents = Int[getindex_safe(λ,i)+n-i for i=1:n] #the exponents from the Matrix read from top to bottom
 	exp_incr = zeros(Int,n) #the increment with wich exponents increase
 	for i = 1:n-1
 	exp_incr[i] = exponents[i] - exponents[i+1]

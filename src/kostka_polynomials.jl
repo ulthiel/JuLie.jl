@@ -173,7 +173,7 @@ function kostka_polynomial(λ::Partition{T}, μ::Partition{T}) where T<:Integer
 			max_n = max(v[pointer-1][1], v[pointer][1])
 		end
 		while n <= max_n
-			if pointer > 2 && vacancy(n,pointer-1) < 0 || vacancy(n,pointer) < -getelement(size_v,pointer+1)
+			if pointer > 2 && vacancy(n,pointer-1) < 0 || vacancy(n,pointer) < -getindex_safe(size_v,pointer+1)
 			index[pointer] += 1
 			if index[pointer] > index_max[pointer]
 				break
