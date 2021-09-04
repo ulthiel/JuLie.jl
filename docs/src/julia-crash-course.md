@@ -1,8 +1,8 @@
-# [Julia crash course](@id julia-crash)
+# [Julia crash course](@id julia-crash-course)
 
 [Julia](https://julialang.org) is a high-level, high-performance, dynamic programming language that first appeared in 2012 and gained quite a lot of popularity. To get a quick overview, I recommend checking out the [Wikipedia](https://en.wikipedia.org/wiki/Julia_(programming_language)) article. You can learn all the basics of Julia from the official [documentation](https://docs.julialang.org/) but as this is quite a lot to read, I'll mention a few key points.
 
-First of all, you may have noticed that the first time you call a function like ```partitions(10)``` it takes a bit of time to get an answer—but the second time you call it (with any argument) the answer is immediate. This is because Julia uses [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), which means it compiles code at run time just before it is actually needed. This is part of what makes Julia so fast—with the tradeoff that there will be a delay in the first call of a function.
+First of all, you may have noticed that the first time you call a function like ```partitions(10)``` it takes a bit of time to get an answer—but the second time you call it (with any argument) the answer is immediate. This is because Julia uses [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), which means it compiles code at run time just before it is actually needed. This is part of what makes Julia so fast—with the trade-off that there will be a delay in the first call of a function.
 
 Second, there are two—but likely more—caveats for algebraists in Julia: integers are by default 64-bit integers and division is floating point division:
 

@@ -42,12 +42,12 @@ The documentation is automatically built on GitHub using the package [Documenter
 
 ## Programming
 
-If you are completely new to Julia, I recommend reading my Julia [crash course](@ref julia-crash). Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
+If you are completely new to Julia, I recommend reading my Julia [crash course](@ref julia-crash-course). Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
 
 1. We follow the official Julia [style guide](https://docs.julialang.org/en/v1/manual/style-guide/) (except for the next point).
 2. We use *one hard tab* for indentation.
 3. Unicode in the source code is allowed and encouraged to increase readability. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor.
-4. Remember that we want to use [basic algebraic structures](@ref basic-alg-struct) provided by (subpackages of) OSCAR.
+4. Remember that we want to use [basic algebraic structures](@ref basic-algebraic-structures) provided by (subpackages of) OSCAR.
 5. Mathematical structures you implement should somehow reflect how they are defined and treated abstractly. This is often easier said than done and one really needs to think about this *before* implementing anything.
 6. If your implementation is not faster than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all, especially if the structures are mathematically sound so that we can improve functions at a later stage without having to do structural changes). Please read the Julia [performance guide](https://docs.julialang.org/en/v1/manual/performance-tips/) to not fall into typical traps.
 7. For every function you implement, you should add a reasonable test to the unit testing. Try to find computed examples in publications or which follow from general theory etc.

@@ -14,12 +14,12 @@ makedocs(
 	pages = [
 		"About" =>	[
 			"index.md",
+			"julia-crash-course.md",
 			"contributing.md",
-			"benchmarks.md",
-			"julia-crash.md"
+			"benchmarks.md"
 			],
 
-		"Basic algebraic structures" => "basic-alg-struct.md",
+		"Basic algebraic structures" => "basic-algebraic-structures.md",
 
 		"Combinatorics" => 	[
 			"combinatorics.md",
