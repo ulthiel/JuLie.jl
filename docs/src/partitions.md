@@ -1,14 +1,24 @@
 # Partitions and the like
 
 ## Partitions
+
 ```@docs
 Partition
+```
+
+### Generating partitions
+
+```@docs
 partitions
-num_partitions
-dominates
-conjugate
-getelement
 ascending_partitions
+num_partitions
+```
+
+### Operations on partitions
+```@docs
+conjugate
+dominates
+getindex_safe
 ```
 
 ## Multipartitions
