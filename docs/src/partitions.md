@@ -21,14 +21,6 @@ dominates
 getindex_safe
 ```
 
-## Multipartitions
-```@docs
-Multipartition
-multipartitions
-num_multipartitions
-sum(P::Multipartition{T}) where T<:Integer
-```
-
 ## Tableaux
 ```@docs
 Tableau
@@ -46,16 +38,32 @@ schensted
 bump!
 ```
 
-## Compositions
+## Multipartitions
 ```@docs
-Composition
-compositions
-num_compositions
+Multipartition
 ```
 
+### Generating multipartitions
+
+```@docs
+multipartitions
+num_multipartitions
+```
+
+### Operations on multipartitions
+```@docs
+sum(P::Multipartition{T}) where T<:Integer
+```
 
 ## Multiset partitions
 ```@docs
 Multiset_partition
 multiset_partitions
+```
+
+## Compositions
+```@docs
+Composition
+compositions
+num_compositions
 ```

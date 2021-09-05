@@ -170,7 +170,7 @@ end
 """
 	partitions(n::Integer)
 
-A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in Sage, but opposite to GAP. You can apply reverse() to reverse the order. As usual, you may increase performance by using smaller integer types. The algorithm used is "Algorithm ZS1" by Zoghbi & Stojmenovic (1998).
+A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in Sage, but opposite to GAP. You can apply the function ``reverse`` to reverse the order. As usual, you may increase performance by using smaller integer types. The algorithm used is "Algorithm ZS1" by Zoghbi & Stojmenovic (1998).
 
 # Examples
 ```julia-repl
