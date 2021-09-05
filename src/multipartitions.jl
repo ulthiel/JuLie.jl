@@ -11,7 +11,7 @@ export Multipartition, multipartitions, num_multipartitions
 
 Multipartitions are generalizations of partitions. An r-component **multipartition** of an integer n is an r-tuple of partitions λ¹, λ², …, λʳ where each λⁱ is a partition of some integer nᵢ ≥ 0 and the nᵢ sum to n. As for partitions, we have implemented an own type ```Multipartition{T}``` which is a subtype of ```AbstractArray{Partition{T},1}```. As with partitions, you can can use smaller integer types to increase performance.
 
-# Example
+# Examples
 ```julia-repl
 julia> P=Multipartition( [[2,1], [], [3,2,1]] )
 julia> sum(P)
@@ -20,6 +20,9 @@ julia> P[2]
 Int64[]
 julia> Multipartition( Array{Int8,1}[[2,1], [], [3,2,1]] ) #Using 8-bit integers
 ```
+
+# References
+1. Wikipedia, [Multipartition](https://en.wikipedia.org/wiki/Multipartition)
 """
 struct Multipartition{T} <: AbstractArray{Partition{T},1}
 	mp::Array{Partition{T},1}
@@ -121,7 +124,11 @@ end
 """
 	num_multipartitions(n::Int, k::Int)
 
-The number of multipartitions of n into k parts. There's a straightforward way to count them, see the Proof of Lemma 2.4 of Craven (2006).
+The number of multipartitions of ``n`` into ``k`` parts. This number is equal to
+```math
+\sum_{a=1}^k {k \choose a} \sum_{λ} p(λ₁) p(λ₂) ⋯ p(λ_a) \;,
+```
+where the second sum is over all compositions ``λ`` of ``n`` into a parts. I found this formula in the Proof of Lemma 2.4 of Craven (2006).
 
 # References
 1. Craven, D. (2006). The Number of t-Cores of Size n. [http://web.mat.bham.ac.uk/D.A.Craven/docs/papers/tcores0608.pdf](http://web.mat.bham.ac.uk/D.A.Craven/docs/papers/tcores0608.pdf)
