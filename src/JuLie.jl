@@ -15,103 +15,107 @@ module JuLie
 # AbstractAlgebra
 import AbstractAlgebra:
 
-	# General stuff
-	base_ring, gen, gens, parent_type,
+    # General stuff
+    base_ring, gen, gens, parent_type,
 
-	# Groups
-	Group, SymmetricGroup, Perm,
+    # Groups
+    Group, SymmetricGroup, Perm,
 
-	# Group element operations
-	order,
+    # Group element operations
+    order,
 
-	# Ring element operations
-	RingElem,
-	addeq!, mul!, divexact,
+    # Ring element operations
+    RingElem,
+    addeq!, mul!, divexact,
 
-	# Polynomial rings
-	MPolyBuildCtx, PolynomialRing, nvars,
+    # Polynomial rings
+    MPolyBuildCtx, PolynomialRing, nvars,
 
-	# Laurent polynomial ring
-	LaurentPolynomialRing,
+    # Laurent polynomial ring
+    LaurentPolynomialRing,
 
-	# Constructing polynomials
-	finish, push_term!,
+    # Constructing polynomials
+    finish, push_term!,
 
-	# Matrices
-	MatElem, MatrixAlgebra,
-	diagonal_matrix, identity_matrix, matrix, ncols, nrows, zero_matrix,
+    # Matrices
+    MatElem, MatrixAlgebra,
+    diagonal_matrix, identity_matrix, matrix, ncols, nrows, zero_matrix,
 
-	# Vector spaces
-	VectorSpace, FreeModule
+    # Vector spaces
+    VectorSpace, FreeModule
 
 # Nemo
 import Nemo:
 
-	# Basic rings
-	fmpz, ZZ, fmpq, QQ, FiniteField, CyclotomicField, nf_elem,
+    # Basic rings
+    fmpz, ZZ, fmpq, QQ, FiniteField, CyclotomicField, nf_elem,
 
-	# Univariate polynomials
-	fmpz_poly, FmpzPolyRing, fmpq_poly, FmpqPolyRing,
+    # Univariate polynomials
+    fmpz_poly, FmpzPolyRing, fmpq_poly, FmpqPolyRing,
 
-	# Multivariate polynomials
-	fmpz_mpoly, FmpzMPolyRing, fmpq_mpoly, FmpqMPolyRing,
+    # Multivariate polynomials
+    fmpz_mpoly, FmpzMPolyRing, fmpq_mpoly, FmpqMPolyRing,
 
-	# Matrices
-	fmpz_mat, FmpzMatSpace, fmpq_mat, FmpqMatSpace,
+    # Matrices
+    fmpz_mat, FmpzMatSpace, fmpq_mat, FmpqMatSpace,
 
-	# Libs
-	libflint,
+    # Libs
+    libflint,
 
-	# Combinatorial functions
-	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
+    # Combinatorial functions
+    bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial
 
 # LightGraphs
 import LightGraphs:
 
-	SimpleGraph, add_edge!, connected_components, vertices, edges
+    SimpleGraph, add_edge!, connected_components, vertices, edges
 
 ################################################################################
 # Export (more exports are in the various source files)
 ################################################################################
 export
-	# Rings from Nemo
-	QQ, ZZ, FiniteField, CyclotomicField,
+    # Rings from Nemo
+    QQ, ZZ, FiniteField, CyclotomicField,
 
-	# General stuff from AbstractAlgebra
-	base_ring, gen, gens, parent_type,
+    # General stuff from AbstractAlgebra
+    base_ring, gen, gens, parent_type,
 
-	# Groups from AbstractAlgebra
-	SymmetricGroup, Perm,
+    # Groups from AbstractAlgebra
+    SymmetricGroup, Perm,
 
-	# Rings from AbstractAlgebra
-	LaurentPolynomialRing, PolynomialRing,
-	nvars,
+    # Rings from AbstractAlgebra
+    LaurentPolynomialRing, PolynomialRing,
+    nvars,
 
-	# Matrices from AbstractAlgebra
-	matrix, identity_matrix, ncols, nrows, zero_matrix,
+    # Matrices from AbstractAlgebra
+    matrix, identity_matrix, ncols, nrows, zero_matrix,
 
-	# Combinatorial functions from Nemo
-	bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial,
+    # Combinatorial functions from Nemo
+    bell, bernoulli, binomial, factorial, fibonacci, harmonic, rising_factorial,
 
-	# Vector spaces from AbstractAlgebra
-	VectorSpace, FreeModule,
+    # Vector spaces from AbstractAlgebra
+    VectorSpace, FreeModule,
 
-	# LightGraphs
-	SimpleGraph, add_edge!, connected_components, vertices, edges
+    # LightGraphs
+    SimpleGraph, add_edge!, connected_components, vertices, edges
 
 
 ################################################################################
 # JuLie source files
 ################################################################################
-include("enum_func.jl")
-include("partitions.jl")
-include("compositions.jl")
-include("multipartitions.jl")
-include("multiset_partitions.jl")
-include("quantum_analogs.jl")
-include("tableaux.jl")
-include("kostka_polynomials.jl")
-include("schur_polynomials.jl")
+
+# Combinatorics
+include("combinatorics/enum_func.jl")
+include("combinatorics/partitions.jl")
+include("combinatorics/compositions.jl")
+include("combinatorics/multipartitions.jl")
+include("combinatorics/multiset_partitions.jl")
+include("combinatorics/quantum_analogs.jl")
+include("combinatorics/tableaux.jl")
+include("combinatorics/kostka_polynomials.jl")
+include("combinatorics/schur_polynomials.jl")
+
+
 #include("block_matrices.jl")
 #include("cartan_matrices.jl")
 

@@ -431,6 +431,7 @@ end
 
 """
 	standard_tableaux(s::Partition)
+	standard_tableaux(s::Array{Integer,1})
 
 Returns a list of all standard tableaux of a given shape.
 """
@@ -485,11 +486,6 @@ function standard_tableaux(s::Partition)
 end
 
 
-"""
-	standard_tableaux(s::Array{Integer,1})
-
-Shortcut for ```standard_tableaux(Partition(s))```.
-"""
 function standard_tableaux(s::Array{T,1}) where T<:Integer
 	return standard_tableaux(Partition(s))
 end

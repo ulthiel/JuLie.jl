@@ -82,3 +82,26 @@ Wall time: 30.5 s
 </pre>
 </details>
 ```
+
+### Standard tableaux
+
+We create the full list of standard tableaux of shape (10,8,2). There are about 1.5 million.
+
+| JuLie | Sage | GAP  | Magma |
+| ----- | ---- | ---- | ----- |
+| 0.40  | 69   | —    | —     |
+
+```@raw html
+<details><summary>Code</summary>
+<pre>
+#JuLie
+@time L=standard_tableaux(Int8[10,8,2]);
+  0.404633 seconds (7.35 M allocations: 757.029 MiB)
+  
+sage: time L = StandardTableaux([10,8,2]).list()
+CPU times: user 1min 9s, sys: 246 ms, total: 1min 9s
+Wall time: 1min 9s
+</pre>
+</details>
+```
+

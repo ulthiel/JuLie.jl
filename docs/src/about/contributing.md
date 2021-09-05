@@ -44,8 +44,7 @@ The documentation is automatically built on GitHub using the package [Documenter
 
 If you are completely new to Julia, I recommend reading my Julia [crash course](@ref julia-crash-course). Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
 
-1. We follow the official Julia [style guide](https://docs.julialang.org/en/v1/manual/style-guide/) (except for the next point).
-2. We use *one hard tab* for indentation.
+1. We follow the official Julia [style guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 3. Unicode in the source code is allowed and encouraged to increase readability. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor.
 4. Remember that we want to use [basic algebraic structures](@ref basic-algebraic-structures) provided by (subpackages of) OSCAR.
 5. Mathematical structures you implement should somehow reflect how they are defined and treated abstractly. This is often easier said than done and one really needs to think about this *before* implementing anything.
@@ -56,7 +55,9 @@ If you are completely new to Julia, I recommend reading my Julia [crash course](
 
 Everything has to be well-documented, algorithms and papers have to be properly referenced. Here are some guidelines:
 
-1. To express mathematics in the documentation we use unicode, and for the more complicated things we combine this with LaTeX. Here's an example of how this is done:
+1. Add comments in the code to explain what you're doing.
+
+2. To express mathematics in the documentation we use unicode, and for the more complicated things we combine this with LaTeX. Here's an example of how this is done:
 
    ```julia
    @doc raw"""
@@ -70,9 +71,9 @@ Everything has to be well-documented, algorithms and papers have to be properly 
 
    Everything between the ``` `` ``` is interpreted as LaTex. You can add similar comments for structures. The comments can be integrated in the documentation by adding the function (or structure) name to the Markdown files in the [docs/src](https://github.com/ulthiel/JuLie.jl/tree/master/docs/src) directory.
 
-2. We use an "Examples" section in the documentation block to give some examples.
+3. We use an "Examples" section in the documentation block to give some examples.
 
-3. We use a "References" section at the end of a documentation block to list references. The references are given in [APA style](https://en.wikipedia.org/wiki/APA_style), e.g. "Etingof, P. & Ginzburg, V. (2002). Symplectic reflection algebras, Calogero-Moser space, and deformed Harish-Chandra homomorphism. *Invent. Math., 147*(2), 243–348. [https://doi.org/10.1007/s002220100171](https://doi.org/10.1007/s002220100171)". In-text references in APA style look like "Etingof & Ginzburg (2002)". You can use [BibDesk](https://bibdesk.sourceforge.io) and my [APA export template](https://gist.github.com/ulthiel/3ecbc5b9e95beae896958028a0e42ca4) to save time dealing with this.
+4. We use a "References" section at the end of a documentation block to list references. The references are given in [APA style](https://en.wikipedia.org/wiki/APA_style), e.g. "Etingof, P. & Ginzburg, V. (2002). Symplectic reflection algebras, Calogero-Moser space, and deformed Harish-Chandra homomorphism. *Invent. Math., 147*(2), 243–348. [https://doi.org/10.1007/s002220100171](https://doi.org/10.1007/s002220100171)". In-text references in APA style look like "Etingof & Ginzburg (2002)". You can use [BibDesk](https://bibdesk.sourceforge.io) and my [APA export template](https://gist.github.com/ulthiel/3ecbc5b9e95beae896958028a0e42ca4) to save time dealing with this.
 
 ## The Revise package
 

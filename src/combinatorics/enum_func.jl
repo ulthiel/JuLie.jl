@@ -133,12 +133,12 @@ The n-th Euler number. The implementation is a wrapper to [FLINT](http://flintli
 2. [Wikipedia](https://en.wikipedia.org/wiki/Euler_numbers)
 """
 function euler(n::fmpz)
-	 z = ZZ()
-	 ccall((:arith_euler_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, UInt(n))
-	 return z
+	z = ZZ()
+	ccall((:arith_euler_number, libflint), Cvoid, (Ref{fmpz}, Culong), z, UInt(n))
+	return z
 end
 
 function euler(n::Integer)
-	 z = euler(ZZ(n))
-	 return z
+	z = euler(ZZ(n))
+	return z
 end

@@ -91,14 +91,18 @@ end
 
 
 """
-	num_partitions(n::fmpz)
 	num_partitions(n::Integer)
+	num_partitions(n::fmpz)
 
 The number of integer partitions of the integer n ≥ 0. Uses the function from [FLINT](http://flintlib.org), which is really fast.
 
 # References
 1. The On-Line Encyclopedia of Integer Sequences, [A000041](https://oeis.org/A000041)
 """
+function num_partitions(n::Integer)
+	return num_partitions(ZZ(n))
+end
+
 function num_partitions(n::fmpz)
 	n >= 0 || throw(ArgumentError("n >= 0 required"))
 	z = ZZ()
@@ -106,20 +110,20 @@ function num_partitions(n::fmpz)
 	return z
 end
 
-function num_partitions(n::Integer)
-	return num_partitions(ZZ(n))
-end
-
 
 """
-	num_partitions(n::fmpz, k::fmpz)
 	num_partitions(n::Integer, k::Integer)
+	num_partitions(n::fmpz, k::fmpz)
 
 The number of integer partitions of the integer n ≥ 0 into k ≥ 0 parts. The implementation uses a recurrence relation.
 
 # References
 1. The On-Line Encyclopedia of Integer Sequences, [A008284](https://oeis.org/A008284)
 """
+function num_partitions(n::Integer, k::Integer)
+	return num_partitions(ZZ(n), ZZ(k))
+end
+
 function num_partitions(n::fmpz, k::fmpz)
 	n >= 0 || throw(ArgumentError("n >= 0 required"))
 	k >= 0 || throw(ArgumentError("k >= 0 required"))
@@ -154,7 +158,7 @@ function num_partitions(n::fmpz, k::fmpz)
 		p = fill( ZZ(1), n )
 		for l = 2:k
 			for m = l+1:n-l+1
-			p[m] = p[m] + p[m-l]
+				p[m] = p[m] + p[m-l]
 			end
 		end
 		return p[n-k+1]
@@ -162,15 +166,11 @@ function num_partitions(n::fmpz, k::fmpz)
 
 end
 
-function num_partitions(n::Integer, k::Integer)
-	return num_partitions(ZZ(n), ZZ(k))
-end
-
 
 """
 	partitions(n::Integer)
 
-A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in Sage, but opposite to GAP. You can apply the function ``reverse`` to reverse the order. As usual, you may increase performance by using smaller integer types. The algorithm used is "Algorithm ZS1" by Zoghbi & Stojmenovic (1998).
+A list of all partitions of an integer n ≥ 0, produced in lexicographically *descending* order. This ordering is like in Sage, but opposite to GAP. You can apply the function ```reverse``` to reverse the order. As usual, you may increase performance by using smaller integer types. The algorithm used is "Algorithm ZS1" by Zoghbi & Stojmenovic (1998).
 
 # Examples
 ```julia-repl
@@ -482,7 +482,6 @@ end
 	partitions(m::Integer, n::Integer)
 
 All partitions of an integer m ≥ 0 into n ≥ 1 parts (no further restrictions).
-This simply calls ```partitions(m,n,1,m,z=0)```.
 """
 function partitions(m::Integer, n::Integer)
 	return partitions(m,n,1,m,z=0)
@@ -665,7 +664,7 @@ end
 """
 	conjugate(λ::Partition{T}) where T<:Integer
 
-The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableau](@ref)) and then flipping it along its main diagonal.
+The **conjugate** of a partition is obtained by considering its Young diagram (see [Tableaux](@ref)) and then flipping it along its main diagonal.
 
 # References
 1. Wikipedia, [Partition (number theory)](https://en.wikipedia.org/wiki/Partition_(number_theory)#Conjugate_and_self-conjugate_partitions)

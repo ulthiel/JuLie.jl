@@ -145,7 +145,7 @@ function num_multipartitions(n::Int, k::Int)
 	for a=1:k
 		w = ZZ(0)
 		for λ in compositions(n,a)
-		 w += prod([num_partitions(λ[i]) for i=1:length(λ)])
+			w += prod([num_partitions(λ[i]) for i=1:length(λ)])
 		end
 		z += binomial(k,a)*w
 	end
