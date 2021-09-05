@@ -32,7 +32,7 @@ julia> P=Partition(Int8[3,2,1]) #Same partition but using 8 bit integers
 1. Wikipedia, [Partition (number theory)](https://en.wikipedia.org/wiki/Partition_(number_theory))
 """
 struct Partition{T} <: AbstractArray{T,1}
-	 p::Array{T,1}
+	p::Array{T,1}
 end
 
 # The following are functions to make the Partition struct array-like.
@@ -126,38 +126,38 @@ function num_partitions(n::fmpz, k::fmpz)
 
 	# Special cases
 	if n == k
-	return ZZ(1)
+		return ZZ(1)
 	elseif n < k || k == 0
-	return ZZ(0)
+		return ZZ(0)
 	elseif k == 1
-	return ZZ(1)
+		return ZZ(1)
 
 	# See https://oeis.org/A008284
 	elseif n < 2*k
-	return num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
+		return num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
 
 	# See https://oeis.org/A008284
 	elseif n <= 2+3*k
-	p = num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
-	for i=0:Int(n)-2*Int(k)-1
-		p = p - num_partitions(ZZ(i))
-	end
-	return p
+		p = num_partitions(n-k) #n-k>=0 holds since the case n<k was already handled
+		for i=0:Int(n)-2*Int(k)-1
+			p = p - num_partitions(ZZ(i))
+		end
+		return p
 
 	# Otherwise, use recurrence
 	# The following is taken from the GAP code in lib/combinat.gi
 	# It uses the standard recurrence relation but in a more intelligent
 	# way without recursion.
 	else
-	n = Int(n)
-	k = Int(k)
-	p = fill( ZZ(1), n )
-	for l = 2:k
-		for m = l+1:n-l+1
-		p[m] = p[m] + p[m-l]
+		n = Int(n)
+		k = Int(k)
+		p = fill( ZZ(1), n )
+		for l = 2:k
+			for m = l+1:n-l+1
+			p[m] = p[m] + p[m-l]
+			end
 		end
-	end
-	return p[n-k+1]
+		return p[n-k+1]
 	end
 
 end
@@ -190,9 +190,9 @@ function partitions(n::Integer)
 
 	# Some trivial cases
 	if n==0
-	return Partition{T}[ Partition{T}([]) ]
+		return Partition{T}[ Partition{T}([]) ]
 	elseif n==1
-	return Partition{T}[ Partition{T}([1]) ]
+		return Partition{T}[ Partition{T}([1]) ]
 	end
 
 	# Now, the algorithm starts
@@ -203,30 +203,30 @@ function partitions(n::Integer)
 	d[1] = n
 	push!(P, Partition{T}(d[1:1]))
 	while q != 0
-	if d[q] == 2
-		k += 1
-		d[q] = 1
-		q -= 1
-	else
-		m = d[q] - 1
-		np = k - q + 1
-		d[q] = m
-		while np >= m
-		q += 1
-		d[q] = m
-		np = np - m
-		end
-		if np == 0
-		k = q
+		if d[q] == 2
+			k += 1
+			d[q] = 1
+			q -= 1
 		else
-		k = q + 1
-		if np > 1
-			q += 1
-			d[q] = np
+			m = d[q] - 1
+			np = k - q + 1
+			d[q] = m
+			while np >= m
+				q += 1
+				d[q] = m
+				np = np - m
+			end
+			if np == 0
+				k = q
+			else
+				k = q + 1
+				if np > 1
+					q += 1
+					d[q] = np
+				end
+			end
 		end
-		end
-	end
-	push!(P, Partition{T}(d[1:k]))
+		push!(P, Partition{T}(d[1:k]))
 	end
 	return P
 
@@ -273,96 +273,95 @@ function ascending_partitions(n::Integer; alg="ks")
 
 	# Some trivial cases
 	if n==0
-	return Vector{T}[ [] ]
+		return Vector{T}[ [] ]
 	elseif n==1
-	return Vector{T}[ [1] ]
+		return Vector{T}[ [1] ]
 	end
 
 	# Now, the algorithm starts
 	if alg=="ks"
-	P = Vector{T}[]	#this will be the array of all partitions
-	a = zeros(T, n)
-	k = 2
-	y = n-1
-	while k != 1
-		k -= 1
-		x = a[k] + 1
-		while 2*x <= y
-		a[k] = x
-		y -= x
-		k += 1
+		P = Vector{T}[]	#this will be the array of all partitions
+		a = zeros(T, n)
+		k = 2
+		y = n-1
+		while k != 1
+			k -= 1
+			x = a[k] + 1
+			while 2*x <= y
+				a[k] = x
+				y -= x
+				k += 1
+			end
+			l = k + 1
+			while x <= y
+				a[k] = x
+				a[l] = y
+				push!(P, a[1:l])
+				x += 1
+				y -= 1
+			end
+			y += x - 1
+			a[k] = y + 1
+			push!(P, a[1:k])
 		end
-		l = k + 1
-		while x <= y
-		a[k] = x
-		a[l] = y
-		push!(P, a[1:l])
-		x += 1
-		y -= 1
-		end
-		y += x - 1
-		a[k] = y + 1
-		push!(P, a[1:k])
-	end
-	return P
+		return P
 
 	elseif alg=="m"
-	P = Vector{T}[]	#this will be the array of all partitions
-	a = zeros(T, n)
-	k = 1
-	x = 1
-	y = n-1
-	while true
-		while 3*x <= y
-		a[k] = x
-		y = y-x
-		k += 1
-		end
-		t = k + 1
-		u = k + 2
-		while 2*x <= y
-		a[k] = x
-		a[t] = x
-		a[u] = y - x
-		push!(P, a[1:u])
-		p = x + 1
-		q = y - p
-		while p <= q
-			a[t] = p
-			a[u] = q
-			push!(P, a[1:u])
-			p += 1
-			q -= 1
-		end
-		a[t] = y
-		push!(P, a[1:t])
-		x += 1
-		y -= 1
-		end
-		while x<=y
-		a[k] = x
-		a[t] = y
-		push!(P, a[1:t])
-		x += 1
-		y -= 1
-		end
-		y += x-1
-		a[k] = y+1
-		push!(P, a[1:k])
-		k -= 1
+		P = Vector{T}[]	#this will be the array of all partitions
+		a = zeros(T, n)
+		k = 1
+		x = 1
+		y = n-1
+		while true
+			while 3*x <= y
+				a[k] = x
+				y = y-x
+				k += 1
+			end
+			t = k + 1
+			u = k + 2
+			while 2*x <= y
+				a[k] = x
+				a[t] = x
+				a[u] = y - x
+				push!(P, a[1:u])
+				p = x + 1
+				q = y - p
+				while p <= q
+					a[t] = p
+					a[u] = q
+					push!(P, a[1:u])
+					p += 1
+					q -= 1
+				end
+				a[t] = y
+				push!(P, a[1:t])
+				x += 1
+				y -= 1
+			end
+			while x<=y
+				a[k] = x
+				a[t] = y
+				push!(P, a[1:t])
+				x += 1
+				y -= 1
+			end
+			y += x-1
+			a[k] = y+1
+			push!(P, a[1:k])
+			k -= 1
 
-		# I think there's a mistake in the publication
-		# because here k could be zero and then we access
-		# a[k].
-		# That's why I do a while true and check k > 0 here.
-		if k == 0
-		break
-		else
-		x = a[k] + 1
+			# I think there's a mistake in the publication
+			# because here k could be zero and then we access
+			# a[k].
+			# That's why I do a while true and check k > 0 here.
+			if k == 0
+				break
+			else
+				x = a[k] + 1
+			end
 		end
-	end
-	return P
-
+		return P
 	end
 
 end
@@ -398,19 +397,19 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 
 	# Some trivial cases
 	if m == 0
-	if n == 0
-		return Partition{T}[ Partition{T}([]) ]
-	else
-		return Partition{T}[]
-	end
+		if n == 0
+			return Partition{T}[ Partition{T}([]) ]
+		else
+			return Partition{T}[]
+		end
 	end
 
 	if n == 0
-	return Partition{T}[]
+		return Partition{T}[]
 	end
 
 	if n > m
-	return Partition{T}[]
+		return Partition{T}[]
 	end
 
 	#Algorithm starts here
@@ -423,55 +422,55 @@ function partitions(m::Integer, n::Integer, l1::Integer, l2::Integer; z=0)
 	l2 = l2 - l1
 	if m>=0 && m<=n*l2-j
 
-	for i = 1:n
-		x[i] = l1+z*(n-i)
-		y[i] = x[i]
-	end
+		for i = 1:n
+			x[i] = l1+z*(n-i)
+			y[i] = x[i]
+		end
 
-	i = 1
-	l2 = l2-z*(n-1)
+		i = 1
+		l2 = l2-z*(n-1)
 
-	lcycle = true
-	while lcycle
-		lcycle = false
-		if m > l2
-		m = m-l2
-		x[i] = y[i] + l2
-		i = i + 1
 		lcycle = true
-		continue
-		end
+		while lcycle
+			lcycle = false
+			if m > l2
+				m = m-l2
+				x[i] = y[i] + l2
+				i = i + 1
+				lcycle = true
+				continue
+			end
 
-		x[i] = y[i] + m
-		num = num + 1
-		push!(P, Partition{T}(x[1:n]))
+			x[i] = y[i] + m
+			num = num + 1
+			push!(P, Partition{T}(x[1:n]))
 
-		if i<n && m>1
-		m = 1
-		x[i] = x[i]-1
-		i = i+1
-		x[i] = y[i] + 1
-		num = num + 1
-		push!(P, Partition{T}(x[1:n]))
-		end
+			if i<n && m>1
+				m = 1
+				x[i] = x[i]-1
+				i = i+1
+				x[i] = y[i] + 1
+				num = num + 1
+				push!(P, Partition{T}(x[1:n]))
+			end
 
-		for j = i-1:-1:1
-		l2 = x[j] - y[j] - 1
-		m = m + 1
-		if m <= (n-j)*l2
-			x[j] = y[j] + l2
-			lcycle = true
-			break
-		end
-		m = m + l2
-		x[i] = y[i]
-		i = j
-		end
+			for j = i-1:-1:1
+				l2 = x[j] - y[j] - 1
+				m = m + 1
+				if m <= (n-j)*l2
+					x[j] = y[j] + l2
+					lcycle = true
+					break
+				end
+				m = m + l2
+				x[i] = y[i]
+				i = j
+			end
 
-		if !lcycle
-		break
+			if !lcycle
+				break
+			end
 		end
-	end
 	end
 
 	return P
@@ -509,7 +508,7 @@ function partitions(mu::Array{S,1}, m::Integer, v::Array{S,1}, n::Integer) where
 
 	T = typeof(m)
 	if isempty(mu)
-	return Partition{T}[]
+		return Partition{T}[]
 	end
 
 	r = length(v)
@@ -527,105 +526,105 @@ function partitions(mu::Array{S,1}, m::Integer, v::Array{S,1}, n::Integer) where
 	gotob1 = true
 
 	for i = n:-1:1
-	 x[i] = ll
-	 y[i] = ll
-	 k = k - 1
-	 m = m - ll
-	 if k == 0
-		 if j == r
-		 return P
-		 end
-		j = j + 1
-		k = mu[j]
-		ll = v[j]
-	 end
-	 end #for i
+		x[i] = ll
+		y[i] = ll
+		k = k - 1
+		m = m - ll
+		if k == 0
+			if j == r
+				return P
+			end
+			j = j + 1
+			k = mu[j]
+			ll = v[j]
+		end
+	end #for i
 
 	lr = v[r]
 	ll = v[1]
 
 	if m < 0 || m > n * (lr - ll)
-	return P
+		return P
 	end
 
 	if m == 0
-	push!(P,Partition{T}(x[1:n]))
-	return P
+		push!(P,Partition{T}(x[1:n]))
+		return P
 	end
 
 	i = 1
 	m = m + y[1]
 
 	while gotob1 == true
-	if !gotob2
-		for j = mu[r]:-1:1
-		if m<=lr
-			gotob2 = true
-			break
-		end
-		x[i] = lr
-		ii[i] = r - 1
-		i = i + 1
-		m = m - lr + y[i]
-		end #for j
-
 		if !gotob2
-		r = r - 1
-		end
+			for j = mu[r]:-1:1
+				if m<=lr
+					gotob2 = true
+					break
+				end
+				x[i] = lr
+				ii[i] = r - 1
+				i = i + 1
+				m = m - lr + y[i]
+			end #for j
 
-		gotob2 = true
-	end #if
+			if !gotob2
+				r = r - 1
+			end
 
-	if gotob2
-		while r>0 && v[r] > m
-		r = r - 1
-		end
-
-		if r == 0
-		break
-		end
-
-		lr = v[r]
-		if m == lr
-		x[i] = lr
-		if i<=n
-			push!(P, Partition{T}(x[1:n]))
-		else
-			break
-		end
-
-		r = r - 1
-		if r==0
-			break
-		end
-		lr = v[r]
+			gotob2 = true
 		end #if
 
-		k = y[i]
-		if lr > k && m - lr <= (n-i)*(lr - ll)
-		gotob2 = false
-		continue
-		else
-		x[i] = k
-		end #if
-		i_1 = i - 1
-		for i_0 = i_1:-1:1
-		i = i_0
-		r = ii[i]
-		lr = v[r]
-		m = m + x[i] - k
-		k = y[i]
-		if lr > k && m - lr <= (n-i)*(lr-ll)
-			gotob2 = false
-			break
-		else
-			x[i] = k
-		end #if
-		end #for
 		if gotob2
-		gotob1 = false
-		end
-	end #if gotob2
+			while r>0 && v[r] > m
+				r = r - 1
+			end
+
+			if r == 0
+				break
+			end
+
+			lr = v[r]
+			if m == lr
+				x[i] = lr
+				if i<=n
+					push!(P, Partition{T}(x[1:n]))
+				else
+					break
+				end
+
+				r = r - 1
+				if r==0
+					break
+				end
+				lr = v[r]
+			end #if
+
+			k = y[i]
+			if lr > k && m - lr <= (n-i)*(lr - ll)
+				gotob2 = false
+				continue
+			else
+				x[i] = k
+			end #if
+			i_1 = i - 1
+			for i_0 = i_1:-1:1
+				i = i_0
+				r = ii[i]
+				lr = v[r]
+				m = m + x[i] - k
+				k = y[i]
+				if lr > k && m - lr <= (n-i)*(lr-ll)
+					gotob2 = false
+					break
+				else
+					x[i] = k
+				end #if
+			end #for
+			if gotob2
+				gotob1 = false
+			end
+		end #if gotob2
 	end #while
 	return P
 end
@@ -644,20 +643,20 @@ function dominates(λ::Partition, μ::Partition)
 	dif = 0
 	i = 1
 	while i <= min(length(λ), length(μ))
-	dif += λ[i] - μ[i]
-	i += 1
-	if dif < 0
-		return false
-	end
+		dif += λ[i] - μ[i]
+		i += 1
+		if dif < 0
+			return false
+		end
 	end
 	if length(λ) < length(μ)
-	while i <= length(μ)
-		dif -= μ[i]
-		i += 1
-	end
-	if dif < 0
-		return false
-	end
+		while i <= length(μ)
+			dif -= μ[i]
+			i += 1
+		end
+		if dif < 0
+			return false
+		end
 	end
 	return true
 end
@@ -673,15 +672,15 @@ The **conjugate** of a partition is obtained by considering its Young diagram (s
 """
 function conjugate(λ::Partition{T}) where T<:Integer
 	if isempty(λ)
-	return copy(λ)
+		return copy(λ)
 	end
 
 	μ = zeros(T, λ[1])
 
 	for i = 1:length(λ)
-	for j = 1:λ[i]
-		μ[j] += 1
-	end
+		for j = 1:λ[i]
+			μ[j] += 1
+		end
 	end
 
 	return Partition(μ)

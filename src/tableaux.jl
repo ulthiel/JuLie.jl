@@ -15,16 +15,17 @@ A **Young tableau** of shape λ is a filling of the boxes of the Young diagram o
 
 For efficiency, we do not check whether the given array is really a tableau, i.e. whether the structure of the array defines a partition.
 
-For more information see [Wikipedia](https://en.wikipedia.org/wiki/Young_tableau).
-
 # Example
 ```julia-repl
-Tab=Tableau([[1,2,3],[4,5],[6]])
-Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]]) #Using 8 bit integers
+julia> Tab=Tableau([[1,2,3],[4,5],[6]])
+julia> Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]]) #Using 8 bit integers
 ```
+
+# References
+1. Wikipedia, [Young tableau](https://en.wikipedia.org/wiki/Young_tableau).
 """
 struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
-	 t::Array{Array{T,1},1}
+	t::Array{Array{T,1},1}
 end
 
 function Base.show(io::IO, ::MIME"text/plain", Tab::Tableau)
@@ -53,7 +54,7 @@ end
 """
 	shape(Tab::Tableau{T})
 
-Returns the shape of a tableau.
+Returns the shape of a tableau, i.e. the partition given by the lengths of the rows of the tableau.
 """
 function shape(Tab::Tableau{T}) where T
 	return Partition{T}([ length(Tab[i]) for i=1:length(Tab) ])
@@ -67,21 +68,21 @@ The **weight** of a tableau is the number of times each number appears in the ta
 """
 function weight(Tab::Tableau)
 	if isempty(Tab)
-	return Int[]
+		return Int[]
 	end
 
 	max = 0
 	for i = 1:length(Tab)
-	if max < Tab[i][end]
-		max = Tab[i][end]
-	end
+		if max < Tab[i][end]
+			max = Tab[i][end]
+		end
 	end
 
 	w = zeros(Int,max)
 	for rows in Tab
-	for box in rows
-		w[box] += 1
-	end
+		for box in rows
+			w[box] += 1
+		end
 	end
 	return w
 end
@@ -108,10 +109,10 @@ function reading_word(Tab::Tableau)
 	w = zeros(Int,sum(shape(Tab)))
 	k = 0
 	for i = length(Tab):-1:1
-	for j = 1:length(Tab[i])
-		k += 1
-		w[k] = Tab[i,j]
-	end
+		for j = 1:length(Tab[i])
+			k += 1
+			w[k] = Tab[i,j]
+		end
 	end
 	return w
 end
@@ -125,37 +126,37 @@ A tableau is called **semistandard** if the entries weakly increase along each r
 function is_semistandard(Tab::Tableau)
 	s = shape(Tab)
 	if isempty(s)
-	return true
+		return true
 	end
 
 	#correct shape
 	for i = 1:length(s)-1
-	if s[i] < s[i+1]
-		return false
-	end
+		if s[i] < s[i+1]
+			return false
+		end
 	end
 
 	#increasing first row
 	for j = 2:s[1]
-	if Tab[1][j] < Tab[1][j-1]
-		return false
-	end
+		if Tab[1][j] < Tab[1][j-1]
+			return false
+		end
 	end
 
 	#increasing first column
 	for i = 2:length(s)
-	if Tab[i][1] <= Tab[i-1][1]
-		return false
-	end
+		if Tab[i][1] <= Tab[i-1][1]
+			return false
+		end
 	end
 
 	#increasing rows and columns
 	for i = 2:length(Tab)
-	for j = 2:s[i]
-		if Tab[i][j] < Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
-		return false
+		for j = 2:s[i]
+			if Tab[i][j] < Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
+				return false
+			end
 		end
-	end
 	end
 	return true
 end
@@ -171,60 +172,61 @@ function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer)
 	SST = Array{Tableau{T},1}()
 	len = length(shape)
 	if max_val < len
-	return SST
+		return SST
 	elseif len==0
-	push!(SST, Tableau(Array{T,1}[]))
-	return SST
+		push!(SST, Tableau(Array{T,1}[]))
+		return SST
 	end
 	Tab = [Array{T}(fill(i,shape[i])) for i = 1:len]
 	m = len
 	n = shape[m]
 
 	while true
-	push!(SST,Tableau([copy(row) for row in Tab]))
+		push!(SST,Tableau([copy(row) for row in Tab]))
 
-	#raise one element by 1
-	while !(Tab[m][n]<max_val &&
-		(n==shape[m] || Tab[m][n]<Tab[m][n+1]) &&
-		(m==len || shape[m+1]<n || Tab[m][n]+1<Tab[m+1][n]))
-		if n > 1
-		n -= 1
-		elseif m > 1
-		m -= 1
-		n = shape[m]
-		else
-		return SST
+		#raise one element by 1
+		while !(Tab[m][n]<max_val &&
+			(n==shape[m] || Tab[m][n]<Tab[m][n+1]) &&
+			(m==len || shape[m+1]<n || Tab[m][n]+1<Tab[m+1][n]))
+			if n > 1
+				n -= 1
+			elseif m > 1
+				m -= 1
+				n = shape[m]
+			else
+				return SST
+			end
 		end
+
+		Tab[m][n] += 1
+
+		#minimize trailing elements
+		if n < shape[m]
+			i = m
+			j = n + 1
+		else
+			i = m + 1
+			j = 1
+		end
+		while (i<=len && j<=shape[i])
+			if i==1
+				Tab[1][j] = Tab[1][j-1]
+			elseif j==1
+				Tab[i][1] = Tab[i-1][1] + 1
+			else
+				Tab[i][j] = max(Tab[i][j-1], Tab[i-1][j] + 1)
+			end
+			if j < shape[i]
+				j += 1
+			else
+				j = 1
+				i += 1
+			end
+		end
+		m = len
+		n = shape[len]
 	end
 
-	Tab[m][n] += 1
-
-	#minimize trailing elements
-	if n < shape[m]
-		i = m
-		j = n + 1
-	else
-		i = m + 1
-		j = 1
-	end
-	while (i<=len && j<=shape[i])
-		if i==1
-		Tab[1][j] = Tab[1][j-1]
-		elseif j==1
-		Tab[i][1] = Tab[i-1][1] + 1
-		else
-		Tab[i][j] = max(Tab[i][j-1], Tab[i-1][j] + 1)
-		end
-		if j < shape[i]
-		j += 1
-		else
-		j = 1
-		i += 1
-		end
-	end
-	m = len
-	n = shape[len]
-	end
 end
 
 """
@@ -245,14 +247,14 @@ function semistandard_tableaux(box_num::T, max_val=box_num::T) where T<:Integer
 	box_num>=0 || throw(ArgumentError("box_num ≥ 0 required"))
 	SST = Array{Tableau{T},1}()
 	if max_val<=0
-	return SST
+		return SST
 	end
 	shapes = partitions(box_num)
 
 	for s in shapes
-	if max_val >= length(s)
-		append!(SST, semistandard_tableaux(s.p,max_val))
-	end
+		if max_val >= length(s)
+			append!(SST, semistandard_tableaux(s.p,max_val))
+		end
 	end
 
 	return SST
@@ -271,8 +273,8 @@ function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integ
 
 	Tabs = Array{Tableau,1}()
 	if isempty(s)
-	push!(Tabs, Tableau(Array{Int,1}[]))
-	return Tabs
+		push!(Tabs, Tableau(Array{Int,1}[]))
+		return Tabs
 	end
 	ls = length(s)
 
@@ -283,88 +285,85 @@ function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integ
 
 	function rec_sst!(n::Integer)
 
-	#fill the remaining boxes if possible, else set them to 0
-	if n == length(weight)
-		for i = 1:ls
-		for j = sub_s[i]+1:s[i]
-			Tab[i][j] = n
-			if i!=1 && Tab[i-1][j]==n
-			for k = 1:i
-				for l = sub_s[k]+1:s[k]
-				Tab[i][j] = 0
+		#fill the remaining boxes if possible, else set them to 0
+		if n == length(weight)
+			for i = 1:ls
+				for j = sub_s[i]+1:s[i]
+					Tab[i][j] = n
+					if i!=1 && Tab[i-1][j]==n
+						for k = 1:i
+							for l = sub_s[k]+1:s[k]
+								Tab[i][j] = 0
+							end
+						end
+						return
+					end
 				end
 			end
+			push!(Tabs,Tableau([copy(row) for row in Tab]))
+
 			return
-			end
-		end
-		end
-		push!(Tabs,Tableau([copy(row) for row in Tab]))
 
-		return
-	#skip to next step if weight[n]==0
-	elseif weight[n] == 0
-		rec_sst!(n+1)
-		return
-	end
-	#here starts the main part of the function
-	tracker_row = zeros(Integer, weight[n])
-	i = 1
-	while sub_s[i] == s[i]
-		i += 1
-	end
-	j = sub_s[i] + 1
-
-	m=0
-	while m >= 0
-		if m == weight[n]		 #jump to next recursive step
-		rec_sst!(n+1)
-		Tab[tracker_row[m]][sub_s[tracker_row[m]]] = 0
-		i = tracker_row[m] + 1
-		if i <= ls
-			j = sub_s[i] + 1
-		end
-		m -= 1
-		sub_s[i-1] -= 1
-
-		elseif i > ls
-		if m == 0
+		#skip to next step if weight[n]==0
+		elseif weight[n] == 0
+			rec_sst!(n+1)
 			return
-		else
-			Tab[tracker_row[m]][sub_s[tracker_row[m]]] = 0
-			i = tracker_row[m] + 1
-			if i <= ls
-			j = sub_s[i] + 1
+		end
+
+		#here starts the main part of the function
+		tracker_row = zeros(Integer, weight[n])
+		i = 1
+		while sub_s[i] == s[i]
+			i += 1
+		end
+		j = sub_s[i] + 1
+
+		m=0
+		while m >= 0
+			if m == weight[n]		 #jump to next recursive step
+				rec_sst!(n+1)
+				Tab[tracker_row[m]][sub_s[tracker_row[m]]] = 0
+				i = tracker_row[m] + 1
+				if i <= ls
+					j = sub_s[i] + 1
+				end
+				m -= 1
+				sub_s[i-1] -= 1
+
+			elseif i > ls
+				if m == 0
+					return
+				else
+					Tab[tracker_row[m]][sub_s[tracker_row[m]]] = 0
+					i = tracker_row[m] + 1
+					if i <= ls
+						j = sub_s[i] + 1
+					end
+					m -= 1
+					sub_s[i-1] -= 1
+				end
+
+			elseif j<=s[i] && (i==1 || (j<=sub_s[i-1] && n>Tab[i-1][j]))	#add an entry
+				m += 1
+				Tab[i][j] = n
+				sub_s[i] += 1
+				tracker_row[m] = i
+				j += 1
+
+			else #move pointerhead
+				i += 1
+				if i <= ls
+					j = sub_s[i] + 1
+				end
 			end
-			m -= 1
-			sub_s[i-1] -= 1
-		end
+		end	#while
 
-		elseif j<=s[i] && (i==1 || (j<=sub_s[i-1] && n>Tab[i-1][j]))	#add an entry
-		m += 1
-		Tab[i][j] = n
-		sub_s[i] += 1
-		tracker_row[m] = i
-		j += 1
-
-		else				#move pointerhead
-		i += 1
-		if i <= ls
-			j = sub_s[i] + 1
-		end
-		end
-	end	#while
 	end	#rec_sst!()
 
 	rec_sst!(1)
 	return Tabs
 end
 
-
-"""
-	semistandard_tableaux(s::Partition{T}, weight::Partition{T}) where T<:Integer
-
-Same as for [`semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer`](@ref).
-"""
 function semistandard_tableaux(s::Partition{T}, weight::Partition{T}) where T<:Integer
 	return semistandard_tableaux(Array{T,1}(s),Array{T,1}(weight))
 end
@@ -374,12 +373,12 @@ end
 """
 	is_standard(Tab::Tableau)
 
-A tableau is called **standard** if it is semistandard and the entries are in bijection with 1,…n, where n is the number of boxes.
+A tableau is called **standard** if it is semistandard and the entries are in bijection with 1,…,n, where n is the number of boxes.
 """
 function is_standard(Tab::Tableau)
 	s = shape(Tab)
 	if isempty(s)
-	return true
+		return true
 	end
 
 	#correct shape
@@ -393,38 +392,38 @@ function is_standard(Tab::Tableau)
 	n = sum(s)
 	numbs = falses(n)
 	for i = 1:length(s)
-	for j = 1:s[i]
-		if Tab[i][j]>n
-		return false
+		for j = 1:s[i]
+			if Tab[i][j]>n
+				return false
+			end
+			numbs[Tab[i][j]] = true
 		end
-		numbs[Tab[i][j]] = true
-	end
 	end
 	if false in numbs
-	return false
+		return false
 	end
 
 	#increasing first row
 	for j = 2:s[1]
-	if Tab[1][j] <= Tab[1][j-1]
-		return false
-	end
+		if Tab[1][j] <= Tab[1][j-1]
+			return false
+		end
 	end
 
 	#increasing first column
 	for i = 2:length(s)
-	if Tab[i][1] <= Tab[i-1][1]
-		return false
-	end
+		if Tab[i][1] <= Tab[i-1][1]
+			return false
+		end
 	end
 
 	#increasing rows and columns
 	for i = 2:length(s)
-	for j = 2:s[i]
-		if Tab[i][j] <= Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
-		return false
+		for j = 2:s[i]
+			if Tab[i][j] <= Tab[i][j-1] || Tab[i][j] <= Tab[i-1][j]
+				return false
+			end
 		end
-	end
 	end
 	return true
 end
@@ -438,8 +437,8 @@ Returns a list of all standard tableaux of a given shape.
 function standard_tableaux(s::Partition)
 	Tabs = Array{Tableau,1}()
 	if isempty(s)
-	push!(Tabs, Tableau(Array{Int,1}[]))
-	return Tabs
+		push!(Tabs, Tableau(Array{Int,1}[]))
+		return Tabs
 	end
 	n_max = sum(s)
 	ls = length(s)
@@ -456,30 +455,30 @@ function standard_tableaux(s::Partition)
 	j = 2
 
 	while n > 0
-	if n == n_max || i > ls
-		if n == n_max
-		push!(Tabs,Tableau([copy(row) for row in Tab]))
+		if n == n_max || i > ls
+			if n == n_max
+				push!(Tabs,Tableau([copy(row) for row in Tab]))
+			end
+			Tab[tracker_row[n]][sub_s[tracker_row[n]]] = 0
+			i = tracker_row[n] + 1
+			if i <= ls
+				j = sub_s[i] + 1
+			end
+			n -= 1
+			sub_s[i-1] -= 1
+		elseif j<=s[i] && (i==1 || j<=sub_s[i-1])
+			n += 1
+			Tab[i][j] = n
+			sub_s[i] += 1
+			tracker_row[n] = i
+			i = 1
+			j = sub_s[1] + 1
+		else
+			i += 1
+			if i <= ls
+				j = sub_s[i] + 1
+			end
 		end
-		Tab[tracker_row[n]][sub_s[tracker_row[n]]] = 0
-		i = tracker_row[n] + 1
-		if i <= ls
-		j = sub_s[i] + 1
-		end
-		n -= 1
-		sub_s[i-1] -= 1
-	elseif j<=s[i] && (i==1 || j<=sub_s[i-1])
-		n += 1
-		Tab[i][j] = n
-		sub_s[i] += 1
-		tracker_row[n] = i
-		i = 1
-		j = sub_s[1] + 1
-	else
-		i += 1
-		if i <= ls
-		j = sub_s[i] + 1
-		end
-	end
 	end
 
 	return Tabs
@@ -505,7 +504,7 @@ function standard_tableaux(n::Integer)
 	n>=0 || throw(ArgumentError("n ≥ 0 required"))
 	ST = Array{Tableau,1}()
 	for s in partitions(n)
-	append!(ST, standard_tableaux(s))
+		append!(ST, standard_tableaux(s))
 	end
 	return ST
 end
@@ -521,8 +520,8 @@ function hook_length(lambda::Partition, i::Integer, j::Integer)
 	h = lambda[i] - j + 1
 	k = i + 1
 	while k<=length(lambda) && lambda[k]>=j
-	k += 1
-	h += 1
+		k += 1
+		h += 1
 	end
 	return h
 end
@@ -544,7 +543,7 @@ Returns the tableau of shape λ in which the entry at position (i,j) is equal to
 """
 function hook_lengths(lambda::Partition)
 	if isempty(lambda)
-	return Tableau(Array{Int,1}[])
+		return Tableau(Array{Int,1}[])
 	end
 	Tab = [ [hook_length(lambda,i,j) for j in 1:lambda[i]] for i in 1:length(lambda) ]
 	return Tableau(Tab)
@@ -553,24 +552,25 @@ end
 
 
 
-"""
+@doc raw"""
 	num_standard_tableaux(lambda::Partition)
 
-Returns the number ``f^\\lambda`` of standard tableaux of shape λ using the hook length formula
+Returns the number ``f^\lambda`` of standard tableaux of shape ``λ`` using the hook length formula
 ```math
-f^{\\lambda} = \\frac{n!}{\\prod_{i,j} h_\\lambda(i,j)} \\;,
+f^{\lambda} = \frac{n!}{\prod_{i,j} h_\lambda(i,j)} \;,
 ```
-where the product is taken over all boxes in the Young diagram of ``\\lambda`` and ``h_\\lambda`` denotes the hook length of the box (i,j).
+where the product is taken over all boxes in the Young diagram of ``\lambda`` and ``h_\lambda`` denotes the hook length of the box (i,j).
 
-For my information, see [Wikipedia](https://en.wikipedia.org/wiki/Hook_length_formula).
+# References
+1. Wikipedia, [Hook length formula](https://en.wikipedia.org/wiki/Hook_length_formula).
 """
 function num_standard_tableaux(lambda::Partition)
 	n = sum(lambda)
 	h=factorial(ZZ(n))
 	for i = 1:length(lambda)
-	for j = 1:lambda[i]
-		h = div(h,ZZ(hook_length(lambda,i,j)))
-	end
+		for j = 1:lambda[i]
+			h = div(h,ZZ(hook_length(lambda,i,j)))
+		end
 	end
 	return h
 end
@@ -578,58 +578,71 @@ end
 
 """
 	schensted(sigma::Array{Integer,1})
+	schensted(sigma::Perm{T})
 
 The Robinson–Schensted correspondence is a bijection between permutations and pairs of standard Young tableaux of the same shape. For a permutation sigma (given as an array), this function performs the Schnested algorithm and returns the corresponding pair of standard tableaux (the insertion and recording tableaux).
 
-For more information, see [Wikipedia](https://en.wikipedia.org/wiki/Robinson–Schensted_correspondence).
-
 # Example
 ```julia-repl
-julia> schensted([3,1,6,2,5,4])
-(AbstractArray{Int64,1}[[1, 2, 4], [3, 5], [6]], AbstractArray{Int64,1}[[1, 3, 5], [2, 4], [6]])
+julia> P,Q = schensted([3,1,6,2,5,4]);
+julia> P
+[[1, 2, 4], [3, 5], [6]]
+
+julia> Q
+[[1, 3, 5], [2, 4], [6]]
 ```
+
+# References
+1. Wikipedia, [Robinson–Schensted correspondence](https://en.wikipedia.org/wiki/Robinson–Schensted_correspondence)
 """
 function schensted(sigma::Array{T,1}) where T<:Integer
 	if isempty(sigma)
-	return Tableau(Array{T,1}[]),Tableau(Array{T,1}[])
+		return Tableau(Array{T,1}[]),Tableau(Array{T,1}[])
 	end
 	P = Tableau{T}([[sigma[1]]])
 	Q = Tableau{T}([[1]])
 	for i = 2:length(sigma)
-	bump!(P, sigma[i], Q, i)
+		bump!(P, sigma[i], Q, i)
 	end
 	return P,Q
+end
+
+function schensted(sigma::Perm{T}) where T<:Integer
+	return schensted(sigma.d)
 end
 
 
 """
 	bump!(Tab::Tableau, x::Int)
 
-Inserts the integer x into the tableau Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion.
+Inserts the integer x into the tableau Tab according to the bumping algorithm by applying the Schensted insertion.
+
+# References
+1. Wolfram MathWorld, [Bumping Algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html)
 """
 function bump!(Tab::Tableau, x::Integer)
 	if isempty(Tab)
-	push!(Tab.t,[x])
-	return Tab
+		push!(Tab.t,[x])
+		return Tab
 	end
 
 	i = 1
 	while i <= length(Tab)
-	if Tab[i, length(Tab[i])] <= x
-		push!(Tab[i], x)
-		return Tab
-	end
-	j = 1
-	while j <= length(Tab[i])
-		if Tab[i,j] > x
-		temp = x
-		x = Tab[i,j]
-		Tab[i][j] = temp
-		i += 1
-		break
+		if Tab[i, length(Tab[i])] <= x
+			push!(Tab[i], x)
+			return Tab
 		end
-		j += 1
-	end
+		j = 1
+		while j <= length(Tab[i])
+			if Tab[i,j] > x
+				temp = x
+				x = Tab[i,j]
+				Tab[i][j] = temp
+				i += 1
+				break
+			end
+			j += 1
+		end
 	end
 	push!(Tab.t,[x])
 	return Tab
@@ -638,32 +651,32 @@ end
 """
 	bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
 
-Inserts x into Tab according to the [bumping algorithm](https://mathworld.wolfram.com/BumpingAlgorithm.html) by applying the Schensted insertion. Traces the change with Q by inserting y at the same Position in Q as x in Tab.
+Inserts x into Tab according to the bumping algorithm by applying the Schensted insertion. Traces the change with Q by inserting y at the same Position in Q as x in Tab.
 """
 function bump!(Tab::Tableau, x::Integer, Q::Tableau, y::Integer)
 	if isempty(Tab)
-	push!(Tab.t,[x])
-	push!(Q.t,[x])
-	return Tab,Q
+		push!(Tab.t,[x])
+		push!(Q.t,[x])
+		return Tab,Q
 	end
 	i = 1
 	while i <= length(Tab)
-	if Tab[i,length(Tab[i])] <= x
-		push!(Tab[i], x)
-		push!(Q[i], y)
-		return Tab
-	end
-	j=1
-	while j <= length(Tab[i])
-		if Tab[i,j] > x
-		temp = x
-		x = Tab[i,j]
-		Tab[i][j] = temp
-		i += 1
-		break
+		if Tab[i,length(Tab[i])] <= x
+			push!(Tab[i], x)
+			push!(Q[i], y)
+			return Tab
 		end
+		j=1
+		while j <= length(Tab[i])
+			if Tab[i,j] > x
+				temp = x
+				x = Tab[i,j]
+				Tab[i][j] = temp
+				i += 1
+				break
+			end
 		j += 1
-	end
+		end
 	end
 	push!(Tab.t, [x])
 	push!(Q.t, [y])
