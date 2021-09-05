@@ -53,6 +53,20 @@ function Base.copy(P::Composition{T}) where T<:Integer
 end
 
 
+@doc raw"""
+    num_compositions(n::Integer, k::Integer)
+
+The number of compositions of ``n`` into ``k`` parts is equal to 1 if ``n=k=0``, otherwise it is equal to ``{n-1 \choose k-1}``.
+"""
+function num_compositions(n::Integer, k::Integer)
+    if n==0 && k==0
+        return ZZ(1)
+    else
+        return binomial(ZZ(n-1),ZZ(k-1))
+    end
+end
+
+
 """
     num_compositions(n::Integer)
 
@@ -68,6 +82,8 @@ function num_compositions(n::Integer)
         return ZZ(2)^(n-1)
     end
 end
+
+
 
 
 """
