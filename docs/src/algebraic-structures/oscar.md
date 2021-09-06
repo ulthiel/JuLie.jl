@@ -1,4 +1,4 @@
-# [Basic algebraic structures](@id basic-algebraic-structures)
+# OSCAR
 
 The goal of the [OSCAR](https://oscar.computeralgebra.de) project (which is short for *Open Source Computer Algebra Research*) is to develop a modern, high-performance, mathematically sound computer algebra system based on Julia and integrating existing computer algebra systems. Part of the OSCAR [ecosystem](https://oscar.computeralgebra.de/documentation/) are the following Julia packages:
 

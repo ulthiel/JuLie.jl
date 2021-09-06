@@ -1,2 +1,2 @@
 print("Semistandard Tableaux")
-time L=SemistandardTableaux([5,3,2]).list()
+time L=SemistandardTableaux([6,3,2]).list()

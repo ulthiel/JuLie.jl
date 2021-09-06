@@ -20,7 +20,9 @@ makedocs(
             "about/benchmarks.md"
             ],
 
-        "Basic algebraic structures" => "basic-algebraic-structures.md",
+        "Algebraic structures" => [
+            "algebraic-structures/oscar.md"
+            ],
 
         "Combinatorics" => [
             "combinatorics/compositions.md",
