@@ -10,11 +10,12 @@ export Composition, num_compositions, compositions
 """
     Composition{T} <: AbstractArray{T,1}
 
-A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λᵣ) of positive integers whose sum is equal to n.
+A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λₖ) of positive integers λᵢ whose sum is equal to n. Compositions can also be thought of as **ordered partitions** of n. You can use smaller integer types to increase efficiency.
 
 # Examples
 ```julia-repl
-julia> c=Composition([2,1]);
+julia> c=Composition([2,1])
+[2, 1]
 julia> sum(c)
 3
 julia> c=Composition(Int8[2,1]); #You can use smaller integer types
@@ -56,10 +57,22 @@ end
 @doc raw"""
     num_compositions(n::Integer, k::Integer)
 
-The number of compositions of ``n`` into ``k`` parts is equal to 1 if ``n=k=0``, otherwise it is equal to ``{n-1 \choose k-1}``.
+The number of compositions of an integer ``n ≥ 0`` into ``k ≥ 0`` parts is equal
+```math
+\left\lbrace \begin{array}{ll} 1 & \text{if } n=k=0 \\ {n-1 \choose k-1} & \text{otherwise} \;. \end{array} \right.
+```
+See Corollary 5.3 of Bóna (2017).
+
+# References
+1. Bóna, M. (2017). *A Walk Through Combinatorics* (Fourth Edition). World Scientific.
 """
 function num_compositions(n::Integer, k::Integer)
-    if n==0 && k==0
+
+    # Argument checking
+    n >= 0 || throw(ArgumentError("n ≥ 0 required"))
+    k >= 0 || throw(ArgumentError("k ≥ 0 required"))
+
+    if n == 0 && k == 0
         return ZZ(1)
     else
         return binomial(ZZ(n-1),ZZ(k-1))
@@ -67,15 +80,24 @@ function num_compositions(n::Integer, k::Integer)
 end
 
 
-"""
+@doc raw"""
     num_compositions(n::Integer)
 
-The number of compositons of an integer ``n>0`` is equal to ``2^{n-1}``. For ``n=0`` there is 1 composition (the empty one) by convention.
+The number of compositions of an integer ``n ≥ 0`` is equal to
+```math
+\left\lbrace \begin{array}{ll} 1 & \text{if } n = 0 \\ 2^{n-1} & \text{if } n ≥ 1 \;. \end{array} \right.
+```
+See Corollary 5.4 of Bóna (2017).
 
 # References
 1. The On-Line Encyclopedia of Integer Sequences, [A011782](https://oeis.org/A011782)
+2. Bóna, M. (2017). *A Walk Through Combinatorics* (Fourth Edition). World Scientific.
 """
 function num_compositions(n::Integer)
+
+    # Argument checking
+    n >= 0 || throw(ArgumentError("n ≥ 0 required"))
+
     if n==0
         return ZZ(1)
     else
@@ -89,7 +111,16 @@ end
 """
     compositions(n::Integer, k::Integer)
 
-Returns an array of all compositions of n into k parts. The algorithm used is Algorithm 72 "Composition Generator" by Hellerman & Ogden (1961), which also refers to Chapter 6 of Riordan (1958). De-gotoed by E. Thiel. I don't know if there are faster algorithms but this one is already very fast.
+Returns an array of all compositions of n into k parts. The algorithm used is Algorithm 72 "Composition Generator" by Hellerman & Ogden (1961), which refers to Chapter 6 of Riordan (1958). De-gotoed by E. Thiel. I don't know if there are faster algorithms but this one is already very fast.
+
+# Examples
+```julia-repl
+julia> compositions(4,2)
+3-element Array{Composition{Int64},1}:
+ [1, 3]
+ [2, 2]
+ [3, 1]
+```
 
 # References
 1. Hellerman, L. & Ogden, S. (1961). Algorithm 72: composition generator. *Communications of the ACM, 4*(11), 498. [https://doi.org/10.1145/366813.366837](https://doi.org/10.1145/366813.366837)
@@ -171,7 +202,17 @@ end
 """
     compositions(n::Integer)
 
-Returns an array of all compositions of an integer n. This iterates over compositions of n into k parts for 1 ≤ k ≤ n.
+Returns an array of all compositions of an integer n. This iterates over [`compositions(n::Integer, k::Integer)`](@ref) of n into k parts for 1 ≤ k ≤ n.
+
+# Examples
+```julia-repl
+julia> compositions(3)
+4-element Array{Composition{Int64},1}:
+ [3]
+ [1, 2]
+ [2, 1]
+ [1, 1, 1]
+```
 """
 function compositions(n::Integer)
 

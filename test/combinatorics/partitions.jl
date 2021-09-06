@@ -1,13 +1,13 @@
-@testset "Partitions" begin
+@testset "combinatorics/partitions.jl" begin
 
-	# num_partitions
+	# Check some stupid cases
 	@test num_partitions(0) == 1
 	@test num_partitions(1) == 1
-
 	@test num_partitions(0,0) == 1
 	@test num_partitions(1,0) == 0
 	@test num_partitions(1,1) == 1
 	@test num_partitions(0,1) == 0
+
 
 	@test num_partitions(ZZ(991)) == ZZ(16839773100833956878604913215477)
 

@@ -24,9 +24,9 @@ makedocs(
 
 		"Combinatorics" => 	[
 			"combinatorics/compositions.md",
-			"combinatorics/partitions.md",
 			"combinatorics/multipartitions.md",
 			"combinatorics/multiset-partitions.md",
+			"combinatorics/partitions.md",
 			"combinatorics/tableaux.md",
 			],
 

@@ -1,4 +1,4 @@
-@testset "combinatorics/compositions" begin
+@testset "combinatorics/compositions.jl" begin
 
     # Check some stupid cases
     @test num_compositions(0,0) == 1
