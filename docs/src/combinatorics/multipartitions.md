@@ -2,16 +2,11 @@
 
 ```@docs
 Multipartition
-```
-
-## Generating
-
-```@docs
 multipartitions
 num_multipartitions
 ```
 
-### Operations
+## Operations
 
 ```@docs
 sum(::Multipartition{T}) where T<:Integer

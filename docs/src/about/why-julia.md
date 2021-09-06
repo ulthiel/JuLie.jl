@@ -1,4 +1,4 @@
-# [Julia crash course](@id julia-crash-course)
+# [Why Julia?](@id why-julia)
 
 [Julia](https://julialang.org) is a high-level, high-performance, dynamic programming language that first appeared in 2012 and gained quite a lot of popularity. To get a quick overview, I recommend checking out the [Wikipedia](https://en.wikipedia.org/wiki/Julia_(programming_language)) article. You can learn all the basics of Julia from the official [documentation](https://docs.julialang.org/) but as this is quite a lot to read, I'll mention a few key points.
 

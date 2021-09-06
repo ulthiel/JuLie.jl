@@ -10,15 +10,20 @@ export Composition, num_compositions, compositions
 """
     Composition{T} <: AbstractArray{T,1}
 
-A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λₖ) of positive integers λᵢ whose sum is equal to n. Compositions can also be thought of as **ordered partitions** of n. You can use smaller integer types to increase efficiency.
+A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λₖ) of positive integers λᵢ whose sum is equal to n. Compositions can also be thought of as **ordered partitions** of n.
+
+Compositions are implemented as a subtype of 1-dimensional integer arrays and you can thus work with compositions like with arrays. You can use smaller integer types to increase performance.
 
 # Examples
-```julia-repl
-julia> c=Composition([2,1])
+```jldoctest
+julia> P=Composition([2,1])
 [2, 1]
-julia> sum(c)
+julia> sum(P)
 3
-julia> c=Composition(Int8[2,1]); #You can use smaller integer types
+julia> P[1]
+2
+julia> P=Composition(Int8[2,1])
+Int8[2, 1]
 ```
 
 # References
@@ -114,9 +119,9 @@ end
 Returns an array of all compositions of n into k parts. The algorithm used is Algorithm 72 "Composition Generator" by Hellerman & Ogden (1961), which refers to Chapter 6 of Riordan (1958). De-gotoed by E. Thiel. I don't know if there are faster algorithms but this one is already very fast.
 
 # Examples
-```julia-repl
+```jldoctest
 julia> compositions(4,2)
-3-element Array{Composition{Int64},1}:
+3-element Vector{Composition{Int64}}:
  [1, 3]
  [2, 2]
  [3, 1]
@@ -205,9 +210,9 @@ end
 Returns an array of all compositions of an integer n. This iterates over [`compositions(n::Integer, k::Integer)`](@ref) of n into k parts for 1 ≤ k ≤ n.
 
 # Examples
-```julia-repl
+```jldoctest
 julia> compositions(3)
-4-element Array{Composition{Int64},1}:
+4-element Vector{Composition{Int64}}:
  [3]
  [1, 2]
  [2, 1]
