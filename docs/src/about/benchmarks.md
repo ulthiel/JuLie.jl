@@ -13,6 +13,6 @@ Here is an overview of timings of some benchmarks to show how JuLie compares to 
 
 * Compositions: Creating the list of compositions of the integer 26. There are about 33.5 million.
 * Partitions: Creating the list of partitions of the integer 90. There are about 56.6 million.
-* Semistandard tableaux: Creating the list of semistandard tableaux of shape (6,3,2). There are about 2.5 million.
-* Standard tableaux: Creating the list of standard tableaux of shape (10,8,3). There are about 1.5 million.
+* Semistandard tableaux: Creating the list of semistandard tableaux of shape (6,3,2). There are about 17 million.
+* Standard tableaux: Creating the list of standard tableaux of shape (10,8,3). There are about 7.9 million.
 
