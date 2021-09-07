@@ -14,7 +14,7 @@ Multipartitions are generalizations of partitions. An r-component **multipartiti
 Multipartitions are implemented as a subtype of 1-dimensional arrays of partitions. You can use smaller integer types to increase performance.
 
 # Examples
-```jldoctest
+```julia-repl
 julia> P=Multipartition( [[2,1], [], [3,2,1]] )
 Partition{Int64}[[2, 1], [], [3, 2, 1]]
 julia> sum(P)
@@ -81,7 +81,7 @@ end
 A list of all r-component multipartitions of n. The algorithm is recursive and  based on [`partitions(::Integer)`](@ref).
 
 # Example
-```jldoctest
+```julia-repl
 julia> multipartitions(2,2)
 5-element Vector{Multipartition{Int64}}:
  Partition{Int64}[[], [2]]
