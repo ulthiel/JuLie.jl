@@ -1,6 +1,6 @@
-# [Why Julia?](@id why-julia)
+# [Introduction to Julia](@id introduction-to-julia)
 
-[Julia](https://julialang.org) is a high-level, high-performance, dynamic programming language that first appeared in 2012 and gained quite a lot of popularity. To get a quick overview, I recommend checking out the [Wikipedia](https://en.wikipedia.org/wiki/Julia_(programming_language)) article. You can learn all the basics of Julia from the official [documentation](https://docs.julialang.org/) but as this is quite a lot to read, I'll mention a few key points.
+You can learn all the basics of Julia from the official [documentation](https://docs.julialang.org/) but as this is quite a lot to read, I'll mention a few key points.
 
 First of all, you may have noticed that the first time you call a function like ```partitions(10)``` it takes a bit of time to get an answer—but the second time you call it (with any argument) the answer is immediate. This is because Julia uses [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), which means it compiles code at run time just before it is actually needed. This is part of what makes Julia so fast—with the trade-off that there will be a delay in the first call of a function.
 
@@ -79,3 +79,5 @@ julia> conjugate(P)
 ```
 
 Beautiful. Now, one of the backbones of Julia is that you can implement a *separate* function with the *same* name ```conjugate``` but acting on a *different* type in a *different* way. This concept is called [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch). Using types and multiple dispatch one can model mathematical structures quite closely to how one abstractly thinks about them and this is another very good reason why Julia is a great choice for modern computer algebra.
+
+A further important aspect of Julia is that one can [create packages](https://pkgdocs.julialang.org/v1/creating-packages/) (like JuLie) and use everything from any other package as well. You can use JuLie as a template for your own package (see also the additional information in the section on [contributing](@ref Contributing) to learn some basics about developing in Julia).

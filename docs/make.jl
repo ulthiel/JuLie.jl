@@ -15,7 +15,9 @@ makedocs(
     pages = [
         "About" => [
             "index.md",
-            "about/why-julia.md",
+            "about/motivation.md",
+            "about/introduction-to-julia.md",
+            "about/important-remark.md",
             "about/contributing.md",
             "about/benchmarks.md"
             ],

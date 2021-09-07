@@ -15,7 +15,7 @@ A **composition** of an integer n ≥ 0 is a sequence (λ₁,…,λₖ) of posit
 Compositions are implemented as a subtype of 1-dimensional integer arrays and you can thus work with compositions like with arrays. You can use smaller integer types to increase performance.
 
 # Examples
-```jldoctest
+```julia-repl
 julia> P=Composition([2,1])
 [2, 1]
 julia> sum(P)
@@ -119,7 +119,7 @@ end
 Returns an array of all compositions of n into k parts. The algorithm used is Algorithm 72 "Composition Generator" by Hellerman & Ogden (1961), which refers to Chapter 6 of Riordan (1958). De-gotoed by E. Thiel. I don't know if there are faster algorithms but this one is already very fast.
 
 # Examples
-```jldoctest
+```julia-repl
 julia> compositions(4,2)
 3-element Vector{Composition{Int64}}:
  [1, 3]
@@ -210,7 +210,7 @@ end
 Returns an array of all compositions of an integer n. This iterates over [`compositions(n::Integer, k::Integer)`](@ref) of n into k parts for 1 ≤ k ≤ n.
 
 # Examples
-```jldoctest
+```julia-repl
 julia> compositions(3)
 4-element Vector{Composition{Int64}}:
  [3]

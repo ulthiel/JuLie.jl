@@ -30,23 +30,23 @@ To merge your repository into mine, you do a [pull request](https://docs.github.
 
 ## Structure of JuLie
 
-The source files are located in the [src](https://github.com/ulthiel/JuLie.jl/tree/master/src) directory. The main source file is [src/JuLie.jl](https://github.com/ulthiel/JuLie.jl/blob/master/src/JuLie.jl). Three things are happening here:
+JuLie is composed of three parts: the sources, the tests, and the documentation. The source files are located in the [src](https://github.com/ulthiel/JuLie.jl/tree/master/src) directory. The main source file is [src/JuLie.jl](https://github.com/ulthiel/JuLie.jl/blob/master/src/JuLie.jl). Three things are happening here:
 
 1. Importing structures and functions from other packages. I have decided to do the imports one by one instead of doing a full import of everything from, e.g., OSCAR, to keep JuLie slick and have maximal control. All these structures and functions can be used directly in the JuLie code. If necessary, you may add more imports here (as long as you're developing and haven't finally decided on what you actually need, I recommend putting the new imports in the source file you're working on first).
 2. Exporting structures and functions. This only concerns exports of some of the imports above and I am doing this for convenience so that, e.g., one can directly create a polynomial ring from within JuLie without having to load AbstractAlgebra or Nemo first. The exports of functions implemented in JuLie itself are located in the various source files.
 3. Inclusion of all the various source files of JuLie.
 
-To ensure proper functionality of JuLie we use [unit testing](https://docs.julialang.org/en/v1/stdlib/Test/). The directory [test](https://github.com/ulthiel/JuLie.jl/tree/master/test) contains various test sets, and these are combined in the file [runtests.jl](https://github.com/ulthiel/JuLie.jl/blob/master/test/runtests.jl). You can run the complete unit test with ```Pkg.test("JuLie")```.
+To ensure proper functionality of JuLie we use [unit testing](https://docs.julialang.org/en/v1/stdlib/Test/). The directory [test](https://github.com/ulthiel/JuLie.jl/tree/master/test) contains various test sets, and these are combined in the file [runtests.jl](https://github.com/ulthiel/JuLie.jl/blob/master/test/runtests.jl). You can run a single test set by, e.g., ```julia runtests.jl combinatorics/partitions.jl```, and you can run the full unit test with ```Pkg.test("JuLie")``` in Julia.
 
 The documentation is automatically built on GitHub using the package [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl) from the comments in the source files together with the Markdown files in the [docs/src](https://github.com/ulthiel/JuLie.jl/tree/master/docs) directory. The file [docs/make.jl](https://github.com/ulthiel/JuLie.jl/blob/master/docs/make.jl) defines the structure of the navigation panel. You can build the documentation locally by running ```julia make.jl local```; the result is then in the build directory.
 
 ## Programming
 
-If you are completely new to Julia, I recommend reading my Julia [crash course](@ref julia-crash-course). Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
+If you are completely new to Julia, I recommend reading my [introduction](@ref introduction-to-julia) to Julia. Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
 
 1. We follow the official Julia [style guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 3. Unicode in the source code is allowed and encouraged to increase readability. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor.
-4. Remember that we want to use [basic algebraic structures](@ref basic-algebraic-structures) provided by (subpackages of) OSCAR.
+4. Remember that we want to use [basic algebraic structures](@ref OSCAR) provided by (subpackages of) OSCAR.
 5. Mathematical structures you implement should somehow reflect how they are defined and treated abstractly. This is often easier said than done and one really needs to think about this *before* implementing anything.
 6. If your implementation is not faster than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all, especially if the structures are mathematically sound so that we can improve functions at a later stage without having to do structural changes). Please read the Julia [performance guide](https://docs.julialang.org/en/v1/manual/performance-tips/) to not fall into typical traps.
 7. For every function you implement, you should add a reasonable test to the unit testing. Try to find computed examples in publications or which follow from general theory etc.
@@ -92,3 +92,8 @@ using JuLie
 ```
 
 Now, changes you make in the code are immediately available in the running Julia session (except for changes to structures, here you still need to restart).
+
+## The BenchmarkTools package
+
+You can measure the execution time of a command by using the ```@time``` macro. But this is not ideal because this measure a lot of overhead as well like just-in-time compilation. For proper benchmarking you can use the [BenchmarkTools](https://github.com/JuliaCI/BenchmarkTools.jl) package.
+
