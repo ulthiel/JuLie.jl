@@ -7,6 +7,7 @@ Composition
 ## Unrestricted compositions
 
 ```@docs
+Compositions
 compositions(::Integer)
 num_compositions(::Integer)
 ```

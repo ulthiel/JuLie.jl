@@ -2,7 +2,7 @@
 
 You can learn all the basics of Julia from the official [documentation](https://docs.julialang.org/) but as this is quite a lot to read, I'll mention a few key points.
 
-First of all, you may have noticed that the first time you call a function like ```partitions(10)``` it takes a bit of time to get an answer—but the second time you call it (with any argument) the answer is immediate. This is because Julia uses [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), which means it compiles code at run time just before it is actually needed. This is part of what makes Julia so fast—with the trade-off that there will be a delay in the first call of a function.
+First of all, you may have noticed that the first time you call a function like ```partitions(10)``` it takes a bit of time to get an answer—but the second time you call it the answer is immediate. This is because Julia uses [just-in-time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), which means it compiles code at run time just before it is actually needed. This is part of what makes Julia so fast—with the trade-off that there will be a delay in the first call of a function.
 
 Second, there are two—but likely more—caveats for algebraists in Julia: integers are by default 64-bit integers and division is floating point division:
 
@@ -61,9 +61,9 @@ julia> P.p
  1
 ```
 
-As you can see in the partition type example, you can build up a hierarchy—a tree—of types but it is important to note that only the *leaves* of this tree can be instantiated: there is a distinction between *concrete* types (the leaves) and *abstract* types (everything else). If you want to know more, you should read the section about [types](https://docs.julialang.org/en/v1/manual/types/) in the Julia documentation.
+As you can see in the partition type example, you can build up a hierarchy—a tree—of types but it is important to note that only the *leaves* of this tree can be instantiated: there is a distinction between *concrete* types (the leaves) and *abstract* types (everything else). If you want to know more about types, you should read the section about [types](https://docs.julialang.org/en/v1/manual/types/) in the Julia documentation.
 
-Functions in Julia are implemented in such a way that one specifies the type of the parameters, e.g. I have implemented a function to obtain the conjugate of a partition and this looks like:
+Functions in Julia are implemented in such a way that one specifies the type of the parameters, there is a function to obtain the conjugate of a partition and this looks like:
 
 ```julia
 function conjugate(P::Partition{T}) where T<:Integer
@@ -79,5 +79,8 @@ julia> conjugate(P)
 ```
 
 Beautiful. Now, one of the backbones of Julia is that you can implement a *separate* function with the *same* name ```conjugate``` but acting on a *different* type in a *different* way. This concept is called [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch). Using types and multiple dispatch one can model mathematical structures quite closely to how one abstractly thinks about them and this is another very good reason why Julia is a great choice for modern computer algebra.
+
+!!! warning "Warning"
+    Recall that Julia structures form a tree of which only the leaves can be instantiated. Structures in the mathematical world, however, do not form a tree, e.g. an algebra over a field is both a vector space and a ring. Therefore, you should not think of types as the way to go for modeling all sorts of mathematical structures in general. Types should be used to implement structures for which one can implement generic code. 
 
 A further important aspect of Julia is that one can [create packages](https://pkgdocs.julialang.org/v1/creating-packages/) (like JuLie) and use everything from any other package as well. You can use JuLie as a template for your own package (see also the additional information in the section on [contributing](@ref Contributing) to learn some basics about developing in Julia).

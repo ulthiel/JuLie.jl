@@ -33,7 +33,7 @@ julia> @time partitions(Int8(90)); #One goal of JuLie is being fast :-)
 
 ## Acknowledgments
 
-This is a contribution to Project-ID 286237555 – [TRR 195](https://www.computeralgebra.de/sfb/) – by the [Deutsche Forschungsgemeinschaft](https://www.dfg.de/en/). I thank everyone who contributed (see below). The logo shows the root system of type G₂ and is taken from [Wikipedia](https://commons.wikimedia.org/wiki/File:Root_system_G2.svg).
+This work is a contribution to the [SFB-TRR 195](https://www.computeralgebra.de/sfb/) 'Symbolic Tools in Mathematics and their Application' of the German Research Foundation (DFG). I thank everyone who contributed (see below). The logo shows the root system of type G₂ and is taken from [Wikipedia](https://commons.wikimedia.org/wiki/File:Root_system_G2.svg).
 
 ## Contributors
 

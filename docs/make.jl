@@ -17,7 +17,7 @@ makedocs(
             "index.md",
             "about/motivation.md",
             "about/introduction-to-julia.md",
-            "about/important-remark.md",
+            "about/integer-remarks.md",
             "about/contributing.md",
             "about/benchmarks.md"
             ],

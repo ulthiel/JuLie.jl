@@ -9,17 +9,8 @@
     # First few number of compositions from https://oeis.org/A011782
     nums = [1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296, 8589934592]
 
-    # Check if num_compositions is correct
+    # Check if num_compositions is correct in these examples
     @test [num_compositions(n) for n=0:length(nums)-1] == nums
-
-    # From https://en.wikipedia.org/wiki/Composition_(combinatorics)
-    comp = [Composition([5]), Composition([4,1]), Composition([3,2]), Composition([3,1,1]), Composition([2,3]), Composition([2,2,1]), Composition([2,1,2]), Composition([2,1,1,1]), Composition([1,4]), Composition([1,3,1]), Composition([1,2,2]), Composition([1,2,1,1]), Composition([1,1,3]), Composition([1,1,2,1]), Composition([1,1,1,2]), Composition([1,1,1,1,1])]
-
-    # Computed compositions are in different order, so need to check sets
-    comp2 = compositions(5)
-    @test comp == unique(comp)
-    @test comp2 == unique(comp2)
-    @test Set(comp) == Set(comp2)
 
     # Complete check of compositions for small cases
     for n=0:5

@@ -71,6 +71,11 @@ import LightGraphs:
     SimpleGraph, add_edge!, connected_components, vertices, edges
 
 ################################################################################
+# Internal types
+################################################################################
+IntegerUnion = Union{Integer, fmpz}
+
+################################################################################
 # Export (more exports are in the various source files)
 ################################################################################
 export
