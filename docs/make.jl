@@ -16,22 +16,19 @@ makedocs(
         "About" => [
             "index.md",
             "about/motivation.md",
-            "about/introduction-to-julia.md",
-            "about/integer-remarks.md",
+            "about/julia-intro.md",
+            "about/integer-types.md",
             "about/contributing.md",
             "about/benchmarks.md"
             ],
 
         "Algebraic structures" => [
-            "algebraic-structures/oscar.md"
+            "algebraic-structures/oscar.md",
+            "algebraic-structures/jucat.md"
             ],
 
         "Combinatorics" => [
-            "combinatorics/compositions.md",
-            "combinatorics/multipartitions.md",
-            "combinatorics/multiset-partitions.md",
-            "combinatorics/partitions.md",
-            "combinatorics/tableaux.md",
+            "combinatorics/permutations.md",
             ],
 
         "Index" => "julie-index.md",

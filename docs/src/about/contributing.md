@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions are necessary and very much welcome! Here is some help on how to do this. I have written this document for those who are very new to developing in Julia, so you may skip many things—but please at least read the [programming](@ref Programming) and [documenting](@ref Documenting) guidelines.
+Contributions are necessary and very much welcome! Here is some help on how to do this. This section is written for those who are very new to developing in Julia, so you may skip many things—but please at least read the [programming](@ref Programming) and [documenting](@ref Documenting) guidelines.
 
 ## Setting up the repository
 
@@ -26,14 +26,14 @@ using JuLie
 
 The idea of working with Git is that for any reasonable chunk of changes you do in the source code, you fix the state by doing a Git *commit* (with a reasonable description). Remeber to first add every new file via ```git add```. As a commit is only a local thing, you need to eventually *push* all your commits to your repository on GitHub. If you're asked for your GitHub username and passwort at every push, then [here](https://docs.github.com/en/get-started/getting-started-with-git/why-is-git-always-asking-for-my-password) is some advice on how to stop this.
 
-To merge your repository into mine, you do a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) on GitHub. But before you do this, please make sure that everything is well-documented, the documentation builds correctly, and all tests pass.
+To merge your repository into the official one, you do a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) on GitHub. But before you do this, please make sure that everything is well-documented, the documentation builds correctly, and all tests pass.
 
 ## Structure of JuLie
 
 JuLie is composed of three parts: the sources, the tests, and the documentation. The source files are located in the [src](https://github.com/ulthiel/JuLie.jl/tree/master/src) directory. The main source file is [src/JuLie.jl](https://github.com/ulthiel/JuLie.jl/blob/master/src/JuLie.jl). Three things are happening here:
 
-1. Importing structures and functions from other packages. I have decided to do the imports one by one instead of doing a full import of everything from, e.g., OSCAR, to keep JuLie slick and have maximal control. All these structures and functions can be used directly in the JuLie code. If necessary, you may add more imports here (as long as you're developing and haven't finally decided on what you actually need, I recommend putting the new imports in the source file you're working on first).
-2. Exporting structures and functions. This only concerns exports of some of the imports above and I am doing this for convenience so that, e.g., one can directly create a polynomial ring from within JuLie without having to load AbstractAlgebra or Nemo first. The exports of functions implemented in JuLie itself are located in the various source files.
+1. Importing structures and functions from other packages. Imports are done one by one instead of doing a full import of everything from, e.g., OSCAR, to keep JuLie slick and have maximal control. All these structures and functions can be used directly in the JuLie code. If necessary, you may add more imports here (as long as you're developing and haven't finally decided on what you actually need, put the new imports in the source file you're working on first).
+2. Exporting structures and functions. This only concerns exports of some of the imports above and this is done for convenience so that, e.g., one can directly create a polynomial ring from within JuLie without having to load AbstractAlgebra or Nemo first. The exports of functions implemented in JuLie itself are located in the various source files.
 3. Inclusion of all the various source files of JuLie.
 
 To ensure proper functionality of JuLie we use [unit testing](https://docs.julialang.org/en/v1/stdlib/Test/). The directory [test](https://github.com/ulthiel/JuLie.jl/tree/master/test) contains various test sets, and these are combined in the file [runtests.jl](https://github.com/ulthiel/JuLie.jl/blob/master/test/runtests.jl). You can run a single test set by, e.g., ```julia runtests.jl combinatorics/partitions.jl```, and you can run the full unit test with ```Pkg.test("JuLie")``` in Julia.
@@ -42,13 +42,13 @@ The documentation is automatically built on GitHub using the package [Documenter
 
 ## Programming
 
-If you are completely new to Julia, I recommend reading my [introduction](@ref introduction-to-julia) to Julia. Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). I recommend browsing through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
+If you are completely new to Julia, you should read the [introduction](@ref julia-intro) section. Eventually, you will need to look things up in the official Julia [documentation](https://docs.julialang.org/en/v1/). It will be helpful to browse through some of the source files of JuLie to get a quick impression of the programming style. Here are some guidelines:
 
 1. We follow the official Julia [style guide](https://docs.julialang.org/en/v1/manual/style-guide/).
-3. Unicode in the source code is allowed and encouraged to increase readability. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor.
-4. Remember that we want to use [basic algebraic structures](@ref OSCAR) provided by (subpackages of) OSCAR.
+3. Unicode in the source code is allowed and encouraged to increase readability. The [LaTex-like abbreviations](https://docs.julialang.org/en/v1/manual/unicode-input/) for unicode characters can be used in, e.g., the [Atom](https://atom.io) editor with the [latex-completions](https://atom.io/packages/latex-completions) package.
+4. We use everything from [OSCAR](@ref OSCAR) that is useful for us.
 5. Mathematical structures you implement should somehow reflect how they are defined and treated abstractly. This is often easier said than done and one really needs to think about this *before* implementing anything.
-6. If your implementation is not faster than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. I prefer to have a not incredibly fast algorithm than no algorithm at all, especially if the structures are mathematically sound so that we can improve functions at a later stage without having to do structural changes). Please read the Julia [performance guide](https://docs.julialang.org/en/v1/manual/performance-tips/) to not fall into typical traps.
+6. If your implementation is not faster than those in other computer algebra systems then it's not good enough. (Don't take this too seriously, but at least try. A not incredibly fast algorithm is better than no algorithm at all, especially if the structures are mathematically sound so that we can improve functions at a later stage without having to do structural changes). Please read the Julia [performance guide](https://docs.julialang.org/en/v1/manual/performance-tips/) to not fall into typical traps.
 7. For every function you implement, you should add a reasonable test to the unit testing. Try to find computed examples in publications or which follow from general theory etc.
 
 ## Documenting
@@ -65,7 +65,7 @@ Everything has to be well-documented, algorithms and papers have to be properly 
    Let ``n ∈ ℤ`` and let ``ℚ(𝐪)`` be the fraction field of the polynomial ring ``ℤ[𝐪]``...
    """
    function quantum_integer(n::Int, q::RingElem)
-     ...
+       ...
    end
    ```
 
@@ -73,7 +73,7 @@ Everything has to be well-documented, algorithms and papers have to be properly 
 
 3. We use an "Examples" section in the documentation block to give some examples.
 
-4. We use a "References" section at the end of a documentation block to list references. The references are given in [APA style](https://en.wikipedia.org/wiki/APA_style), e.g. "Etingof, P. & Ginzburg, V. (2002). Symplectic reflection algebras, Calogero-Moser space, and deformed Harish-Chandra homomorphism. *Invent. Math., 147*(2), 243–348. [https://doi.org/10.1007/s002220100171](https://doi.org/10.1007/s002220100171)". In-text references in APA style look like "Etingof & Ginzburg (2002)". You can use [BibDesk](https://bibdesk.sourceforge.io) and my [APA export template](https://gist.github.com/ulthiel/3ecbc5b9e95beae896958028a0e42ca4) to save time dealing with this.
+4. We use a "References" section at the end of a documentation block to list references. The references are given in [APA style](https://en.wikipedia.org/wiki/APA_style), e.g. "Etingof, P. & Ginzburg, V. (2002). Symplectic reflection algebras, Calogero-Moser space, and deformed Harish-Chandra homomorphism. *Invent. Math., 147*(2), 243–348. [https://doi.org/10.1007/s002220100171](https://doi.org/10.1007/s002220100171)". In-text references in APA style look like "Etingof & Ginzburg (2002)". You can use [BibDesk](https://bibdesk.sourceforge.io) and the [APA export template](https://gist.github.com/ulthiel/3ecbc5b9e95beae896958028a0e42ca4) to save time dealing with this.
 
 ## The Revise package
 

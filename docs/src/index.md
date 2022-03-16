@@ -1,6 +1,6 @@
 # JuLie
 
-JuLie is an early-stage package for the programming language [Julia](https://julialang.org) with the goal of providing mathematically sound structures and fast algorithms for things around representation theory, especially algebraic Lie theory and accompanying combinatorics. These fields are huge and this package is still small—I hope it will grow with time. [Contributions](@ref Contributing) are necessary and very much welcome!
+JuLie is an early-stage package for the programming language [Julia](https://julialang.org) with the goal of providing mathematically sound structures and fast algorithms for things around representation theory, especially algebraic Lie theory and accompanying combinatorics. These fields are huge and this package is still small—hopefully it will grow with time. [Contributions](@ref Contributing) are necessary and very much welcome!
 
 By [Ulrich Thiel](https://ulthiel.com/math) (University of Kaiserslautern) and [contributors](@ref Contributors).
 
@@ -28,7 +28,7 @@ julia> partitions(3)
  [2, 1]
  [1, 1, 1]
 julia> @time partitions(Int8(90)); #One goal of JuLie is being fast :-)
-  5.844981 seconds (56.63 M allocations: 6.239 GiB, 19.75% gc time)
+  5.723798 seconds (56.63 M allocations: 4.529 GiB, 25.55% gc time)
 ```
 
 ## Acknowledgments
@@ -38,5 +38,5 @@ This work is a contribution to the [SFB-TRR 195](https://www.computeralgebra.de/
 ## Contributors
 
 * [Max Horn](https://www.quendi.de/en/math) (TU Kaiserslautern, 2020): Julia generalities
-* Tom Schmit (TU Kaiserslautern, 2020–2021): Cartan matrices, Coxeter groups, Documenter.jl and GitHub integration, Kostka polynomials, Schur polynomials, Tableaux
+* Tom Schmit (TU Kaiserslautern, 2020–2021): Cartan matrices, Coxeter groups (Casselman I algorithm), Documenter.jl and GitHub integration, Kostka polynomials, Schur polynomials, Tableaux
 * Elisa Thiel (2020): De-gotoing old ALGOL code

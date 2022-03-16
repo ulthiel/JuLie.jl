@@ -1,4 +1,4 @@
-# OSCAR
+# [Basic algebraic structures: OSCAR](@id OSCAR)
 
 The goal of the [OSCAR](https://oscar.computeralgebra.de) project (which is short for *Open Source Computer Algebra Research*) is to develop a modern, high-performance, mathematically sound computer algebra system based on Julia and integrating existing computer algebra systems. Part of the OSCAR [ecosystem](https://oscar.computeralgebra.de/documentation/) are the following Julia packages:
 
@@ -9,7 +9,7 @@ The goal of the [OSCAR](https://oscar.computeralgebra.de) project (which is shor
 * [Singular.jl](https://oscar-system.github.io/Singular.jl/dev/): [Singular](https://www.singular.uni-kl.de) integration.
 * [Oscar.jl](https://oscar-system.github.io/Oscar.jl/dev/): high-level package combining and extending the above.
 
-JuLie may be considered as a further contribution to the OSCAR project and in particular integrates with and builds upon this ecosystem. Here is an overview of basic algebraic structures that are used in JuLie (see [here](https://github.com/ulthiel/JuLie.jl/blob/master/src/JuLie.jl) for the full list of imports):
+JuLie may be considered as a further contribution to the OSCAR project and in particular integrates with and builds upon this ecosystem. Here is an overview of basic algebraic structures from OSCAR that are used in JuLie (see [here](https://github.com/ulthiel/JuLie.jl/blob/master/src/JuLie.jl) for the full list of imports):
 
 * Big [integers](https://nemocas.github.io/Nemo.jl/stable/integer/) of type ```fmpz``` (with shortcut ```ZZ```) from Nemo, e.g. ```ZZ(5)```. We prefer this to ```BigInt``` because it is what is used in Nemo and is faster.
 * Big exact [rationals](https://nemocas.github.io/Nemo.jl/stable/rational/) of type ```fmpq``` (with shortcut ```QQ```) from Nemo, e.g. ```QQ(5//3)``` or ```ZZ(5)//ZZ(3)```.
@@ -20,4 +20,4 @@ JuLie may be considered as a further contribution to the OSCAR project and in pa
 * [Univariate Laurent polynomial rings](https://nemocas.github.io/AbstractAlgebra.jl/stable/laurent_polynomial/), e.g. ```R, x = LaurentPolynomialRing(ZZ, "x")```.
 * [Matrices](https://nemocas.github.io/Nemo.jl/stable/matrix/), e.g. ```M = matrix(ZZ, [3 1 2; 2 0 1])```. Again, there are special types for rings optimized in Nemo.
 * [Vector spaces](https://nemocas.github.io/AbstractAlgebra.jl/stable/free_module/), e.g. ```VectorSpace(QQ, 2)```, and [free modules](https://nemocas.github.io/AbstractAlgebra.jl/stable/free_module/), e.g. ```FreeModule(ZZ, 3)```.
-* [Symmetric groups](https://nemocas.github.io/AbstractAlgebra.jl/stable/perm/), e.g. ```SymmetricGroup(6)```.
+

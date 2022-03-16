@@ -1,0 +1,5 @@
+# Permutations
+
+```@docs
+Permutation
+```

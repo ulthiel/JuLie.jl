@@ -110,7 +110,8 @@ export
 ################################################################################
 
 # Combinatorics
-include("combinatorics/enum_func.jl")
+include("combinatorics/combinatorial_functions.jl")
+include("combinatorics/permutations.jl")
 include("combinatorics/partitions.jl")
 include("combinatorics/compositions.jl")
 include("combinatorics/multipartitions.jl")

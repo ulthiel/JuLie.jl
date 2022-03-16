@@ -8,10 +8,6 @@ The ultimate goal of JuLie is to help finding new results in (and around) [repre
 4. It is open source and community-driven.
 5. It is modern.
 
-These points speak in favor of using Julia as basis for modern computer algebra. This is exactly the motivation and the goal of the [OSCAR](https://oscar.computeralgebra.de) project started in 2017 (see also my [overview](@ref OSCAR)). JuLie may be considered as a contribution to OSCAR in the field of representation theory (which in turn is another motivation for JuLie). The basic philosophy of this whole enterprise is to:
-
-1. Implement mathematically sound structures.
-2. Be fast.
+These points speak in favor of using Julia as basis for modern computer algebra and this is precisely the motivation of the [OSCAR](https://oscar.computeralgebra.de) project started in 2017 (see also my [overview](@ref OSCAR)). JuLie may be considered as a contribution to OSCAR in the field of representation theory (which in turn is another motivation for JuLie).
 
 One "milestone" of JuLie is to implement "all" the material from (and as in) the book [Introduction to Soergel bimodules](https://www.springer.com/gp/book/9783030488253) by B. Elias, S. Makisumi, U. Thiel, and G. Williamson. Of course, anything else is always welcome: please [contribute](@ref Contributing)!
-
