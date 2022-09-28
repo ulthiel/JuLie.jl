@@ -161,7 +161,7 @@ end
 
 
 """
-	CartanMatrix(types::Array{String,1})
+	CartanMatrix(types::Vector{String})
 
 generates the **Cartan block matrix** defined by ``types`` whose elements should be of the following form:
 "LN~" or "LN" with L ∈ {A,B,C,D,E,F,G} and N ∈ ℕ.
@@ -171,7 +171,7 @@ for example you could call:
 CartanMatrix( [ "A1~" , "B2" , "C3~" ] )
 ```
 """
-function CartanMatrix(types::Array{String,1})
+function CartanMatrix(types::Vector{String})
 	if isempty(types)
 		throw(ArgumentError("types can't be empty"))
 	end

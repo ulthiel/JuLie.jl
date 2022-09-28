@@ -9,7 +9,7 @@ export kostka_polynomial, charge
 
 """
 	kostka_polynomial(λ::Partition{T}, μ::Partition{T})
-	kostka_polynomial(λ::Array{Int,1}, μ::Array{Int,1})
+	kostka_polynomial(λ::Vector{Int}, μ::Vector{Int})
 
 The (one-variable) **Kostka polymial** ``K_{λμ}(t)`` associated to partitions λ and μ can be defined as
 
@@ -98,7 +98,7 @@ function kostka_polynomial(λ::Partition{T}, μ::Partition{T}) where T<:Integer
 	end
 
 	#compute the Arrays of available Partitions
-	parts = Array{Array{Partition{T},1},1}([[] for i = 1:len_λ])
+	parts = Vector{Vector{Partition{T}}}([[] for i = 1:len_λ])
 	for i = 2:len_λ
 	parts[i] = partitions(size_v[i])
 	end
@@ -109,7 +109,7 @@ function kostka_polynomial(λ::Partition{T}, μ::Partition{T}) where T<:Integer
 	index = ones(Int, len_λ)	#will be our iterator with which we will look at all admissible configurations
 	empty_partition = Partition{T}([])	#this will act as a placeholder during the Algorithm
 	pointer = 2	#this will index the part of the configuration we are currently looking at
-	v = Array{Partition{T},1}([empty_partition for i=1:len_λ])
+	v = Vector{Partition{T}}([empty_partition for i=1:len_λ])
 	v[1] = μ
 
 	#returns P_n^(k)
@@ -203,13 +203,13 @@ function kostka_polynomial(λ::Partition{T}, μ::Partition{T}) where T<:Integer
 end
 
 
-function kostka_polynomial(λ::Array{Int,1}, μ::Array{Int,1})
+function kostka_polynomial(λ::Vector{Int}, μ::Vector{Int})
 	 return kostka_polynomial(Partition(λ), Partition(μ))
 end
 
 
 """
-	charge(config::Array{Partition{T},1})
+	charge(config::Vector{Partition{T}})
 
 The **charge** ``c`` of an admissible configuration ``v:=`` ```config```, is defined by:
 
@@ -221,7 +221,7 @@ The **charge** ``c`` of an admissible configuration ``v:=`` ```config```, is def
 \\end{aligned}
 ```
 """
-function charge(config::Array{Partition{T},1}) where T<:Integer
+function charge(config::Vector{Partition{T}}) where T<:Integer
 	function M(p::Partition{T}, k::Partition{T})
 	res = 0
 	for i in p
@@ -273,7 +273,7 @@ end
 
 
 """
-	charge(word::Array{Int,1},standard=false::Bool)
+	charge(word::Vector{Int},standard=false::Bool)
 
 This returns the **charge** of the Tableau corresponding to the reading word ```word```.
 
@@ -281,12 +281,12 @@ We call a word **standard**, if each of its letters or numbers only appears once
 
 This Algorithm is based on the Algorithm following Example 7.3 in "[Hall-Littlewood Functions and Kostka-Foulkes Polynomials in Representation Theory](https://www.emis.de/journals/SLC/opapers/s32leclerc.pdf)", J. Désarménien, B. Leclerc and J.-Y. Thibon.
 """
-function charge(word::Array{Int,1},standard=false::Bool)
+function charge(word::Vector{Int},standard=false::Bool)
 	c = 0
 	if !standard
 	baseword = copy(word)
 	while length(baseword) > 0
-		indices = Array{Int,1}()
+		indices = Vector{Int}()
 		a = 1
 		maxim = maximum(baseword)
 		while a <= maxim

@@ -3,13 +3,13 @@
 	@test reading_word(Tableau([ [1,2,5,7], [3,4], [6]])) == [6,3,4,1,2,5,7]
 	@test reading_word(Tableau([ [1], [2], [3]])) == [3,2,1]
 	@test reading_word(Tableau([[1,2,3]])) == [1,2,3]
-	@test reading_word(Tableau(Array{Int,1}[])) == Int[]
+	@test reading_word(Tableau(Vector{Int}[])) == Int[]
 
 	# weight
 	@test weight(Tableau([[1,2,3],[1,2],[1]])) == [3,2,1]
 	@test weight(Tableau([[1,2,3,4,5]])) == [1,1,1,1,1]
 	@test weight(Tableau([[1],[1],[1]])) == [3]
-	@test weight(Tableau(Array{Int,1}[])) == Int[]
+	@test weight(Tableau(Vector{Int}[])) == Int[]
 
 	# is_standard
 	@test is_standard(Tableau([[1,2,4,7,8],[3,5,6,9],[10]])) == true
@@ -30,7 +30,7 @@
 	@test is_semistandard(Tableau([[1,2,3],[1,4]])) == false
 	@test is_semistandard(Tableau([[1,2,1],[2,4]])) == false
 
-	# semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
+	# semistandard_tableaux(shape::Vector{T}, max_val=sum(shape)::Integer)
 	check = true
 	shapes = [[3,2,1],[3,3,1],[2,2,2]]
 	for s in shapes
@@ -51,7 +51,7 @@
 	@test check==true
 	@test isempty(semistandard_tableaux([3,2,1],2))
 
-	# semistandard_tableaux(s::Array{T,1}, weight::Array{T,1})
+	# semistandard_tableaux(s::Vector{T}, weight::Vector{T})
 	check = true
 	shapes = [[5,3,1,1],[4,3,2,1],[2,2,2,2,2]]
 	weights = [[1,1,1,1,1,1,1,1,1,1],[3,0,2,0,0,5],[4,3,2,1]]
@@ -87,7 +87,7 @@
 		end
 	end
 	@test check==true
-	@test semistandard_tableaux(Int[], Int[]) == [Tableau(Array{Int,1}[])]
+	@test semistandard_tableaux(Int[], Int[]) == [Tableau(Vector{Int}[])]
 
 	#semistandard_tableaux(box_num, max_val)
 	check = true
@@ -154,7 +154,7 @@
 		end
 	end
 	@test check==true
-	@test standard_tableaux(Partition(Int[])) == [Tableau(Array{Int,1}[])]
+	@test standard_tableaux(Partition(Int[])) == [Tableau(Vector{Int}[])]
 	@test standard_tableaux([3,2,1]) == standard_tableaux(Partition([3,2,1]))
 
 	# standard_tableaux(n::Integer)
@@ -191,18 +191,18 @@
 	# hook_lengths
 	@test hook_lengths(Partition([4,3,1,1])) == Tableau([[7,4,3,1],[5,2,1],[2],[1]])
 	@test hook_lengths(Partition([1])) == Tableau([[1]])
-	@test hook_lengths(Partition([])) == Tableau(Array{Int,1}[])
+	@test hook_lengths(Partition([])) == Tableau(Vector{Int}[])
 
 	# schensted
 	@test schensted([6,2,7,3,5,4,1]) == (Tableau([[1,3,4],[2,7],[5],[6]]),Tableau([[1,3,5],[2,4],[6],[7]]))
 	@test schensted([5,2,7,1,3,8,6,4]) == (Tableau([[1,3,4],[2,6,8],[5,7]]),Tableau([[1,3,6],[2,5,7],[4,8]]))
 	@test schensted([1]) == (Tableau([[1]]),Tableau([[1]]))
-	@test schensted(Int[]) == (Tableau(Array{Int,1}[]),Tableau(Array{Int,1}[]))
+	@test schensted(Int[]) == (Tableau(Vector{Int}[]),Tableau(Vector{Int}[]))
 
 	# bump!
-	tab = Tableau(Array{Int,1}[])
-	tab2 = Tableau(Array{Int,1}[])
-	Q = Tableau(Array{Int,1}[])
+	tab = Tableau(Vector{Int}[])
+	tab2 = Tableau(Vector{Int}[])
+	Q = Tableau(Vector{Int}[])
 	for x in [1,2,1,1,3,4,1,1]
 		bump!(tab,x)
 		bump!(tab2, x, Q, x)

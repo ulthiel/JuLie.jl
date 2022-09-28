@@ -219,10 +219,10 @@
 	for n in N
 		for k = 1:n+1
 			for i = 1:20
-				v = convert(Array{Integer,1}, rand(1:20,i))
+				v = convert(Vector{Integer}, rand(1:20,i))
 				unique!(v)
 				sort!(v)
-				mu = convert(Array{Integer,1}, rand((0:k).+1, length(v)))
+				mu = convert(Vector{Integer}, rand((0:k).+1, length(v)))
 				P = partitions(mu, n, v, k)
 				# check that partitions have k parts
 				if length(P) !=0 && unique([ length(p) for p in P ]) != [k]

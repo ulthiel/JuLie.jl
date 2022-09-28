@@ -9,7 +9,7 @@ export schur_polynomial
 """
 	schur_polynomial(λ::Partition{T}, n=sum(λ)::Int) where T<:Integer
 	schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing, n=sum(λ)::Int) where T<:Integer
-	schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
+	schur_polynomial(λ::Partition{T}, x::Vector{fmpz_mpoly}) where T<:Integer
 
 Returns the Schur polynomial ``s_λ(x₁,x₂,...,xₙ)`` in n variables, as a Multivariate Polynomial.
 
@@ -83,7 +83,7 @@ function schur_polynomial(λ::Partition{T}, R::FmpzMPolyRing, n=sum(λ)::Int) wh
 end
 
 
-function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
+function schur_polynomial(λ::Partition{T}, x::Vector{fmpz_mpoly}) where T<:Integer
 	n = length(x)
 
 	if n==0 || n < length(λ)
@@ -109,7 +109,7 @@ function schur_polynomial(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Int
 end
 
 #returning the schur polynomial in the first k generators of R using Cauchy's bialternant formula.
-function schur_polynomial_cbf(λ::Partition{T}, x::Array{fmpz_mpoly,1}) where T<:Integer
+function schur_polynomial_cbf(λ::Partition{T}, x::Vector{fmpz_mpoly}) where T<:Integer
 	#if isempty(x) #this event is handled in the calling methods
 	#	if sum(λ)==0
 	#	return 1
@@ -215,7 +215,7 @@ function schur_polynomial_combinat(λ::Partition{T}, R::FmpzMPolyRing, k=sum(λ)
 	S = R.base_ring
 	sf = MPolyBuildCtx(R)
 
-	#version of the function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::Integer)
+	#version of the function semistandard_tableaux(shape::Vector{T}, max_val=sum(shape)::Integer)
 	len = length(λ)
 	Tab = [(fill(i,λ[i])) for i = 1:len]
 	m = len

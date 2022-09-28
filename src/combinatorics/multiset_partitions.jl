@@ -17,7 +17,7 @@ julia> P = Multiset_partition( [2,1], [4], [3,2,1] )
 {[2, 1], [4], [3, 2, 1]}
 julia> sum(P)
 13
-julia> Multiset_partition( Array{Int8,1}[[2,1], [4], [3,2,1]] ) #Using 8-bit integers
+julia> Multiset_partition( Vector{Int8}[[2,1], [4], [3,2,1]] ) #Using 8-bit integers
 {Int8[2, 1], Int8[4], Int8[3, 2, 1]}
 ```
 
@@ -47,14 +47,14 @@ Multiset_partition() = Multiset_partition{Int}(Dict{Partition{Int},Int}())
 Multiset_partition{T}() where T<:Integer = Multiset_partition{T}(Dict{Partition{T},Int}())
 
 """
-	Multiset_partition(msp::Array{Partition{T},1}) where T<:Integer
-	Multiset_partition(msp::Array{Array{T,1},1}) where T<:Integer
+	Multiset_partition(msp::Vector{Partition{T}}) where T<:Integer
+	Multiset_partition(msp::Vector{Vector{T}}) where T<:Integer
 	Multiset_partition(p::Partition{T}...) where T<:Integer
-	Multiset_partition(p::Array{T,1}...) where T<:Integer
+	Multiset_partition(p::Vector{T}...) where T<:Integer
 
 Generates a **Multiset_partition** containing the Partitions `p` or the Partitions from `msp` respectively.
 """
-function Multiset_partition(msp::Array{Partition{T},1}) where T<:Integer
+function Multiset_partition(msp::Vector{Partition{T}}) where T<:Integer
 	m = Dict{Partition{T}, Int}(p => 0 for p in msp)
 	for p in msp
 	m[p] = m[p] + 1
@@ -63,7 +63,7 @@ function Multiset_partition(msp::Array{Partition{T},1}) where T<:Integer
 end
 
 # More convenient constructors
-function Multiset_partition(msp::Array{Array{T,1},1}) where T<:Integer
+function Multiset_partition(msp::Vector{Vector{T}}) where T<:Integer
 	 return Multiset_partition(Partition{T}[Partition(p) for p in msp])
 end
 
@@ -76,7 +76,7 @@ function Multiset_partition(p::Partition{T}...) where T<:Integer
 end
 
 # More convenient constructors
-function Multiset_partition(p::Array{T,1}...) where T<:Integer
+function Multiset_partition(p::Vector{T}...) where T<:Integer
 	 return Multiset_partition([Partition(part) for part in p])
 end
 
@@ -197,20 +197,20 @@ end
 """
 	collect(MSP::Multiset_partition{T}) where T<:Integer
 
-Returns an Array{T,1} of all Partitions in `MSP`.
+Returns an Vector{T} of all Partitions in `MSP`.
 # Example
 ```julia-repl
 julia> MSP = Multiset_partition( [4], [4], [3,1] )
 {[4], [4], [3, 1]}
 julia> collect(MSP)
-3-element Array{Partition{Int64},1}:
+3-element Vector{Partition{Int64}}:
  [4]
  [4]
  [3, 1]
 ```
 """
 function Base.collect(MSP::Multiset_partition{T}) where T<:Integer
-	P = Array{Partition{T},1}(undef, length(MSP))
+	P = Vector{Partition{T}}(undef, length(MSP))
 	k = 1
 	for p in keys(MSP.msp)
 	for i = 1:MSP[p]
@@ -612,7 +612,7 @@ returns the **part-count** representation of a partition ``p``, where the ``n``-
 
 ```
 julia> partition_to_partcount([5,3,3,3,2,1,1])
-	5-element Array{Int64,1}:
+	5-element Vector{Int64}:
 	2
 	1
 	3
@@ -641,7 +641,7 @@ end
 
 
 """
-	partcount_to_partition(pc::Array{T,1}) where T<:Integer
+	partcount_to_partition(pc::Vector{T}) where T<:Integer
 
 returns the partition from a part-count representation ``pc`` of a partition.
 ```
@@ -649,7 +649,7 @@ julia> partcount_to_partition([2,0,1])
 	[3,1,1]
 ```
 """
-function partcount_to_partition(pc::Array{T,1}) where T<:Integer
+function partcount_to_partition(pc::Vector{T}) where T<:Integer
 
 	if isempty(pc)
 	return Partition{T}(T[])
