@@ -13,7 +13,7 @@ export
 # Type for compositions
 ################################################################################
 """
-    Composition{T<:Integer} <: AbstractArray{T,1}
+    Composition{T<:Integer} <: AbstractVector{T}
 
 A **composition** (also called **ordered partition**) of an integer n ≥ 0 is a sequence (λ₁,…,λₖ) of positive integers λᵢ whose sum is equal to n. The λᵢ are called the **parts** of the composition.
 
@@ -31,8 +31,8 @@ julia> c[1]
 1. Wikipedia, [Composition (combinatorics)](https://en.wikipedia.org/wiki/Composition_(combinatorics))
 2. Bóna, M. (2017). *A Walk Through Combinatorics* (Fourth Edition). World Scientific.
 """
-struct Composition{T<:Integer} <: AbstractArray{T,1}
-    p::Array{T,1}
+struct Composition{T<:Integer} <: AbstractVector{T}
+    p::Vector{T}
 end
 
 # The following are functions to make the Composition struct array-like.
@@ -201,7 +201,7 @@ end
         c = Composition{T}([ [1 for i=1:k-1] ; n-k+1 ])
         finished = false
     end
-    d = Array{T,1}([0 for i=1:k])
+    d = Vector{T}([0 for i=1:k])
 
     return c, (c,d,finished)
 
@@ -295,7 +295,7 @@ function compositions_old(n::Integer, k::Integer)
     end
 
     # Initialize d
-    d = Array{T,1}([0 for i=1:k])
+    d = Vector{T}([0 for i=1:k])
 
     while true
 

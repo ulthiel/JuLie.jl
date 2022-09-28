@@ -2,16 +2,16 @@
 
 	#different generating functions
 	@test Multiset_partition() == Multiset_partition{Int}()
-	@test Multiset_partition() == Multiset_partition(Array{Int,1}[])
+	@test Multiset_partition() == Multiset_partition(Vector{Int}[])
 	@test Multiset_partition() == Multiset_partition(Partition{Int}[])
 
 	@test Multiset_partition([[3,2,1],[5],[5]]) == Multiset_partition([3,2,1],[5],[5])
 	@test Multiset_partition([[3,2,1],[5],[5]]) == Multiset_partition(Partition([3,2,1]),Partition([5]),Partition([5]))
 	@test Multiset_partition([[3,2,1],[5],[5]]) == Multiset_partition([Partition([3,2,1]),Partition([5]),Partition([5])])
 
-	@test Multiset_partition(Array{Int8,1}[[3,2,1],[5],[5]]) == Multiset_partition(Int8[3,2,1],Int8[5],Int8[5])
-	@test Multiset_partition(Array{Int8,1}[[3,2,1],[5],[5]]) == Multiset_partition(Partition(Int8[3,2,1]),Partition(Int8[5]),Partition(Int8[5]))
-	@test Multiset_partition(Array{Int8,1}[[3,2,1],[5],[5]]) == Multiset_partition([Partition(Int8[3,2,1]),Partition(Int8[5]),Partition(Int8[5])])
+	@test Multiset_partition(Vector{Int8}[[3,2,1],[5],[5]]) == Multiset_partition(Int8[3,2,1],Int8[5],Int8[5])
+	@test Multiset_partition(Vector{Int8}[[3,2,1],[5],[5]]) == Multiset_partition(Partition(Int8[3,2,1]),Partition(Int8[5]),Partition(Int8[5]))
+	@test Multiset_partition(Vector{Int8}[[3,2,1],[5],[5]]) == Multiset_partition([Partition(Int8[3,2,1]),Partition(Int8[5]),Partition(Int8[5])])
 
 	# push!
 	msp = Multiset_partition()

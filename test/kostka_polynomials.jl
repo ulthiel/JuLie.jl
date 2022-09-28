@@ -44,7 +44,7 @@
 	@test charge(Tableau([[1,1,1,3], [2,2], [4]])) == 2
 	@test charge(Tableau([[1,1,1,2], [2,4], [3]])) == 2
 	@test charge(Tableau([[1,1,1,2], [2,3], [4]])) == 3
-	@test charge(Tableau(Array{Int,1}[])) == 0
+	@test charge(Tableau(Vector{Int}[])) == 0
 
 	@test charge([Partition([2,2,2,2,2,2,2]),Partition([4,3,1,1]),Partition([3,2]),Partition([2])]) == 18
 	@test charge([Partition([6,4,3,2]),Partition([5,2]),Partition([2])]) == 3

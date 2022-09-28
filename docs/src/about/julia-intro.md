@@ -49,12 +49,12 @@ You see that there is a type ```Rational``` for (exact) rational numbers in Juli
 You can implement your own types, e.g. here is how I implemented a type for partitions:
 
 ```julia
-struct Partition{T} <: AbstractArray{T,1}
-    p::Array{T,1}
+struct Partition{T} <: AbstractVector{T}
+    p::Vector{T}
 end
 ```
 
-This means that ```Partition{T}``` is a parametric *subtype* of ```AbstractArray{T,1}```, the latter being the parametric type of (abstract) one-dimensional arrays. The array is internally stored in the field called ```p``` and this field will be filled by the type constructor:
+This means that ```Partition{T}``` is a parametric *subtype* of ```AbstractVector{T}```, the latter being the parametric type of (abstract) one-dimensional arrays. The array is internally stored in the field called ```p``` and this field will be filled by the type constructor:
 
 ```julia-repl
 julia> P = Partition([6,4,3,1]);

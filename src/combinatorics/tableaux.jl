@@ -7,25 +7,25 @@
 export Tableau, shape, semistandard_tableaux, is_standard, is_semistandard, standard_tableaux, schensted, hook_length, hook_lengths, num_standard_tableaux, reading_word, weight, bump!
 
 """
-	Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
+	Tableau{T} <: AbstractVector{AbstractVector{T}}
 
 A **Young diagram** is a diagram of finitely many empty "boxes" arranged in left-justified rows, with the row lengths in non-increasing order. The box in row i and and column j has the **coordinates** (i,j). Listing the number of boxes in each row gives a partition λ of a non-negative integer n (the total number of boxes of the diagram). The diagram is then said to be of **shape** λ. Conversely, one can associate to any partition λ a Young diagram in the obvious way, so Young diagrams are just another way to look at partitions.
 
-A **Young tableau** of shape λ is a filling of the boxes of the Young diagram of λ with elements from some set. After relabeling we can (and will) assume that we fill from a set of integers from 1 up to some number, which in applications is often equal to n. We encode a tableau as an array of arrays and we have implemented an own type ```Tableau{T}```	as subtype of ```AbstractArray{AbstractArray{T,1},1}``` to work with tableaux. As for partitions, you may increase performance by casting into smaller integer types, e.g.
+A **Young tableau** of shape λ is a filling of the boxes of the Young diagram of λ with elements from some set. After relabeling we can (and will) assume that we fill from a set of integers from 1 up to some number, which in applications is often equal to n. We encode a tableau as an array of arrays and we have implemented an own type ```Tableau{T}```	as subtype of ```AbstractVector{AbstractVector{T}}``` to work with tableaux. As for partitions, you may increase performance by casting into smaller integer types, e.g.
 
 For efficiency, we do not check whether the given array is really a tableau, i.e. whether the structure of the array defines a partition.
 
 # Example
 ```julia-repl
 julia> Tab=Tableau([[1,2,3],[4,5],[6]])
-julia> Tab=Tableau(Array{Int8,1}[[2,1], [], [3,2,1]]) #Using 8 bit integers
+julia> Tab=Tableau(Vector{Int8}[[2,1], [], [3,2,1]]) #Using 8 bit integers
 ```
 
 # References
 1. Wikipedia, [Young tableau](https://en.wikipedia.org/wiki/Young_tableau).
 """
-struct Tableau{T} <: AbstractArray{AbstractArray{T,1},1}
-	t::Array{Array{T,1},1}
+struct Tableau{T} <: AbstractVector{AbstractVector{T}}
+	t::Vector{Vector{T}}
 end
 
 function Base.show(io::IO, ::MIME"text/plain", Tab::Tableau)
@@ -96,7 +96,7 @@ The **reading word** of a tableau is the word obtained by concatenating the fill
 # Example
 ```
 julia> reading_word(Tableau([ [1,2,3] , [4,5] , [6] ]))
-6-element Array{Int64,1}:
+6-element Vector{Int64}:
  6
  4
  5
@@ -169,12 +169,12 @@ end
 Returns a list of all semistandard tableaux of given shape and filling elements bounded by `max_val`. By default, `max_val` is equal to the sum of the shape partition (the number of boxes in the Young diagram). The list of tableaux is in lexicographic order from left to right and top to bottom.
 """
 function semistandard_tableaux(shape::Partition{T}, max_val=sum(shape)::Integer) where T<:Integer
-	SST = Array{Tableau{T},1}()
+	SST = Vector{Tableau{T}}()
 	len = length(shape)
 	if max_val < len
 		return SST
 	elseif len==0
-		push!(SST, Tableau(Array{T,1}[]))
+		push!(SST, Tableau(Vector{T}[]))
 		return SST
 	end
 	Tab = [Array{T}(fill(i,shape[i])) for i = 1:len]
@@ -234,7 +234,7 @@ end
 
 Shortcut for ```semistandard_tableaux(Partition(shape),max_val)```.
 """
-function semistandard_tableaux(shape::Array{T,1}, max_val=sum(shape)::T) where T<:Integer
+function semistandard_tableaux(shape::Vector{T}, max_val=sum(shape)::T) where T<:Integer
 	return semistandard_tableaux(Partition(shape), max_val)
 end
 
@@ -245,7 +245,7 @@ Returns a list of all semistandard tableaux consisting of `box_num` boxes and fi
 """
 function semistandard_tableaux(box_num::T, max_val=box_num::T) where T<:Integer
 	box_num>=0 || throw(ArgumentError("box_num ≥ 0 required"))
-	SST = Array{Tableau{T},1}()
+	SST = Vector{Tableau{T}}()
 	if max_val<=0
 		return SST
 	end
@@ -262,18 +262,18 @@ end
 
 
 """
-	semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer
+	semistandard_tableaux(s::Vector{T}, weight::Vector{T}) where T<:Integer
 
 Returns a list of all semistandard tableaux with shape s and given weight. This
 requires that sum(s) = sum(weight).
 """
-function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integer
+function semistandard_tableaux(s::Vector{T}, weight::Vector{T}) where T<:Integer
 	n_max = sum(s)
 	n_max==sum(weight) || throw(ArgumentError("sum(s) = sum(weight) required"))
 
-	Tabs = Array{Tableau,1}()
+	Tabs = Vector{Tableau}()
 	if isempty(s)
-		push!(Tabs, Tableau(Array{Int,1}[]))
+		push!(Tabs, Tableau(Vector{Int}[]))
 		return Tabs
 	end
 	ls = length(s)
@@ -365,7 +365,7 @@ function semistandard_tableaux(s::Array{T,1}, weight::Array{T,1}) where T<:Integ
 end
 
 function semistandard_tableaux(s::Partition{T}, weight::Partition{T}) where T<:Integer
-	return semistandard_tableaux(Array{T,1}(s),Array{T,1}(weight))
+	return semistandard_tableaux(Vector{T}(s),Vector{T}(weight))
 end
 
 
@@ -431,14 +431,14 @@ end
 
 """
 	standard_tableaux(s::Partition)
-	standard_tableaux(s::Array{Integer,1})
+	standard_tableaux(s::Vector{Integer})
 
 Returns a list of all standard tableaux of a given shape.
 """
 function standard_tableaux(s::Partition)
-	Tabs = Array{Tableau,1}()
+	Tabs = Vector{Tableau}()
 	if isempty(s)
-		push!(Tabs, Tableau(Array{Int,1}[]))
+		push!(Tabs, Tableau(Vector{Int}[]))
 		return Tabs
 	end
 	n_max = sum(s)
@@ -486,7 +486,7 @@ function standard_tableaux(s::Partition)
 end
 
 
-function standard_tableaux(s::Array{T,1}) where T<:Integer
+function standard_tableaux(s::Vector{T}) where T<:Integer
 	return standard_tableaux(Partition(s))
 end
 
@@ -498,7 +498,7 @@ Returns a list of all standard tableaux with n boxes.
 """
 function standard_tableaux(n::Integer)
 	n>=0 || throw(ArgumentError("n ≥ 0 required"))
-	ST = Array{Tableau,1}()
+	ST = Vector{Tableau}()
 	for s in partitions(n)
 		append!(ST, standard_tableaux(s))
 	end
@@ -539,7 +539,7 @@ Returns the tableau of shape λ in which the entry at position (i,j) is equal to
 """
 function hook_lengths(lambda::Partition)
 	if isempty(lambda)
-		return Tableau(Array{Int,1}[])
+		return Tableau(Vector{Int}[])
 	end
 	Tab = [ [hook_length(lambda,i,j) for j in 1:lambda[i]] for i in 1:length(lambda) ]
 	return Tableau(Tab)
@@ -573,7 +573,7 @@ end
 
 
 """
-	schensted(sigma::Array{Integer,1})
+	schensted(sigma::Vector{Integer})
 	schensted(sigma::Perm{T})
 
 The Robinson–Schensted correspondence is a bijection between permutations and pairs of standard Young tableaux of the same shape. For a permutation sigma (given as an array), this function performs the Schnested algorithm and returns the corresponding pair of standard tableaux (the insertion and recording tableaux).
@@ -591,9 +591,9 @@ julia> Q
 # References
 1. Wikipedia, [Robinson–Schensted correspondence](https://en.wikipedia.org/wiki/Robinson–Schensted_correspondence)
 """
-function schensted(sigma::Array{T,1}) where T<:Integer
+function schensted(sigma::Vector{T}) where T<:Integer
 	if isempty(sigma)
-		return Tableau(Array{T,1}[]),Tableau(Array{T,1}[])
+		return Tableau(Vector{T}[]),Tableau(Vector{T}[])
 	end
 	P = Tableau{T}([[sigma[1]]])
 	Q = Tableau{T}([[1]])
